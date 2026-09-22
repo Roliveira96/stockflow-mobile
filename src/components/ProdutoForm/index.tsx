@@ -4,8 +4,9 @@ import { Switch, Text, View } from "react-native";
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { cores } from "@/constants/theme";
+import { useCampoMoeda } from "@/hooks/useCampoMoeda";
 import type { ProdutoFormProps } from "@/types";
-import { extrairDigitos, formatarCentavosComoTexto } from "@/utils/moeda";
+import { extrairDigitos } from "@/utils/moeda";
 
 import { styles } from "./styles";
 
@@ -20,9 +21,7 @@ export function ProdutoForm({
   const [quantidade, setQuantidade] = useState(
     valoresIniciais ? String(valoresIniciais.quantidade) : ""
   );
-  const [precoCentavos, setPrecoCentavos] = useState(
-    valoresIniciais ? Math.round(valoresIniciais.preco * 100) : 0
-  );
+  const campoPreco = useCampoMoeda(valoresIniciais?.preco ?? 0);
   const [descricao, setDescricao] = useState(valoresIniciais?.descricao ?? "");
   const [ativo, setAtivo] = useState(valoresIniciais?.ativo ?? true);
 
@@ -57,23 +56,6 @@ export function ProdutoForm({
     );
   }, [quantidade]);
 
-  const textoPreco = formatarCentavosComoTexto(precoCentavos);
-  const [selecaoPreco, setSelecaoPreco] = useState({
-    start: textoPreco.length,
-    end: textoPreco.length,
-  });
-
-  function moverCursorParaFinal(texto: string) {
-    setSelecaoPreco({ start: texto.length, end: texto.length });
-  }
-
-  function handlePrecoChange(texto: string) {
-    const digitos = extrairDigitos(texto);
-    const novoValor = digitos ? Number(digitos) : 0;
-    setPrecoCentavos(novoValor);
-    moverCursorParaFinal(formatarCentavosComoTexto(novoValor));
-  }
-
   const formularioValido =
     nome.trim().length >= 3 &&
     !erroNome &&
@@ -81,14 +63,14 @@ export function ProdutoForm({
     !erroCodigoBarras &&
     quantidade.trim().length > 0 &&
     !erroQuantidade &&
-    precoCentavos > 0;
+    campoPreco.centavos > 0;
 
   function handleEnviar() {
     aoEnviar({
       nome: nome.trim(),
       codigoBarras: extrairDigitos(codigoBarras),
       quantidade: Number(quantidade),
-      preco: precoCentavos / 100,
+      preco: campoPreco.valor,
       descricao: descricao.trim() || undefined,
       ativo,
     });
@@ -121,12 +103,12 @@ export function ProdutoForm({
       />
       <CustomInput
         label="Preço"
-        value={textoPreco}
-        onChangeText={handlePrecoChange}
+        value={campoPreco.texto}
+        onChangeText={campoPreco.aoMudarTexto}
         keyboardType="numeric"
-        selection={selecaoPreco}
-        onSelectionChange={() => moverCursorParaFinal(textoPreco)}
-        onFocus={() => moverCursorParaFinal(textoPreco)}
+        selection={campoPreco.selecao}
+        onSelectionChange={campoPreco.aoFocar}
+        onFocus={campoPreco.aoFocar}
       />
       <CustomInput
         label="Descrição (opcional)"
