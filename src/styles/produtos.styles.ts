@@ -40,6 +40,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 20,
     flexGrow: 1,
   },
+  celulaComMenuAberto: {
+    zIndex: 100,
+    elevation: 100,
+  },
   vazio: {
     marginTop: 40,
     textAlign: "center",

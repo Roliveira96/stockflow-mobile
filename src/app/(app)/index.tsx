@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import type { CellRendererProps } from "@react-native/virtualized-lists";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -36,6 +37,7 @@ export default function ListaDeProdutos() {
   const [filtroStatus, setFiltroStatus] = useState<StatusFiltro>("todos");
   const [sugestoes, setSugestoes] = useState<Produto[]>([]);
   const [menuAberto, setMenuAberto] = useState(false);
+  const [produtoMenuAbertoId, setProdutoMenuAbertoId] = useState<string | null>(null);
 
   useEffect(() => {
     const temporizador = setTimeout(() => setBuscaDebounced(busca), 350);
@@ -159,6 +161,19 @@ export default function ListaDeProdutos() {
     router.push({ pathname: "/visualizar-produto", params: { id } });
   }
 
+  function renderizarCelula({ item, style, children, ...resto }: CellRendererProps<Produto>) {
+    const celulaComMenuAberto = produtoMenuAbertoId === item.id;
+
+    return (
+      <View
+        style={[style, celulaComMenuAberto ? styles.celulaComMenuAberto : undefined]}
+        {...resto}
+      >
+        {children}
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.cabecalho}>
@@ -210,8 +225,13 @@ export default function ListaDeProdutos() {
               onExcluir={handleExcluir}
               onEditar={handleEditar}
               onVisualizar={handleVisualizar}
+              menuAberto={produtoMenuAbertoId === item.id}
+              aoAlternarMenu={() =>
+                setProdutoMenuAbertoId((atual) => (atual === item.id ? null : item.id))
+              }
             />
           )}
+          CellRendererComponent={renderizarCelula}
           onEndReached={handleCarregarMais}
           onEndReachedThreshold={0.4}
           ListEmptyComponent={<Text style={styles.vazio}>Nenhum produto encontrado.</Text>}

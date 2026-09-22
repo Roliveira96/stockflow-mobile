@@ -106,6 +106,8 @@ export interface ProductCardProps {
   onExcluir: (id: string) => void;
   onEditar: (id: string) => void;
   onVisualizar: (id: string) => void;
+  menuAberto: boolean;
+  aoAlternarMenu: () => void;
 }
 
 export interface ProdutoFormProps {

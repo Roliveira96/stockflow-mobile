@@ -1,73 +1,64 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios, sombra } from "@/constants/theme";
+import { cores, raios, sombra } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   card: {
     width: "100%",
-    borderRadius: raios.lg,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderRadius: raios.md,
     backgroundColor: cores.superficie,
-    padding: 18,
-    marginBottom: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 10,
+    position: "relative",
+    zIndex: 1,
     ...sombra.cartao,
+  },
+  cardMenuAberto: {
+    zIndex: 20,
+  },
+  conteudo: {
+    flex: 1,
+    paddingRight: 8,
   },
   linhaTopo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  textos: {
-    flex: 1,
+    alignItems: "center",
+    gap: 8,
   },
   nome: {
-    fontSize: 17,
+    flex: 1,
+    fontSize: 15,
     fontWeight: "700",
     color: cores.textoPrimario,
   },
-  descricao: {
-    marginTop: 2,
-    fontSize: 13,
-    color: cores.textoTerciario,
-  },
   preco: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "800",
     color: cores.primaria,
   },
   linhaDetalhes: {
     flexDirection: "row",
-    gap: 16,
-    marginTop: 12,
-  },
-  detalheItem: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    justifyContent: "space-between",
+    gap: 8,
+    marginTop: 4,
   },
   detalheTexto: {
-    fontSize: 13,
-    color: cores.textoSecundario,
-  },
-  rodape: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 14,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: cores.fundo,
+    flex: 1,
+    fontSize: 12,
+    color: cores.textoTerciario,
   },
   selos: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    flexShrink: 1,
+    gap: 4,
   },
   selo: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     borderRadius: raios.pill,
     backgroundColor: cores.sucessoFundo,
   },
@@ -75,7 +66,7 @@ export const styles = StyleSheet.create({
     backgroundColor: cores.neutroFundo,
   },
   seloTexto: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "700",
     color: cores.sucesso,
   },
@@ -83,33 +74,57 @@ export const styles = StyleSheet.create({
     color: cores.textoTerciario,
   },
   seloAlerta: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     borderRadius: raios.pill,
     backgroundColor: cores.alertaFundo,
   },
   seloTextoAlerta: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "700",
     color: cores.alerta,
   },
-  acoes: {
-    flexDirection: "row",
-    gap: 8,
+  menuContainer: {
+    position: "relative",
   },
-  botaoAcao: {
-    width: ALVO_TOQUE_MINIMO,
-    height: ALVO_TOQUE_MINIMO,
-    borderRadius: raios.pill,
+  botaoMenu: {
+    width: 28,
+    height: 28,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: cores.neutroFundo,
   },
-  botaoAcaoPrimaria: {
-    backgroundColor: cores.primariaFundo,
+  menuPainel: {
+    position: "absolute",
+    top: 30,
+    right: 0,
+    width: 168,
+    backgroundColor: cores.superficie,
+    borderRadius: raios.md,
+    overflow: "hidden",
+    zIndex: 30,
+    ...sombra.flutuante,
   },
-  botaoAcaoPerigo: {
-    backgroundColor: cores.perigoFundo,
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    height: 44,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: cores.fundo,
+  },
+  menuItemUltimo: {
+    borderBottomWidth: 0,
+  },
+  menuItemTexto: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: cores.textoSecundario,
+  },
+  menuItemTextoPrimaria: {
+    color: cores.primaria,
+  },
+  menuItemTextoPerigo: {
+    color: cores.perigo,
   },
 });
