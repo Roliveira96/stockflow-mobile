@@ -15,7 +15,8 @@ export default function NovoProduto() {
     setEnviando(true);
 
     try {
-      await api.post("/produtos", dados);
+      const agora = new Date().toISOString();
+      await api.post("/produtos", { ...dados, criadoEm: agora, atualizadoEm: agora });
       Alert.alert("Produto criado", "O produto foi cadastrado com sucesso.");
       router.back();
     } catch {

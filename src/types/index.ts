@@ -8,9 +8,25 @@ export interface Produto {
   ativo: boolean;
   codigoBarras: string;
   descricao?: string;
+  criadoEm: string;
+  atualizadoEm: string;
 }
 
-export type DadosProduto = Omit<Produto, "id">;
+export type DadosProduto = Omit<Produto, "id" | "criadoEm" | "atualizadoEm">;
+
+export interface AlteracaoCampo {
+  campo: string;
+  de: string;
+  para: string;
+}
+
+export interface LogEdicao {
+  id: string;
+  produtoId: string;
+  produtoNome: string;
+  data: string;
+  alteracoes: AlteracaoCampo[];
+}
 
 export interface Usuario {
   id: string;
@@ -43,6 +59,7 @@ export interface ProductCardProps {
   produto: Produto;
   onExcluir: (id: string) => void;
   onEditar: (id: string) => void;
+  onVisualizar: (id: string) => void;
 }
 
 export interface ProdutoFormProps {

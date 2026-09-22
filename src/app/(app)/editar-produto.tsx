@@ -6,6 +6,7 @@ import { ProdutoForm } from "@/components/ProdutoForm";
 import { api } from "@/services/api";
 import { styles } from "@/styles/produto-formulario.styles";
 import type { DadosProduto, Produto } from "@/types";
+import { compararProdutos } from "@/utils/logProduto";
 
 export default function EditarProduto() {
   const router = useRouter();
@@ -31,10 +32,29 @@ export default function EditarProduto() {
   }, [id, router]);
 
   async function handleAtualizar(dados: DadosProduto) {
+    if (!produto) return;
+
     setEnviando(true);
 
     try {
-      await api.put(`/produtos/${id}`, dados);
+      const alteracoes = compararProdutos(produto, dados);
+      const agora = new Date().toISOString();
+
+      await api.put(`/produtos/${id}`, {
+        ...dados,
+        criadoEm: produto.criadoEm,
+        atualizadoEm: agora,
+      });
+
+      if (alteracoes.length > 0) {
+        await api.post("/logs", {
+          produtoId: id,
+          produtoNome: dados.nome,
+          data: agora,
+          alteracoes,
+        });
+      }
+
       Alert.alert("Produto atualizado", "As alterações foram salvas com sucesso.");
       router.back();
     } catch {
