@@ -7,7 +7,7 @@
 **Fase 2 concluída.** Backend mock (`json-server`) configurado e testado manualmente (GET/POST/DELETE em `/produtos` confirmados). Fluxo completo (login → listar → criar → ver na lista) validado ponta a ponta com Playwright headless contra o dev server web real.
 **Fase 3 concluída.** Funcionalidades além da spec original, pedidas pelo usuário: editar produto, código de barras, descrição, máscara de preço em centavos, selo de "últimas unidades", busca com autocomplete e filtro por status. Ver seção própria abaixo.
 **Fase 4 concluída.** Tela de visualização de produto, campos `criadoEm`/`atualizadoEm`, e log de alterações (de/para) a cada edição. Validado com edição real feita pelo próprio usuário durante o desenvolvimento.
-**Pendente:** passada de UX/UI.
+**Fase 5 concluída.** Passada de UX/UI orientada por heurísticas conhecidas (Nielsen, WCAG, Apple HIG/Material Design). Ver seção própria abaixo.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -42,7 +42,7 @@ A spec pede `styles.ts`/`novo-produto.styles.ts` **dentro** de `src/app/(auth)/`
 - [x] `src/app/(app)/novo-produto.styles.ts`, `novo-produto.tsx`
 
 ## Limpeza do Template Padrão
-Removido todo o cluster do template `create-expo-app` (tabs de exemplo) que ficaria órfão ou colidiria em rota com a estrutura da spec: `src/app/index.tsx`, `src/app/explore.tsx`, `src/components/app-tabs*`, `animated-icon*`, `themed-text.tsx`, `themed-view.tsx`, `hint-row.tsx`, `external-link.tsx`, `web-badge.tsx`, `ui/collapsible.tsx`, `constants/theme.ts`, `hooks/use-color-scheme*`, `hooks/use-theme.ts`, `src/global.css`. Confirmado por grep que nenhum arquivo fora desse cluster os referenciava.
+Removido todo o cluster do template `create-expo-app` (tabs de exemplo) que ficaria órfão ou colidiria em rota com a estrutura da spec: `src/app/index.tsx`, `src/app/explore.tsx`, `src/components/app-tabs*`, `animated-icon*`, `themed-text.tsx`, `themed-view.tsx`, `hint-row.tsx`, `external-link.tsx`, `web-badge.tsx`, `ui/collapsible.tsx`, `constants/theme.ts`, `hooks/use-color-scheme*`, `hooks/use-theme.ts`, `src/global.css`. Confirmado por grep que nenhum arquivo fora desse cluster os referenciava. **Nota:** `src/constants/theme.ts` foi recriado depois (fase 5), com conteúdo totalmente diferente — tokens de design (`cores`, `espacamento`, `raios`), não o tema do template antigo.
 
 ## Estrutura Atual (real, em construção)
 
@@ -65,6 +65,8 @@ src/
 │   ├── ProductCard/
 │   ├── ProdutoForm/              # form compartilhado entre criar/editar
 │   └── FiltroProdutos/           # busca com autocomplete + chips de status
+├── constants/
+│   └── theme.ts                  # tokens: cores, espacamento, raios, ALVO_TOQUE_MINIMO
 ├── contexts/
 │   └── AuthContext.tsx
 ├── services/
@@ -81,6 +83,19 @@ src/
     ├── data.ts                  # formatarData (pt-BR)
     └── logProduto.ts            # compararProdutos (gera o log de-para)
 ```
+
+## Passada de UX/UI (Fase 5)
+
+Orientada por heurísticas conhecidas, não por gosto pessoal:
+
+- **Prevenção de erro (Nielsen #5):** excluir produto (na listagem e na visualização) agora exige confirmação via `Alert.alert` com opção destrutiva — antes, um único toque apagava sem aviso.
+- **Alvo de toque mínimo de 44px** (Apple HIG / Material Design): todos os botões e chips (`CustomButton`, ações do `ProductCard`, chips do `FiltroProdutos`, sugestões do autocomplete) têm `minHeight`/`height` de `ALVO_TOQUE_MINIMO` (44).
+- **Contraste de texto (WCAG AA):** cinzas fracos demais (`#829AB1`, `#9AA5B1`) trocados por tons mais escuros com contraste ≥ 4.5:1 sobre fundo claro (`cores.textoTerciario` = `#64748B`, `cores.textoSecundario` = `#334155`).
+- **Reconhecimento em vez de memorização (Nielsen #6) — ícones:** botões de Editar/Excluir/Visualizar (e os demais botões do app: Entrar, Sair, Novo produto, Salvar/Atualizar) ganharam ícones do `@expo/vector-icons` (`Ionicons`), além do texto. **Nota de versão:** a documentação oficial do Expo (`docs.expo.dev/guides/icons`) avisa que `@expo/vector-icons` está sendo descontinuado em favor de `@react-native-vector-icons`, mas o pacote novo não tinha nomes de pacote/instalação documentados publicamente no momento da implementação — optamos por `@expo/vector-icons` (ainda funcional e com exemplo de código atual na doc) e deixamos essa nota para revisão futura se o pacote for de fato removido.
+- **Estado de foco visível:** `CustomInput` agora destaca a borda (cor primária, mais grossa) quando o campo está focado — ajuda a rastrear onde o teclado vai atuar, especialmente em formulários longos.
+- **Teclado não cobre o formulário:** `KeyboardAvoidingView` adicionado nas telas de login, novo produto e editar produto.
+- **Acessibilidade para leitor de tela:** `accessibilityRole`/`accessibilityLabel`/`accessibilityState` adicionados em todos os elementos tocáveis (botões, chips, sugestões, switch, imagem do logo, indicadores de carregamento).
+- **Consistência (Nielsen #4) — tokens de design:** criado `src/constants/theme.ts` (`cores`, `espacamento`, `raios`, `ALVO_TOQUE_MINIMO`) como fonte única da paleta e das medidas, substituindo hex-codes espalhados pelos arquivos `styles.ts`.
 
 ## Backend Mock (Desenvolvimento Local)
 `json-server@0.17.4` (versão estável, não a v1 beta) lê `db.json` na raiz e expõe REST em `http://localhost:3000`, batendo com o fallback padrão de `src/services/api.ts`. Rodar com `npm run mock-api`. Seed inicial: 3 produtos em `db.json` (`produtos`).

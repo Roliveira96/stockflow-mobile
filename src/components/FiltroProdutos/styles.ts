@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 
+import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
@@ -16,24 +18,25 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     marginTop: -12,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
+    backgroundColor: cores.superficie,
+    borderRadius: raios.sm,
     borderWidth: 1,
-    borderColor: "#E4E7EB",
+    borderColor: cores.borda,
     maxHeight: 180,
     overflow: "hidden",
     zIndex: 20,
     elevation: 4,
   },
   sugestaoItem: {
+    justifyContent: "center",
+    minHeight: ALVO_TOQUE_MINIMO,
     paddingHorizontal: 12,
-    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F4F8",
+    borderBottomColor: cores.fundo,
   },
   sugestaoTexto: {
     fontSize: 14,
-    color: "#102A43",
+    color: cores.textoPrimario,
   },
   chipsContainer: {
     flexDirection: "row",
@@ -43,23 +46,24 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    minHeight: ALVO_TOQUE_MINIMO,
+    paddingHorizontal: 14,
+    borderRadius: raios.pill,
+    backgroundColor: cores.superficie,
     borderWidth: 1,
-    borderColor: "#CBD2D9",
+    borderColor: cores.borda,
   },
   chipSelecionado: {
-    backgroundColor: "#208AEF",
-    borderColor: "#208AEF",
+    backgroundColor: cores.primaria,
+    borderColor: cores.primaria,
   },
   chipTexto: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#334E68",
+    color: cores.textoSecundario,
   },
   chipTextoSelecionado: {
-    color: "#FFFFFF",
+    color: cores.textoSobreCor,
   },
 });

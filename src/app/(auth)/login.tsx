@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Image, SafeAreaView, ScrollView, Text } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
@@ -29,38 +29,49 @@ export default function Login() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.conteudo}>
-        <Image
-          source={require("@/assets/images/icon.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.titulo}>StockFlow</Text>
-        <Text style={styles.subtitulo}>Entre para gerenciar seu estoque</Text>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+          <Image
+            source={require("@/assets/images/icon.png")}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel="Logotipo do StockFlow"
+          />
+          <Text style={styles.titulo}>StockFlow</Text>
+          <Text style={styles.subtitulo}>Entre para gerenciar seu estoque</Text>
 
-        <CustomInput
-          label="E-mail"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          placeholder="voce@empresa.com"
-        />
-        <CustomInput
-          label="Senha"
-          value={senha}
-          onChangeText={setSenha}
-          secureTextEntry
-          placeholder="Sua senha"
-        />
+          <CustomInput
+            label="E-mail"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
+            placeholder="voce@empresa.com"
+          />
+          <CustomInput
+            label="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            secureTextEntry
+            autoComplete="password"
+            textContentType="password"
+            placeholder="Sua senha"
+          />
 
-        <CustomButton
-          titulo="Entrar"
-          onPress={handleEntrar}
-          carregando={carregando}
-          desabilitado={!podeEntrar}
-        />
-      </ScrollView>
+          <CustomButton
+            titulo="Entrar"
+            onPress={handleEntrar}
+            carregando={carregando}
+            desabilitado={!podeEntrar}
+            icone="log-in-outline"
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

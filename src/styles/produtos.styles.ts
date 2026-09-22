@@ -1,9 +1,11 @@
 import { StyleSheet } from "react-native";
 
+import { ALVO_TOQUE_MINIMO, cores } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0F4F8",
+    backgroundColor: cores.fundo,
   },
   cabecalho: {
     flexDirection: "row",
@@ -16,13 +18,13 @@ export const styles = StyleSheet.create({
   titulo: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#102A43",
+    color: cores.textoPrimario,
   },
   botaoSair: {
-    width: 96,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: "#334E68",
+    width: "auto",
+    height: ALVO_TOQUE_MINIMO,
+    paddingHorizontal: 14,
+    backgroundColor: cores.neutroTexto,
   },
   carregando: {
     marginTop: 40,
@@ -36,7 +38,7 @@ export const styles = StyleSheet.create({
     marginTop: 40,
     textAlign: "center",
     fontSize: 14,
-    color: "#829AB1",
+    color: cores.textoTerciario,
   },
   rodape: {
     paddingHorizontal: 20,

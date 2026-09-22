@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, SafeAreaView, ScrollView, Text } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text } from "react-native";
 
 import { ProdutoForm } from "@/components/ProdutoForm";
 import { api } from "@/services/api";
@@ -28,10 +28,15 @@ export default function NovoProduto() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.conteudo}>
-        <Text style={styles.titulo}>Novo produto</Text>
-        <ProdutoForm textoBotao="Salvar" enviando={enviando} aoEnviar={handleSalvar} />
-      </ScrollView>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+          <Text style={styles.titulo}>Novo produto</Text>
+          <ProdutoForm textoBotao="Salvar" enviando={enviando} aoEnviar={handleSalvar} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

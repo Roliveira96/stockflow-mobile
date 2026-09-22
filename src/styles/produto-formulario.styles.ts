@@ -1,9 +1,14 @@
 import { StyleSheet } from "react-native";
 
+import { cores } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0F4F8",
+    backgroundColor: cores.fundo,
+  },
+  flex: {
+    flex: 1,
   },
   conteudo: {
     paddingHorizontal: 20,
@@ -13,7 +18,7 @@ export const styles = StyleSheet.create({
   titulo: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#102A43",
+    color: cores.textoPrimario,
     marginBottom: 20,
   },
   carregando: {

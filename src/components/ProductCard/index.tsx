@@ -1,5 +1,7 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { cores } from "@/constants/theme";
 import type { ProductCardProps } from "@/types";
 import { formatarMoeda } from "@/utils/moeda";
 
@@ -11,7 +13,12 @@ export function ProductCard({ produto, onExcluir, onEditar, onVisualizar }: Prod
   return (
     <View style={styles.card}>
       <View style={styles.info}>
-        <TouchableOpacity onPress={() => onVisualizar(produto.id)} activeOpacity={0.7}>
+        <TouchableOpacity
+          onPress={() => onVisualizar(produto.id)}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={`Ver detalhes de ${produto.nome}`}
+        >
           <Text style={styles.nome}>{produto.nome}</Text>
         </TouchableOpacity>
         <Text style={styles.detalhes}>
@@ -39,21 +46,30 @@ export function ProductCard({ produto, onExcluir, onEditar, onVisualizar }: Prod
           style={styles.botaoVisualizar}
           onPress={() => onVisualizar(produto.id)}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={`Visualizar ${produto.nome}`}
         >
+          <Ionicons name="eye-outline" size={16} color={cores.textoSecundario} />
           <Text style={styles.botaoVisualizarTexto}>Visualizar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.botaoEditar}
           onPress={() => onEditar(produto.id)}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={`Editar ${produto.nome}`}
         >
+          <Ionicons name="create-outline" size={16} color={cores.primaria} />
           <Text style={styles.botaoEditarTexto}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.botaoExcluir}
           onPress={() => onExcluir(produto.id)}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={`Remover ${produto.nome}`}
         >
+          <Ionicons name="trash-outline" size={16} color={cores.perigo} />
           <Text style={styles.botaoExcluirTexto}>Remover</Text>
         </TouchableOpacity>
       </View>

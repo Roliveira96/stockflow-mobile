@@ -1,9 +1,11 @@
 import { StyleSheet } from "react-native";
 
+import { cores, raios } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0F4F8",
+    backgroundColor: cores.fundo,
   },
   conteudo: {
     paddingHorizontal: 20,
@@ -19,7 +21,7 @@ export const styles = StyleSheet.create({
   nome: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#102A43",
+    color: cores.textoPrimario,
   },
   selos: {
     marginTop: 8,
@@ -31,37 +33,37 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: "#D3F9D8",
+    borderRadius: raios.pill,
+    backgroundColor: cores.sucessoFundo,
   },
   seloInativo: {
-    backgroundColor: "#F0F4F8",
+    backgroundColor: cores.neutroFundo,
   },
   seloTexto: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#2F9E44",
+    color: cores.sucesso,
   },
   seloTextoInativo: {
-    color: "#829AB1",
+    color: cores.textoTerciario,
   },
   seloAlerta: {
     alignSelf: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: "#FFF3BF",
+    borderRadius: raios.pill,
+    backgroundColor: cores.alertaFundo,
   },
   seloTextoAlerta: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#B08900",
+    color: cores.alerta,
   },
   cartao: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
+    backgroundColor: cores.superficie,
+    borderRadius: raios.md,
     borderWidth: 1,
-    borderColor: "#E4E7EB",
+    borderColor: cores.borda,
     padding: 16,
     marginBottom: 16,
   },
@@ -70,61 +72,62 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F4F8",
+    borderBottomColor: cores.fundo,
   },
   linhaSemBorda: {
     borderBottomWidth: 0,
   },
   linhaRotulo: {
     fontSize: 14,
-    color: "#627D98",
+    color: cores.textoSecundario,
   },
   linhaValor: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#102A43",
+    color: cores.textoPrimario,
   },
   descricaoTexto: {
     marginTop: 8,
     fontSize: 14,
-    color: "#334E68",
+    color: cores.textoSecundario,
   },
   subtitulo: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#102A43",
+    color: cores.textoPrimario,
     marginBottom: 12,
   },
   logItem: {
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F4F8",
+    borderBottomColor: cores.fundo,
     paddingVertical: 10,
   },
   logData: {
     fontSize: 12,
-    color: "#9AA5B1",
+    color: cores.textoTerciario,
     marginBottom: 4,
   },
   logAlteracao: {
     fontSize: 13,
-    color: "#334E68",
+    color: cores.textoSecundario,
   },
   logCampo: {
     fontWeight: "700",
   },
   vazio: {
     fontSize: 13,
-    color: "#829AB1",
+    color: cores.textoTerciario,
   },
   acoes: {
     flexDirection: "row",
     gap: 12,
     marginTop: 4,
+    marginBottom: 24,
   },
   botaoAcao: {
     flex: 1,
   },
   botaoExcluir: {
-    backgroundColor: "#E12D39",
+    backgroundColor: cores.perigo,
   },
 });

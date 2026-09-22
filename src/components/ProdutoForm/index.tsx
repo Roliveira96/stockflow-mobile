@@ -3,6 +3,7 @@ import { Switch, Text, View } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
+import { cores } from "@/constants/theme";
 import type { ProdutoFormProps } from "@/types";
 import { extrairDigitos, formatarCentavosComoTexto } from "@/utils/moeda";
 
@@ -137,7 +138,13 @@ export function ProdutoForm({
 
       <View style={styles.linhaSwitch}>
         <Text style={styles.rotuloSwitch}>Ativo para venda</Text>
-        <Switch value={ativo} onValueChange={setAtivo} />
+        <Switch
+          value={ativo}
+          onValueChange={setAtivo}
+          trackColor={{ true: cores.primaria }}
+          accessibilityLabel="Ativo para venda"
+          accessibilityRole="switch"
+        />
       </View>
 
       <CustomButton
@@ -145,6 +152,7 @@ export function ProdutoForm({
         onPress={handleEnviar}
         carregando={enviando}
         desabilitado={!formularioValido}
+        icone="save-outline"
       />
     </View>
   );

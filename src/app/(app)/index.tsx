@@ -5,6 +5,7 @@ import { ActivityIndicator, Alert, FlatList, SafeAreaView, Text, View } from "re
 import { CustomButton } from "@/components/CustomButton";
 import { FiltroProdutos } from "@/components/FiltroProdutos";
 import { ProductCard } from "@/components/ProductCard";
+import { cores } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
 import { styles } from "@/styles/produtos.styles";
@@ -62,13 +63,28 @@ export default function ListaDeProdutos() {
     });
   }, [produtos, busca, filtroStatus]);
 
-  async function handleExcluir(id: string) {
-    try {
-      await api.delete(`/produtos/${id}`);
-      setProdutos((atual) => atual.filter((produto) => produto.id !== id));
-    } catch {
-      Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
-    }
+  function handleExcluir(id: string) {
+    const produto = produtos.find((item) => item.id === id);
+
+    Alert.alert(
+      "Remover produto",
+      `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Remover",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await api.delete(`/produtos/${id}`);
+              setProdutos((atual) => atual.filter((item) => item.id !== id));
+            } catch {
+              Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
+            }
+          },
+        },
+      ]
+    );
   }
 
   function handleEditar(id: string) {
@@ -83,7 +99,12 @@ export default function ListaDeProdutos() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.cabecalho}>
         <Text style={styles.titulo}>Produtos</Text>
-        <CustomButton titulo="Sair" onPress={logout} estiloContainer={styles.botaoSair} />
+        <CustomButton
+          titulo="Sair"
+          onPress={logout}
+          estiloContainer={styles.botaoSair}
+          icone="log-out-outline"
+        />
       </View>
 
       <FiltroProdutos
@@ -95,7 +116,12 @@ export default function ListaDeProdutos() {
       />
 
       {carregando ? (
-        <ActivityIndicator style={styles.carregando} size="large" color="#208AEF" />
+        <ActivityIndicator
+          style={styles.carregando}
+          size="large"
+          color={cores.primaria}
+          accessibilityLabel="Carregando produtos"
+        />
       ) : (
         <FlatList
           data={produtosFiltrados}
@@ -114,7 +140,11 @@ export default function ListaDeProdutos() {
       )}
 
       <View style={styles.rodape}>
-        <CustomButton titulo="Novo produto" onPress={() => router.push("/novo-produto")} />
+        <CustomButton
+          titulo="Novo produto"
+          onPress={() => router.push("/novo-produto")}
+          icone="add-circle-outline"
+        />
       </View>
     </SafeAreaView>
   );

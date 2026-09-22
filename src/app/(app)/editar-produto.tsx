@@ -1,8 +1,17 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+} from "react-native";
 
 import { ProdutoForm } from "@/components/ProdutoForm";
+import { cores } from "@/constants/theme";
 import { api } from "@/services/api";
 import { styles } from "@/styles/produto-formulario.styles";
 import type { DadosProduto, Produto } from "@/types";
@@ -67,22 +76,32 @@ export default function EditarProduto() {
   if (carregando || !produto) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator style={styles.carregando} size="large" color="#208AEF" />
+        <ActivityIndicator
+          style={styles.carregando}
+          size="large"
+          color={cores.primaria}
+          accessibilityLabel="Carregando produto"
+        />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.conteudo}>
-        <Text style={styles.titulo}>Editar produto</Text>
-        <ProdutoForm
-          valoresIniciais={produto}
-          textoBotao="Atualizar"
-          enviando={enviando}
-          aoEnviar={handleAtualizar}
-        />
-      </ScrollView>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+          <Text style={styles.titulo}>Editar produto</Text>
+          <ProdutoForm
+            valoresIniciais={produto}
+            textoBotao="Atualizar"
+            enviando={enviando}
+            aoEnviar={handleAtualizar}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

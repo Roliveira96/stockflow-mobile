@@ -57,6 +57,8 @@ export function FiltroProdutos({
                 <TouchableOpacity
                   style={styles.sugestaoItem}
                   onPress={() => handleSelecionarSugestao(item.nome)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Selecionar ${item.nome}`}
                 >
                   <Text style={styles.sugestaoTexto}>{item.nome}</Text>
                 </TouchableOpacity>
@@ -76,6 +78,9 @@ export function FiltroProdutos({
               style={[styles.chip, selecionado ? styles.chipSelecionado : undefined]}
               onPress={() => aoMudarFiltroStatus(opcao.valor)}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={`Filtrar por ${opcao.rotulo}`}
+              accessibilityState={{ selected: selecionado }}
             >
               <Text
                 style={[styles.chipTexto, selecionado ? styles.chipTextoSelecionado : undefined]}

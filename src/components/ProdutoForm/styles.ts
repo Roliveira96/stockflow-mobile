@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 
+import { cores } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   linhaSwitch: {
     flexDirection: "row",
@@ -10,6 +12,6 @@ export const styles = StyleSheet.create({
   rotuloSwitch: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1F2933",
+    color: cores.textoSecundario,
   },
 });

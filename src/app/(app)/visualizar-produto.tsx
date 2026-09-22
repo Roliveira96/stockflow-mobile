@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
+import { cores } from "@/constants/theme";
 import { api } from "@/services/api";
 import { styles } from "@/styles/visualizar-produto.styles";
 import type { LogEdicao, Produto } from "@/types";
@@ -52,23 +53,41 @@ export default function VisualizarProduto() {
     }, [id, router])
   );
 
-  async function handleExcluir() {
-    setExcluindo(true);
+  function handleExcluir() {
+    Alert.alert(
+      "Remover produto",
+      `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Remover",
+          style: "destructive",
+          onPress: async () => {
+            setExcluindo(true);
 
-    try {
-      await api.delete(`/produtos/${id}`);
-      router.back();
-    } catch {
-      Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
-    } finally {
-      setExcluindo(false);
-    }
+            try {
+              await api.delete(`/produtos/${id}`);
+              router.back();
+            } catch {
+              Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
+            } finally {
+              setExcluindo(false);
+            }
+          },
+        },
+      ]
+    );
   }
 
   if (carregando || !produto) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator style={styles.carregando} size="large" color="#208AEF" />
+        <ActivityIndicator
+          style={styles.carregando}
+          size="large"
+          color={cores.primaria}
+          accessibilityLabel="Carregando produto"
+        />
       </SafeAreaView>
     );
   }
@@ -125,12 +144,14 @@ export default function VisualizarProduto() {
             titulo="Editar"
             onPress={() => router.push({ pathname: "/editar-produto", params: { id } })}
             estiloContainer={styles.botaoAcao}
+            icone="create-outline"
           />
           <CustomButton
             titulo="Excluir"
             onPress={handleExcluir}
             carregando={excluindo}
             estiloContainer={[styles.botaoAcao, styles.botaoExcluir]}
+            icone="trash-outline"
           />
         </View>
 
