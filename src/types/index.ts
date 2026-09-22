@@ -1,4 +1,8 @@
+import type Ionicons from "@expo/vector-icons/Ionicons";
+import type { ComponentProps } from "react";
 import type { StyleProp, TextInputProps, ViewStyle } from "react-native";
+
+export type NomeIcone = ComponentProps<typeof Ionicons>["name"];
 
 export interface Produto {
   id: string;
@@ -53,6 +57,7 @@ export interface CustomButtonProps {
   carregando?: boolean;
   desabilitado?: boolean;
   estiloContainer?: StyleProp<ViewStyle>;
+  icone?: NomeIcone;
 }
 
 export interface ProductCardProps {

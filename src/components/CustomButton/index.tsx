@@ -1,5 +1,7 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 
+import { cores } from "@/constants/theme";
 import type { CustomButtonProps } from "@/types";
 
 import { styles } from "./styles";
@@ -10,6 +12,7 @@ export function CustomButton({
   carregando,
   desabilitado,
   estiloContainer,
+  icone,
 }: CustomButtonProps) {
   const bloqueado = desabilitado || carregando;
 
@@ -19,11 +22,19 @@ export function CustomButton({
       onPress={onPress}
       disabled={bloqueado}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={titulo}
+      accessibilityState={{ disabled: bloqueado, busy: carregando }}
     >
       {carregando ? (
-        <ActivityIndicator color="#FFFFFF" />
+        <ActivityIndicator color={cores.textoSobreCor} />
       ) : (
-        <Text style={styles.texto}>{titulo}</Text>
+        <>
+          {icone ? (
+            <Ionicons name={icone} size={18} color={cores.textoSobreCor} style={styles.icone} />
+          ) : null}
+          <Text style={styles.texto}>{titulo}</Text>
+        </>
       )}
     </TouchableOpacity>
   );

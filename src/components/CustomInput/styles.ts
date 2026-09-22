@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 
+import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
+
 export const styles = StyleSheet.create({
   container: {
     width: "100%",
@@ -8,26 +10,30 @@ export const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#1F2933",
+    color: cores.textoSecundario,
     marginBottom: 6,
   },
   input: {
     width: "100%",
-    height: 48,
+    height: ALVO_TOQUE_MINIMO,
     borderWidth: 1,
-    borderColor: "#CBD2D9",
-    borderRadius: 8,
+    borderColor: cores.borda,
+    borderRadius: raios.sm,
     paddingHorizontal: 12,
     fontSize: 16,
-    color: "#102A43",
-    backgroundColor: "#FFFFFF",
+    color: cores.textoPrimario,
+    backgroundColor: cores.superficie,
+  },
+  inputFocado: {
+    borderColor: cores.primaria,
+    borderWidth: 2,
   },
   inputComErro: {
-    borderColor: "#E12D39",
+    borderColor: cores.perigo,
   },
   erro: {
     marginTop: 4,
     fontSize: 12,
-    color: "#E12D39",
+    color: cores.perigo,
   },
 });
