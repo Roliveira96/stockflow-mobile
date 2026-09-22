@@ -7,6 +7,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: cores.fundo,
   },
+  scroll: {
+    flex: 1,
+  },
   conteudo: {
     paddingHorizontal: 20,
     paddingTop: 20,
@@ -95,9 +98,11 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
     backgroundColor: cores.neutroFundo,
-    borderRadius: raios.md,
-    padding: 4,
-    marginBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: cores.borda,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 20,
   },
   aba: {
     flex: 1,

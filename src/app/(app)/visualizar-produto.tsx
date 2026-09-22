@@ -118,7 +118,7 @@ export default function VisualizarProduto() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.conteudo}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo}>
         <View style={styles.cabecalho}>
           <Text style={styles.nome}>{produto.nome}</Text>
           <View style={styles.selos}>
@@ -159,27 +159,6 @@ export default function VisualizarProduto() {
             estiloContainer={styles.botaoAcao}
             icone="add-circle-outline"
           />
-        </View>
-
-        <View style={styles.abas}>
-          {ABAS.map((aba) => {
-            const ativa = aba.chave === abaAtiva;
-
-            return (
-              <TouchableOpacity
-                key={aba.chave}
-                style={[styles.aba, ativa ? styles.abaAtiva : undefined]}
-                onPress={() => setAbaAtiva(aba.chave)}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: ativa }}
-                accessibilityLabel={`Aba ${aba.rotulo}`}
-              >
-                <Text style={[styles.abaTexto, ativa ? styles.abaTextoAtiva : undefined]}>
-                  {aba.rotulo}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
         </View>
 
         {abaAtiva === "produto" ? (
@@ -236,6 +215,27 @@ export default function VisualizarProduto() {
           )
         ) : null}
       </ScrollView>
+
+      <View style={styles.abas}>
+        {ABAS.map((aba) => {
+          const ativa = aba.chave === abaAtiva;
+
+          return (
+            <TouchableOpacity
+              key={aba.chave}
+              style={[styles.aba, ativa ? styles.abaAtiva : undefined]}
+              onPress={() => setAbaAtiva(aba.chave)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: ativa }}
+              accessibilityLabel={`Aba ${aba.rotulo}`}
+            >
+              <Text style={[styles.abaTexto, ativa ? styles.abaTextoAtiva : undefined]}>
+                {aba.rotulo}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </SafeAreaView>
   );
 }
