@@ -1,35 +1,53 @@
 import { Text, TouchableOpacity, View } from "react-native";
 
 import type { ProductCardProps } from "@/types";
+import { formatarMoeda } from "@/utils/moeda";
 
 import { styles } from "./styles";
 
-const formatadorPreco = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
+export function ProductCard({ produto, onExcluir, onEditar }: ProductCardProps) {
+  const ultimasUnidades = produto.quantidade > 0 && produto.quantidade < 5;
 
-export function ProductCard({ produto, onExcluir }: ProductCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.info}>
         <Text style={styles.nome}>{produto.nome}</Text>
         <Text style={styles.detalhes}>
-          Quantidade: {produto.quantidade} · {formatadorPreco.format(produto.preco)}
+          Quantidade: {produto.quantidade} · {formatarMoeda(produto.preco)}
         </Text>
-        <View style={[styles.selo, produto.ativo ? undefined : styles.seloInativo]}>
-          <Text style={[styles.seloTexto, produto.ativo ? undefined : styles.seloTextoInativo]}>
-            {produto.ativo ? "Ativo" : "Inativo"}
-          </Text>
+        <Text style={styles.codigoBarras}>Código: {produto.codigoBarras}</Text>
+        {produto.descricao ? <Text style={styles.descricao}>{produto.descricao}</Text> : null}
+
+        <View style={styles.selos}>
+          <View style={[styles.selo, produto.ativo ? undefined : styles.seloInativo]}>
+            <Text style={[styles.seloTexto, produto.ativo ? undefined : styles.seloTextoInativo]}>
+              {produto.ativo ? "Ativo" : "Inativo"}
+            </Text>
+          </View>
+          {ultimasUnidades ? (
+            <View style={styles.seloAlerta}>
+              <Text style={styles.seloTextoAlerta}>Últimas unidades</Text>
+            </View>
+          ) : null}
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.botaoExcluir}
-        onPress={() => onExcluir(produto.id)}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.botaoExcluirTexto}>Remover</Text>
-      </TouchableOpacity>
+
+      <View style={styles.acoes}>
+        <TouchableOpacity
+          style={styles.botaoEditar}
+          onPress={() => onEditar(produto.id)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.botaoEditarTexto}>Editar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.botaoExcluir}
+          onPress={() => onExcluir(produto.id)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.botaoExcluirTexto}>Remover</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

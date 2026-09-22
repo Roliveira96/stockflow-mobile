@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     borderColor: "#E4E7EB",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   info: {
     flex: 1,
@@ -27,8 +27,23 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "#627D98",
   },
-  selo: {
+  codigoBarras: {
+    marginTop: 2,
+    fontSize: 12,
+    color: "#9AA5B1",
+  },
+  descricao: {
+    marginTop: 6,
+    fontSize: 13,
+    color: "#334E68",
+  },
+  selos: {
     marginTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  selo: {
     alignSelf: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -45,6 +60,32 @@ export const styles = StyleSheet.create({
   },
   seloTextoInativo: {
     color: "#829AB1",
+  },
+  seloAlerta: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: "#FFF3BF",
+  },
+  seloTextoAlerta: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#B08900",
+  },
+  acoes: {
+    gap: 8,
+  },
+  botaoEditar: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#E3F2FD",
+  },
+  botaoEditarTexto: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#208AEF",
   },
   botaoExcluir: {
     paddingHorizontal: 12,

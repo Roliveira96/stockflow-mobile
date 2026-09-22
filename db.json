@@ -5,21 +5,27 @@
       "nome": "Teclado Mecânico",
       "quantidade": 12,
       "preco": 349.9,
-      "ativo": true
+      "ativo": true,
+      "codigoBarras": "7891234567890",
+      "descricao": "Teclado mecânico ABNT2 com switches azuis."
     },
     {
       "id": "2",
       "nome": "Mouse sem Fio",
       "quantidade": 30,
       "preco": 89.5,
-      "ativo": true
+      "ativo": true,
+      "codigoBarras": "7891234567906",
+      "descricao": ""
     },
     {
       "id": "3",
       "nome": "Monitor 24 Polegadas",
       "quantidade": 0,
       "preco": 799.0,
-      "ativo": false
+      "ativo": false,
+      "codigoBarras": "7891234567913",
+      "descricao": "Monitor Full HD com ajuste de altura."
     }
   ]
 }
