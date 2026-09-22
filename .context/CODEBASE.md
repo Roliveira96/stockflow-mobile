@@ -20,7 +20,7 @@ A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`,
 - [x] `src/services/api.ts`
 - [x] `src/components/CustomInput/styles.ts` + `index.tsx`
 - [x] `src/components/CustomButton/styles.ts` + `index.tsx`
-- [ ] `src/components/ProductCard/styles.ts` + `index.tsx`
+- [x] `src/components/ProductCard/styles.ts` + `index.tsx`
 - [ ] `src/contexts/AuthContext.tsx`
 - [ ] `src/app/_layout.tsx`
 - [ ] `src/app/(auth)/_layout.tsx`, `styles.ts`, `login.tsx`
@@ -49,3 +49,4 @@ src/
 - `src/services/api.ts` — instância Axios com `baseURL` via `EXPO_PUBLIC_API_URL` e timeout de 10s.
 - `src/components/CustomInput/` — input controlado com label e erro visual, sem estilos inline.
 - `src/components/CustomButton/` — `TouchableOpacity` com estados de loading (`ActivityIndicator`) e desabilitado; não usa `Button` nativo.
+- `src/components/ProductCard/` — cartão com nome, quantidade, preço formatado (`Intl.NumberFormat` pt-BR/BRL), selo ativo/inativo e ação de remoção.

@@ -1,0 +1,60 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  card: {
+    width: "100%",
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E4E7EB",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  info: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  nome: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#102A43",
+  },
+  detalhes: {
+    marginTop: 4,
+    fontSize: 14,
+    color: "#627D98",
+  },
+  selo: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: "#D3F9D8",
+  },
+  seloInativo: {
+    backgroundColor: "#F0F4F8",
+  },
+  seloTexto: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#2F9E44",
+  },
+  seloTextoInativo: {
+    color: "#829AB1",
+  },
+  botaoExcluir: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#FFF1F0",
+  },
+  botaoExcluirTexto: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#E12D39",
+  },
+});
