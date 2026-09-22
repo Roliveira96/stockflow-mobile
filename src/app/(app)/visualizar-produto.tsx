@@ -152,10 +152,12 @@ export default function VisualizarProduto() {
 
         <View style={styles.acoes}>
           <CustomButton
-            titulo="Estoque"
-            onPress={() => router.push({ pathname: "/adicionar-estoque", params: { id } })}
+            titulo="Excluir"
+            onPress={handleExcluir}
+            carregando={excluindo}
             estiloContainer={styles.botaoAcao}
-            icone="add-circle-outline"
+            icone="trash-outline"
+            variante="perigo"
           />
           <CustomButton
             titulo="Editar"
@@ -165,12 +167,10 @@ export default function VisualizarProduto() {
             variante="neutro"
           />
           <CustomButton
-            titulo="Excluir"
-            onPress={handleExcluir}
-            carregando={excluindo}
+            titulo="Estoque"
+            onPress={() => router.push({ pathname: "/adicionar-estoque", params: { id } })}
             estiloContainer={styles.botaoAcao}
-            icone="trash-outline"
-            variante="perigo"
+            icone="add-circle-outline"
           />
         </View>
 
