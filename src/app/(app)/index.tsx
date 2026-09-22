@@ -1,9 +1,19 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, SafeAreaView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
 import { FiltroProdutos } from "@/components/FiltroProdutos";
+import { MenuLateral } from "@/components/MenuLateral";
 import { ProductCard } from "@/components/ProductCard";
 import { cores } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +28,7 @@ export default function ListaDeProdutos() {
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<StatusFiltro>("todos");
+  const [menuAberto, setMenuAberto] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -98,15 +109,26 @@ export default function ListaDeProdutos() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.cabecalho}>
+        <TouchableOpacity
+          style={styles.botaoMenu}
+          onPress={() => setMenuAberto(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir menu"
+        >
+          <Ionicons name="menu" size={22} color={cores.textoPrimario} />
+        </TouchableOpacity>
         <Text style={styles.titulo}>Produtos</Text>
-        <CustomButton
-          titulo="Sair"
-          onPress={logout}
-          estiloContainer={styles.botaoSair}
-          icone="log-out-outline"
-          variante="neutro"
-        />
       </View>
+
+      <MenuLateral
+        visivel={menuAberto}
+        aoFechar={() => setMenuAberto(false)}
+        nomeUsuario="Ricardo"
+        aoSair={() => {
+          setMenuAberto(false);
+          logout();
+        }}
+      />
 
       <FiltroProdutos
         produtos={produtos}

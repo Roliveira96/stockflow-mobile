@@ -63,6 +63,13 @@ export interface SeletorDataProps {
   erro?: string;
 }
 
+export interface MenuLateralProps {
+  visivel: boolean;
+  aoFechar: () => void;
+  nomeUsuario: string;
+  aoSair: () => void;
+}
+
 export interface Usuario {
   id: string;
   nome: string;

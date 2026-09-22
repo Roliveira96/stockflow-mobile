@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -9,22 +9,25 @@ export const styles = StyleSheet.create({
   },
   cabecalho: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: 12,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
+  },
+  botaoMenu: {
+    width: ALVO_TOQUE_MINIMO,
+    height: ALVO_TOQUE_MINIMO,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: raios.sm,
+    backgroundColor: cores.neutroFundo,
   },
   titulo: {
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: -0.5,
     color: cores.textoPrimario,
-  },
-  botaoSair: {
-    width: "auto",
-    height: ALVO_TOQUE_MINIMO,
-    paddingHorizontal: 14,
   },
   carregando: {
     marginTop: 40,
