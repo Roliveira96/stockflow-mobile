@@ -8,7 +8,7 @@ O desenvolvimento deve cumprir com precisão cirúrgica os 10 requisitos do exam
 
 ## 2. Restrições Rígidas de Implementação (Invioláveis)
 - Idioma do código e respostas: Português (Brasil).
-- Comentários de código: NUNCA inclua comentários em código gerado (TypeScript, TSX ou CSS/estilos). O código deve ser limpo e autoexplicativo.
+- Comentários de código: mantenha apenas os comentários estritamente necessários (ex.: diretivas de ferramentas como `eslint-disable`, ou uma justificativa não óbvia que o código sozinho não expressa). Não escreva comentários explicando o que o código faz — nomes de variáveis e funções já devem deixar isso claro. Nada de código poluído com comentários redundantes.
 - Componentes Nativos: Proibido expressamente o uso do componente nativo `Button` rígido do React Native. Utilize exclusivamente `Pressable` ou `TouchableOpacity` encapsulados em componentes customizados.
 - Estilização:
   - Proibido qualquer estilo inline (`style={{ ... }}`).
