@@ -5,13 +5,15 @@ import { formatarMoeda } from "@/utils/moeda";
 
 import { styles } from "./styles";
 
-export function ProductCard({ produto, onExcluir, onEditar }: ProductCardProps) {
+export function ProductCard({ produto, onExcluir, onEditar, onVisualizar }: ProductCardProps) {
   const ultimasUnidades = produto.quantidade > 0 && produto.quantidade < 5;
 
   return (
     <View style={styles.card}>
       <View style={styles.info}>
-        <Text style={styles.nome}>{produto.nome}</Text>
+        <TouchableOpacity onPress={() => onVisualizar(produto.id)} activeOpacity={0.7}>
+          <Text style={styles.nome}>{produto.nome}</Text>
+        </TouchableOpacity>
         <Text style={styles.detalhes}>
           Quantidade: {produto.quantidade} · {formatarMoeda(produto.preco)}
         </Text>
@@ -33,6 +35,13 @@ export function ProductCard({ produto, onExcluir, onEditar }: ProductCardProps) 
       </View>
 
       <View style={styles.acoes}>
+        <TouchableOpacity
+          style={styles.botaoVisualizar}
+          onPress={() => onVisualizar(produto.id)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.botaoVisualizarTexto}>Visualizar</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.botaoEditar}
           onPress={() => onEditar(produto.id)}

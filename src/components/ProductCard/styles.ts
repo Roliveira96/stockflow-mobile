@@ -76,6 +76,17 @@ export const styles = StyleSheet.create({
   acoes: {
     gap: 8,
   },
+  botaoVisualizar: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#F0F4F8",
+  },
+  botaoVisualizarTexto: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#334E68",
+  },
   botaoEditar: {
     paddingHorizontal: 12,
     paddingVertical: 8,

@@ -75,6 +75,10 @@ export default function ListaDeProdutos() {
     router.push({ pathname: "/editar-produto", params: { id } });
   }
 
+  function handleVisualizar(id: string) {
+    router.push({ pathname: "/visualizar-produto", params: { id } });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.cabecalho}>
@@ -98,7 +102,12 @@ export default function ListaDeProdutos() {
           keyExtractor={(produto) => produto.id}
           contentContainerStyle={styles.lista}
           renderItem={({ item }) => (
-            <ProductCard produto={item} onExcluir={handleExcluir} onEditar={handleEditar} />
+            <ProductCard
+              produto={item}
+              onExcluir={handleExcluir}
+              onEditar={handleEditar}
+              onVisualizar={handleVisualizar}
+            />
           )}
           ListEmptyComponent={<Text style={styles.vazio}>Nenhum produto encontrado.</Text>}
         />
