@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, SafeAreaView, Text, View } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
@@ -15,20 +15,34 @@ export default function ListaDeProdutos() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [carregando, setCarregando] = useState(true);
 
-  useEffect(() => {
-    async function buscarProdutos() {
-      try {
-        const resposta = await api.get<Produto[]>("/produtos");
-        setProdutos(resposta.data);
-      } catch {
-        Alert.alert("Erro de conexão", "Não foi possível carregar os produtos.");
-      } finally {
-        setCarregando(false);
-      }
-    }
+  useFocusEffect(
+    useCallback(() => {
+      let ativo = true;
 
-    buscarProdutos();
-  }, []);
+      async function buscarProdutos() {
+        try {
+          const resposta = await api.get<Produto[]>("/produtos");
+          if (ativo) {
+            setProdutos(resposta.data);
+          }
+        } catch {
+          if (ativo) {
+            Alert.alert("Erro de conexão", "Não foi possível carregar os produtos.");
+          }
+        } finally {
+          if (ativo) {
+            setCarregando(false);
+          }
+        }
+      }
+
+      buscarProdutos();
+
+      return () => {
+        ativo = false;
+      };
+    }, [])
+  );
 
   async function handleExcluir(id: string) {
     try {
