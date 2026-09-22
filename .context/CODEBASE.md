@@ -21,7 +21,7 @@ A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`,
 - [x] `src/components/CustomInput/styles.ts` + `index.tsx`
 - [x] `src/components/CustomButton/styles.ts` + `index.tsx`
 - [x] `src/components/ProductCard/styles.ts` + `index.tsx`
-- [ ] `src/contexts/AuthContext.tsx`
+- [x] `src/contexts/AuthContext.tsx`
 - [ ] `src/app/_layout.tsx`
 - [ ] `src/app/(auth)/_layout.tsx`, `styles.ts`, `login.tsx`
 - [ ] `src/app/(app)/_layout.tsx`
@@ -50,3 +50,4 @@ src/
 - `src/components/CustomInput/` — input controlado com label e erro visual, sem estilos inline.
 - `src/components/CustomButton/` — `TouchableOpacity` com estados de loading (`ActivityIndicator`) e desabilitado; não usa `Button` nativo.
 - `src/components/ProductCard/` — cartão com nome, quantidade, preço formatado (`Intl.NumberFormat` pt-BR/BRL), selo ativo/inativo e ação de remoção.
+- `src/contexts/AuthContext.tsx` — `AuthProvider`/`useAuth`; restaura sessão do `AsyncStorage` na montagem (`carregandoSessao` evita flash de rota errada), `login` valida campos e gera usuário/token local (ver decisão de autenticação acima), `logout` limpa as chaves.
