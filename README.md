@@ -45,11 +45,43 @@ Aplicativo móvel para gerenciamento de estoque e catálogo de produtos desenvol
 
 ---
 
+## Como Executar
+
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+2. Em um terminal, suba o backend mock (veja a seção abaixo):
+   ```bash
+   npm run mock-api
+   ```
+3. Em outro terminal, inicie o app:
+   ```bash
+   npx expo start
+   ```
+
+---
+
 ## Configuração do Backend (API REST)
 
-A aplicação consome uma API REST para leitura e escrita dos produtos.
+A aplicação consome uma API REST para leitura (`GET`), criação (`POST`) e remoção (`DELETE`) de produtos, através da instância Axios em `src/services/api.ts`.
 
-### Opção 1: JSON-Server (Recomendado para testes locais)
-1. Instale o json-server globalmente ou na raiz:
+### JSON-Server (mock local, já incluído no projeto)
+
+O `json-server` já está nas `devDependencies` e o seed de dados vive em `db.json` na raiz do projeto.
+
+1. Suba o servidor mock:
    ```bash
-   npm install -g json-server
+   npm run mock-api
+   ```
+2. A API fica disponível em `http://localhost:3000`, com o recurso `/produtos` já populado. Esse é o endereço padrão que `src/services/api.ts` usa quando `EXPO_PUBLIC_API_URL` não está definida.
+
+### Apontando para outra API
+
+Para usar um backend diferente (remoto ou outra porta local), defina a variável de ambiente pública do Expo em um arquivo `.env` na raiz:
+
+```bash
+EXPO_PUBLIC_API_URL=https://sua-api.exemplo.com
+```
+
+> No Android, ao rodar o mock local em outro dispositivo/emulador físico, use o IP da máquina na rede (ex.: `http://192.168.x.x:3000`) em vez de `localhost`.
