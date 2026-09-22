@@ -134,6 +134,17 @@ Orientada por heurísticas conhecidas, não por gosto pessoal:
 ## Ajustes de UX Pós-Fase 7 (feedback direto do usuário)
 - **Ordem dos 3 botões de ação invertida:** o usuário testou no celular e relatou que "Excluir" ficava perto demais do polegar. Ordem final: Excluir (esquerda, mais difícil de alcançar sem querer) → Editar (meio) → Estoque (direita, ação mais usada, mais fácil de alcançar).
 - **Abas Produto / Lotes / Log:** a tela de visualização, que antes empilhava cartão de dados + tabela de lotes + histórico tudo em sequência no scroll, virou um segmented control com 3 abas (estado local `abaAtiva`, sem lib nova). Cabeçalho (nome + selos) e os 3 botões de ação continuam sempre visíveis acima das abas, já que são ações globais do produto, não de uma aba específica.
+- **Correção de layout (2ª rodada):** o usuário pediu explicitamente o oposto do que eu tinha entendido — abas fixas no **topo** (não embaixo) e os 3 botões de ação fixos no **rodapé** (não dentro do scroll). Layout final: `abas` (View fixa, fora do `ScrollView`) → `ScrollView` (cabeçalho + conteúdo da aba ativa) → `acoes` (View fixa, fora do `ScrollView`, com fundo/borda de barra de rodapé).
+
+## Seletor de Data e Regras de Validade (pedido do usuário)
+
+- **`@react-native-community/datetimepicker` e `@expo/ui` foram avaliados e descartados** para o campo "Validade": o primeiro não tem build web (só `src/index.js`, sem `.web.js`, quebraria no navegador, que é como o usuário testa o app); o segundo tem um `DateTimePicker.web.tsx` que é um stub — `return null`, não renderiza nada no navegador. Confirmado lendo o código-fonte instalado em `node_modules`, não só a documentação. Os dois pacotes foram instalados, verificados e **removidos** (`npm uninstall` + reversão do plugin em `app.json`) antes de decidir pela alternativa abaixo.
+- **`src/components/SeletorData/`** (novo): calendário próprio, 100% React Native puro (View/Text/TouchableOpacity), sem nenhuma dependência nativa — funciona igual em web, iOS e Android. Campo mostra a data no formato `DD/MM/AAAA` (`formatarDataCurta`, nova função em `src/utils/data.ts`, usa `Intl.DateTimeFormat("pt-BR", { dateStyle: "short" })`); ao tocar, abre um painel com navegação de mês e grade de dias. Armazena/retorna a data como ISO (`AAAA-MM-DD`) internamente, igual ao resto do app.
+- **`TabelaLotes` corrigida** para usar `formatarDataCurta` (só data) em vez de `formatarData` (data+hora) na validade do lote — a validade é um campo de data, não de data+hora.
+- **Regras de validade em `adicionar-estoque.tsx`:** `src/utils/lote.ts` ganhou `calcularDiasParaVencer(validade)` (extraído de `calcularStatusLote` para reuso, com normalização de horário pra evitar erro de 1 dia por fuso). Ao escolher uma validade (quando "Não expira" está desligado), um aviso inline aparece abaixo do calendário:
+  - **Data no passado (`vencido`):** aviso vermelho — "Essa data já passou (há N dias). O produto já estaria vencido — confira se a validade foi informada corretamente." Não bloqueia o envio (pode ser um lote vencido de verdade, registrado de propósito).
+  - **Faltam até 30 dias (`vencendo`):** aviso âmbar — "Esse lote vence em N dias — fica próximo do vencimento."
+  - **Mais de 30 dias:** nenhum aviso.
 
 ## Backend Mock (Desenvolvimento Local)
 `json-server@0.17.4` (versão estável, não a v1 beta) lê `db.json` na raiz e expõe REST em `http://localhost:3000`, batendo com o fallback padrão de `src/services/api.ts`. Rodar com `npm run mock-api`. Seed inicial: 3 produtos em `db.json` (`produtos`).
