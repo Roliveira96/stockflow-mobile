@@ -1,4 +1,4 @@
-import type { TextInputProps } from "react-native";
+import type { StyleProp, TextInputProps, ViewStyle } from "react-native";
 
 export interface Produto {
   id: string;
@@ -32,6 +32,7 @@ export interface CustomButtonProps {
   onPress: () => void;
   carregando?: boolean;
   desabilitado?: boolean;
+  estiloContainer?: StyleProp<ViewStyle>;
 }
 
 export interface ProductCardProps {
