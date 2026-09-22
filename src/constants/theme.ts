@@ -1,30 +1,40 @@
-export const cores = {
-  fundo: "#F0F4F8",
-  superficie: "#FFFFFF",
-  borda: "#E2E8F0",
+import type { ViewStyle } from "react-native";
 
-  textoPrimario: "#0F172A",
-  textoSecundario: "#334155",
-  textoTerciario: "#64748B",
+export const cores = {
+  fundo: "#F5F5FF",
+  superficie: "#FFFFFF",
+  borda: "#EAEAF5",
+
+  textoPrimario: "#151328",
+  textoSecundario: "#4B4870",
+  textoTerciario: "#6E6B94",
   textoSobreCor: "#FFFFFF",
 
-  primaria: "#2563EB",
-  primariaFundo: "#DBEAFE",
+  primaria: "#6C5CE7",
+  primariaClara: "#8B7CF6",
+  primariaFundo: "#EDEAFE",
 
-  perigo: "#DC2626",
-  perigoFundo: "#FEE2E2",
+  perigo: "#F0335C",
+  perigoFundo: "#FDE7ED",
 
-  sucesso: "#15803D",
-  sucessoFundo: "#DCFCE7",
+  sucesso: "#12B76A",
+  sucessoFundo: "#E1FAEF",
 
-  alerta: "#92400E",
-  alertaFundo: "#FEF3C7",
+  alerta: "#B45B00",
+  alertaFundo: "#FFF1DB",
 
-  neutroFundo: "#F1F5F9",
-  neutroTexto: "#334155",
+  neutroFundo: "#F0F0FA",
+  neutroTexto: "#4B4870",
 
-  desabilitado: "#94A3B8",
+  desabilitado: "#C4C2DB",
 } as const;
+
+export const gradientes = {
+  primaria: [cores.primaria, cores.primariaClara] as [string, string],
+  perigo: [cores.perigo, "#FF6B93"] as [string, string],
+  neutro: [cores.textoSecundario, cores.textoTerciario] as [string, string],
+  desabilitado: [cores.desabilitado, cores.desabilitado] as [string, string],
+};
 
 export const espacamento = {
   xs: 4,
@@ -37,9 +47,22 @@ export const espacamento = {
 } as const;
 
 export const raios = {
-  sm: 8,
-  md: 12,
+  sm: 10,
+  md: 16,
+  lg: 22,
   pill: 999,
 } as const;
 
 export const ALVO_TOQUE_MINIMO = 44;
+
+export const sombra = {
+  cartao: {
+    boxShadow: "0px 8px 16px rgba(43, 37, 96, 0.08)",
+  } satisfies ViewStyle,
+  botao: {
+    boxShadow: "0px 6px 12px rgba(108, 92, 231, 0.28)",
+  } satisfies ViewStyle,
+  flutuante: {
+    boxShadow: "0px 4px 10px rgba(43, 37, 96, 0.10)",
+  } satisfies ViewStyle,
+};

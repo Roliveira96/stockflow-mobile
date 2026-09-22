@@ -51,6 +51,8 @@ export interface CustomInputProps extends TextInputProps {
   erro?: string;
 }
 
+export type VarianteBotao = "primaria" | "perigo" | "neutro";
+
 export interface CustomButtonProps {
   titulo: string;
   onPress: () => void;
@@ -58,6 +60,7 @@ export interface CustomButtonProps {
   desabilitado?: boolean;
   estiloContainer?: StyleProp<ViewStyle>;
   icone?: NomeIcone;
+  variante?: VarianteBotao;
 }
 
 export interface ProductCardProps {

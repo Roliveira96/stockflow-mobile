@@ -150,8 +150,9 @@ export default function VisualizarProduto() {
             titulo="Excluir"
             onPress={handleExcluir}
             carregando={excluindo}
-            estiloContainer={[styles.botaoAcao, styles.botaoExcluir]}
+            estiloContainer={styles.botaoAcao}
             icone="trash-outline"
+            variante="perigo"
           />
         </View>
 

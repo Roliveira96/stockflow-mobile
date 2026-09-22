@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { cores, raios } from "@/constants/theme";
+import { cores, raios, sombra } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -16,23 +16,24 @@ export const styles = StyleSheet.create({
     marginTop: 40,
   },
   cabecalho: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   nome: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: -0.5,
     color: cores.textoPrimario,
   },
   selos: {
-    marginTop: 8,
+    marginTop: 10,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 8,
   },
   selo: {
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: raios.pill,
     backgroundColor: cores.sucessoFundo,
   },
@@ -41,7 +42,7 @@ export const styles = StyleSheet.create({
   },
   seloTexto: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: cores.sucesso,
   },
   seloTextoInativo: {
@@ -49,28 +50,27 @@ export const styles = StyleSheet.create({
   },
   seloAlerta: {
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: raios.pill,
     backgroundColor: cores.alertaFundo,
   },
   seloTextoAlerta: {
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
     color: cores.alerta,
   },
   cartao: {
     backgroundColor: cores.superficie,
-    borderRadius: raios.md,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: raios.lg,
+    padding: 18,
+    marginBottom: 20,
+    ...sombra.cartao,
   },
   linha: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: cores.fundo,
   },
@@ -83,36 +83,39 @@ export const styles = StyleSheet.create({
   },
   linhaValor: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: cores.textoPrimario,
   },
   descricaoTexto: {
-    marginTop: 8,
+    marginTop: 10,
     fontSize: 14,
     color: cores.textoSecundario,
   },
   subtitulo: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 17,
+    fontWeight: "800",
     color: cores.textoPrimario,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   logItem: {
     borderBottomWidth: 1,
     borderBottomColor: cores.fundo,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   logData: {
     fontSize: 12,
+    fontWeight: "600",
     color: cores.textoTerciario,
     marginBottom: 4,
   },
   logAlteracao: {
     fontSize: 13,
     color: cores.textoSecundario,
+    lineHeight: 20,
   },
   logCampo: {
     fontWeight: "700",
+    color: cores.textoPrimario,
   },
   vazio: {
     fontSize: 13,
@@ -122,12 +125,9 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     marginTop: 4,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   botaoAcao: {
     flex: 1,
-  },
-  botaoExcluir: {
-    backgroundColor: cores.perigo,
   },
 });

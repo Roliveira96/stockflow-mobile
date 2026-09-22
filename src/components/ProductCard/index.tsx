@@ -12,21 +12,39 @@ export function ProductCard({ produto, onExcluir, onEditar, onVisualizar }: Prod
 
   return (
     <View style={styles.card}>
-      <View style={styles.info}>
-        <TouchableOpacity
-          onPress={() => onVisualizar(produto.id)}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel={`Ver detalhes de ${produto.nome}`}
-        >
-          <Text style={styles.nome}>{produto.nome}</Text>
-        </TouchableOpacity>
-        <Text style={styles.detalhes}>
-          Quantidade: {produto.quantidade} · {formatarMoeda(produto.preco)}
-        </Text>
-        <Text style={styles.codigoBarras}>Código: {produto.codigoBarras}</Text>
-        {produto.descricao ? <Text style={styles.descricao}>{produto.descricao}</Text> : null}
+      <TouchableOpacity
+        onPress={() => onVisualizar(produto.id)}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`Ver detalhes de ${produto.nome}`}
+      >
+        <View style={styles.linhaTopo}>
+          <View style={styles.textos}>
+            <Text style={styles.nome} numberOfLines={1}>
+              {produto.nome}
+            </Text>
+            {produto.descricao ? (
+              <Text style={styles.descricao} numberOfLines={1}>
+                {produto.descricao}
+              </Text>
+            ) : null}
+          </View>
+          <Text style={styles.preco}>{formatarMoeda(produto.preco)}</Text>
+        </View>
 
+        <View style={styles.linhaDetalhes}>
+          <View style={styles.detalheItem}>
+            <Ionicons name="cube-outline" size={14} color={cores.textoTerciario} />
+            <Text style={styles.detalheTexto}>{produto.quantidade} un.</Text>
+          </View>
+          <View style={styles.detalheItem}>
+            <Ionicons name="barcode-outline" size={14} color={cores.textoTerciario} />
+            <Text style={styles.detalheTexto}>{produto.codigoBarras}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      <View style={styles.rodape}>
         <View style={styles.selos}>
           <View style={[styles.selo, produto.ativo ? undefined : styles.seloInativo]}>
             <Text style={[styles.seloTexto, produto.ativo ? undefined : styles.seloTextoInativo]}>
@@ -39,39 +57,39 @@ export function ProductCard({ produto, onExcluir, onEditar, onVisualizar }: Prod
             </View>
           ) : null}
         </View>
-      </View>
 
-      <View style={styles.acoes}>
-        <TouchableOpacity
-          style={styles.botaoVisualizar}
-          onPress={() => onVisualizar(produto.id)}
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel={`Visualizar ${produto.nome}`}
-        >
-          <Ionicons name="eye-outline" size={16} color={cores.textoSecundario} />
-          <Text style={styles.botaoVisualizarTexto}>Visualizar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.botaoEditar}
-          onPress={() => onEditar(produto.id)}
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel={`Editar ${produto.nome}`}
-        >
-          <Ionicons name="create-outline" size={16} color={cores.primaria} />
-          <Text style={styles.botaoEditarTexto}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.botaoExcluir}
-          onPress={() => onExcluir(produto.id)}
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel={`Remover ${produto.nome}`}
-        >
-          <Ionicons name="trash-outline" size={16} color={cores.perigo} />
-          <Text style={styles.botaoExcluirTexto}>Remover</Text>
-        </TouchableOpacity>
+        <View style={styles.acoes}>
+          <TouchableOpacity
+            style={styles.botaoAcao}
+            onPress={() => onVisualizar(produto.id)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Visualizar ${produto.nome}`}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+          >
+            <Ionicons name="eye-outline" size={18} color={cores.textoSecundario} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.botaoAcao, styles.botaoAcaoPrimaria]}
+            onPress={() => onEditar(produto.id)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Editar ${produto.nome}`}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+          >
+            <Ionicons name="create-outline" size={18} color={cores.primaria} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.botaoAcao, styles.botaoAcaoPerigo]}
+            onPress={() => onExcluir(produto.id)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Remover ${produto.nome}`}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+          >
+            <Ionicons name="trash-outline" size={18} color={cores.perigo} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text } from "react-native";
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
@@ -34,12 +43,14 @@ export default function Login() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
-          <Image
-            source={require("@/assets/images/icon.png")}
-            style={styles.logo}
-            resizeMode="contain"
-            accessibilityLabel="Logotipo do StockFlow"
-          />
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={styles.logo}
+              resizeMode="contain"
+              accessibilityLabel="Logotipo do StockFlow"
+            />
+          </View>
           <Text style={styles.titulo}>StockFlow</Text>
           <Text style={styles.subtitulo}>Entre para gerenciar seu estoque</Text>
 

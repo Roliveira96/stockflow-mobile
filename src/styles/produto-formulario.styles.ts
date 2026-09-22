@@ -16,10 +16,11 @@ export const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   titulo: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
+    letterSpacing: -0.5,
     color: cores.textoPrimario,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   carregando: {
     marginTop: 40,

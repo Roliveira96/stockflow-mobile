@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, cores, raios, sombra } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    marginBottom: 4,
+    marginBottom: 8,
     zIndex: 10,
   },
   buscaContainer: {
@@ -17,20 +17,18 @@ export const styles = StyleSheet.create({
     top: "100%",
     left: 0,
     right: 0,
-    marginTop: -12,
+    marginTop: -14,
     backgroundColor: cores.superficie,
-    borderRadius: raios.sm,
-    borderWidth: 1,
-    borderColor: cores.borda,
+    borderRadius: raios.md,
     maxHeight: 180,
     overflow: "hidden",
     zIndex: 20,
-    elevation: 4,
+    ...sombra.flutuante,
   },
   sugestaoItem: {
     justifyContent: "center",
     minHeight: ALVO_TOQUE_MINIMO,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: cores.fundo,
   },
@@ -48,19 +46,16 @@ export const styles = StyleSheet.create({
   chip: {
     justifyContent: "center",
     minHeight: ALVO_TOQUE_MINIMO,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     borderRadius: raios.pill,
-    backgroundColor: cores.superficie,
-    borderWidth: 1,
-    borderColor: cores.borda,
+    backgroundColor: cores.neutroFundo,
   },
   chipSelecionado: {
     backgroundColor: cores.primaria,
-    borderColor: cores.primaria,
   },
   chipTexto: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
     color: cores.textoSecundario,
   },
   chipTextoSelecionado: {

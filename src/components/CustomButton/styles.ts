@@ -1,27 +1,30 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, cores, raios, sombra } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
+  wrapper: {
+    width: "100%",
+    borderRadius: raios.md,
+  },
+  sombra: {
+    ...sombra.botao,
+  },
   botao: {
     width: "100%",
     height: ALVO_TOQUE_MINIMO,
-    borderRadius: raios.sm,
-    backgroundColor: cores.primaria,
+    borderRadius: raios.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  botaoDesabilitado: {
-    backgroundColor: cores.desabilitado,
-    opacity: 0.7,
+    overflow: "hidden",
   },
   icone: {
     marginRight: 8,
   },
   texto: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: cores.textoSobreCor,
   },
 });

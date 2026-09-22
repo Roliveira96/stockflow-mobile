@@ -104,6 +104,7 @@ export default function ListaDeProdutos() {
           onPress={logout}
           estiloContainer={styles.botaoSair}
           icone="log-out-outline"
+          variante="neutro"
         />
       </View>
 

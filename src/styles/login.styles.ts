@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { cores } from "@/constants/theme";
+import { cores, raios, sombra } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -16,22 +16,32 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 32,
   },
-  logo: {
+  logoContainer: {
     width: 96,
     height: 96,
+    borderRadius: raios.lg,
+    backgroundColor: cores.superficie,
     alignSelf: "center",
-    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    ...sombra.cartao,
+  },
+  logo: {
+    width: 60,
+    height: 60,
   },
   titulo: {
-    fontSize: 28,
-    fontWeight: "700",
+    fontSize: 32,
+    fontWeight: "800",
+    letterSpacing: -0.5,
     color: cores.textoPrimario,
     textAlign: "center",
   },
   subtitulo: {
-    fontSize: 14,
+    fontSize: 15,
     color: cores.textoSecundario,
     textAlign: "center",
-    marginBottom: 32,
+    marginBottom: 36,
   },
 });
