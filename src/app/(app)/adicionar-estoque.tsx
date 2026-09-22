@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -15,13 +16,20 @@ import {
 
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
+import { SeletorData } from "@/components/SeletorData";
 import { cores } from "@/constants/theme";
 import { useCampoMoeda } from "@/hooks/useCampoMoeda";
 import { api } from "@/services/api";
 import { styles } from "@/styles/adicionar-estoque.styles";
 import type { DadosProduto, Produto } from "@/types";
 import { compararProdutos } from "@/utils/logProduto";
-import { gerarCodigoLote, MARGEM_ALVO_PADRAO, sugerirPrecoVenda } from "@/utils/lote";
+import {
+  calcularDiasParaVencer,
+  calcularStatusLote,
+  gerarCodigoLote,
+  MARGEM_ALVO_PADRAO,
+  sugerirPrecoVenda,
+} from "@/utils/lote";
 import { formatarMoeda } from "@/utils/moeda";
 
 export default function AdicionarEstoque() {
@@ -54,11 +62,15 @@ export default function AdicionarEstoque() {
     buscarProduto();
   }, [id, router]);
 
-  const validadeValida = naoExpira || /^\d{4}-\d{2}-\d{2}$/.test(validade.trim());
-  const erroValidade =
-    !naoExpira && validade.trim().length > 0 && !validadeValida
-      ? "Use o formato AAAA-MM-DD."
-      : "";
+  const statusValidade = !naoExpira && validade ? calcularStatusLote(validade) : "regular";
+  const diasParaVencer = !naoExpira && validade ? calcularDiasParaVencer(validade) : 0;
+
+  const avisoValidade =
+    statusValidade === "vencido"
+      ? `Essa data já passou (há ${Math.abs(diasParaVencer)} dia${Math.abs(diasParaVencer) === 1 ? "" : "s"}). O produto já estaria vencido — confira se a validade foi informada corretamente.`
+      : statusValidade === "vencendo"
+        ? `Esse lote vence em ${diasParaVencer} dia${diasParaVencer === 1 ? "" : "s"} — fica próximo do vencimento.`
+        : "";
 
   const quantidadeValida =
     quantidadeEntrada.trim().length > 0 &&
@@ -71,7 +83,6 @@ export default function AdicionarEstoque() {
 
   const formularioValido =
     codigo.trim().length > 0 &&
-    validadeValida &&
     (naoExpira || validade.trim().length > 0) &&
     quantidadeValida &&
     campoCusto.centavos > 0;
@@ -183,13 +194,35 @@ export default function AdicionarEstoque() {
           </View>
 
           {naoExpira ? null : (
-            <CustomInput
-              label="Validade"
-              value={validade}
-              onChangeText={setValidade}
-              erro={erroValidade}
-              placeholder="AAAA-MM-DD"
-            />
+            <>
+              <SeletorData
+                label="Validade"
+                valor={validade || null}
+                onSelecionar={setValidade}
+              />
+              {avisoValidade ? (
+                <View
+                  style={[
+                    styles.avisoCaixa,
+                    statusValidade === "vencido" ? styles.avisoCaixaPerigo : undefined,
+                  ]}
+                >
+                  <Ionicons
+                    name={statusValidade === "vencido" ? "alert-circle-outline" : "time-outline"}
+                    size={18}
+                    color={statusValidade === "vencido" ? cores.perigo : cores.alerta}
+                  />
+                  <Text
+                    style={[
+                      styles.avisoTexto,
+                      statusValidade === "vencido" ? styles.avisoTextoPerigo : undefined,
+                    ]}
+                  >
+                    {avisoValidade}
+                  </Text>
+                </View>
+              ) : null}
+            </>
           )}
 
           <CustomInput

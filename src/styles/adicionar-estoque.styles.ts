@@ -111,6 +111,29 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
     color: cores.primaria,
   },
+  avisoCaixa: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    marginTop: -8,
+    marginBottom: 18,
+    padding: 12,
+    borderRadius: raios.sm,
+    backgroundColor: cores.alertaFundo,
+  },
+  avisoCaixaPerigo: {
+    backgroundColor: cores.perigoFundo,
+  },
+  avisoTexto: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "600",
+    color: cores.alerta,
+  },
+  avisoTextoPerigo: {
+    color: cores.perigo,
+  },
   linhaCheckbox: {
     flexDirection: "row",
     alignItems: "center",
