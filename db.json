@@ -8,18 +8,18 @@
       "descricao": "Teclado mecânico ABNT2 com switches RGB.",
       "ativo": true,
       "criadoEm": "2026-09-01T12:00:00.000Z",
-      "atualizadoEm": "2026-09-22T16:11:43.819Z",
+      "atualizadoEm": "2026-09-22T20:10:31.411Z",
       "id": "1"
     },
     {
       "nome": "Mouse sem Fio",
       "codigoBarras": "7891234567906",
-      "quantidade": 30,
-      "preco": 89.5,
+      "quantidade": 210,
+      "preco": 91.67,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-01T12:00:00.000Z",
-      "atualizadoEm": "2026-09-01T12:00:00.000Z",
+      "atualizadoEm": "2026-09-22T20:12:06.834Z",
       "id": "2"
     },
     {
@@ -27,10 +27,10 @@
       "codigoBarras": "7891234567913",
       "quantidade": 0,
       "preco": 799,
-      "descricao": "Monitor Full HD com ajuste de altura.",
+      "descricao": "Monitor Full HD com ajuste de altura. Vc Hehsbdjdhdjdj",
       "ativo": false,
       "criadoEm": "2026-09-01T12:00:00.000Z",
-      "atualizadoEm": "2026-09-01T12:00:00.000Z",
+      "atualizadoEm": "2026-09-22T20:10:41.835Z",
       "id": "3"
     },
     {
@@ -43,6 +43,17 @@
       "criadoEm": "2026-09-22T17:00:40.847Z",
       "atualizadoEm": "2026-09-22T17:20:49.490Z",
       "id": "hHh7r6d"
+    },
+    {
+      "nome": "Teclado",
+      "codigoBarras": "12312312321",
+      "quantidade": 123,
+      "preco": 1.23,
+      "descricao": "SDASDasdASD asdASDSAD",
+      "ativo": true,
+      "criadoEm": "2026-09-22T20:16:27.704Z",
+      "atualizadoEm": "2026-09-22T20:16:27.704Z",
+      "id": "2x1kaAb"
     }
   ],
   "logs": [
@@ -117,7 +128,72 @@
         }
       ],
       "id": 4
+    },
+    {
+      "produtoId": "3",
+      "produtoNome": "Monitor 24 Polegadas",
+      "data": "2026-09-22T20:10:41.835Z",
+      "alteracoes": [
+        {
+          "campo": "Descrição",
+          "de": "Monitor Full HD com ajuste de altura.",
+          "para": "Monitor Full HD com ajuste de altura. Vc Hehsbdjdhdjdj"
+        }
+      ],
+      "id": 5
+    },
+    {
+      "produtoId": "2",
+      "produtoNome": "Mouse sem Fio",
+      "data": "2026-09-22T20:11:26.094Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade",
+          "de": "30",
+          "para": "177"
+        }
+      ],
+      "id": 6
+    },
+    {
+      "produtoId": "2",
+      "produtoNome": "Mouse sem Fio",
+      "data": "2026-09-22T20:12:06.834Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade",
+          "de": "177",
+          "para": "210"
+        },
+        {
+          "campo": "Preço",
+          "de": "R$ 89,50",
+          "para": "R$ 91,67"
+        }
+      ],
+      "id": 7
     }
   ],
-  "lotes": []
+  "lotes": [
+    {
+      "produtoId": "2",
+      "codigo": "LOTE-20260922-KIIC",
+      "validade": "2026-10-29",
+      "quantidadeEntrada": 147,
+      "saldoRestante": 147,
+      "custoUnitario": 50,
+      "criadoEm": "2026-09-22T20:11:26.094Z",
+      "id": 1
+    },
+    {
+      "produtoId": "2",
+      "codigo": "LOTE-20260922-75M2",
+      "validade": "2026-11-26",
+      "quantidadeEntrada": 33,
+      "saldoRestante": 33,
+      "custoUnitario": 55,
+      "criadoEm": "2026-09-22T20:12:06.834Z",
+      "id": 2
+    }
+  ]
 }
