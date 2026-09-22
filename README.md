@@ -1,56 +1,55 @@
-# Welcome to your Expo app 👋
+# StockFlow — Controle de Estoque Móvel
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo móvel para gerenciamento de estoque e catálogo de produtos desenvolvido em React Native com Expo e TypeScript. O projeto foi construído como solução para o Exame de Suficiência da disciplina de Programação para Dispositivos Móveis (PDM).
 
-## Get started
+---
 
-1. Install dependencies
+## Demonstração em Vídeo
+- **Link da Defesa em Vídeo:** [Adicione o link do vídeo aqui (YouTube / Google Drive)]
+> Vídeo de até 15 minutos apresentando a aplicação em execução e demonstrando o cumprimento de cada um dos 10 requisitos da avaliação.
 
+---
+
+## Funcionalidades
+- **Autenticação e Sessão:** Login de usuário com persistência de token localmente no dispositivo.
+- **Catálogo de Produtos:** Listagem dinâmica sincronizada com servidor remoto via API REST.
+- **Cadastro com Validação em Tempo Real:** Formulário com múltiplos campos controlados, chave seletora (Switch) e feedback visual imediato de erros.
+- **Remoção de Itens:** Exclusão de registros com sincronização direta na API e atualização do estado local.
+- **Resiliência e Feedback Visual:** Indicadores de carregamento (loading) em requisições e alertas visuais de sucesso ou erro.
+
+---
+
+## Tecnologias e Bibliotecas
+- [Expo](https://expo.dev/) (SDK 57)
+- [React Native](https://reactnative.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Expo Router](https://docs.expo.dev/router/introduction/) (Navegação baseada em arquivos)
+- [Context API](https://react.dev/reference/react/createContext) (Gerenciamento de estado global)
+- [@react-native-async-storage/async-storage](https://github.com/react-native-async-storage/async-storage) (Persistência local)
+- [Axios](https://axios-http.com/) (Cliente HTTP)
+
+---
+
+## Cobertura dos 10 Requisitos da Avaliação
+
+1. **Arquitetura de Rotas e Navegação com Expo Router:** Divisão entre fluxo público (`app/(auth)/login.tsx`) e fluxo protegido (`app/(app)/index.tsx` e `app/(app)/novo-produto.tsx`), com transições via `useRouter`.
+2. **Gerenciamento de Estado Global com Context API:** Implementação do `AuthContext` na raiz do app para controle de sessão sem prop drilling.
+3. **Persistência de Sessão com AsyncStorage:** Gravação e recuperação automática de credenciais e limpeza dos dados no logout.
+4. **Componentização Reutilizável e Tipagem com Props:** Componentes próprios tipados com TypeScript (`CustomInput`, `CustomButton` e `ProductCard`), sem o uso do componente `Button` rígido nativo.
+5. **Formulário Controlado com Validação e Switch:** 3 campos controlados via `useState`, 1 `Switch` para status de ativação do produto e mensagens de erro visuais abaixo dos campos.
+6. **Ciclo de Vida e Reatividade com Hooks (useEffect):** Efeito de montagem para inicialização de dados da API/Storage e efeito de monitoramento para validação de campos em tempo real.
+7. **Consumo Otimizado com FlatList e Axios (GET):** Requisição remota com exibição via `FlatList`, chaves exclusivas via `keyExtractor`, tratamento de `ListEmptyComponent` e estilização estruturada com cards.
+8. **Operações Remotas de Escrita e Exclusão (POST e DELETE):** Criação de produtos via formulário e exclusão direta através da lista.
+9. **Tratamento de Estados Visuais:** Componente `ActivityIndicator` durante processos assíncronos e diálogos de feedback via `Alert.alert`.
+10. **Layout Seguro, Flexbox e StyleSheet:** Estruturas seguras com `SafeAreaView` e `ScrollView`, identidade visual via `Image`, posicionamento com Flexbox e estilos 100% isolados via `StyleSheet.create` (sem estilos inline).
+
+---
+
+## Configuração do Backend (API REST)
+
+A aplicação consome uma API REST para leitura e escrita dos produtos.
+
+### Opção 1: JSON-Server (Recomendado para testes locais)
+1. Instale o json-server globalmente ou na raiz:
    ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   npm install -g json-server
