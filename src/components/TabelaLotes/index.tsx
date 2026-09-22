@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
 import type { TabelaLotesProps } from "@/types";
-import { formatarData } from "@/utils/data";
+import { formatarDataCurta } from "@/utils/data";
 import { calcularStatusLote } from "@/utils/lote";
 import { formatarMoeda } from "@/utils/moeda";
 
@@ -50,7 +50,7 @@ export function TabelaLotes({ lotes }: TabelaLotesProps) {
               <View style={styles.campo}>
                 <Text style={styles.campoRotulo}>Validade</Text>
                 <Text style={styles.campoValor}>
-                  {lote.validade ? formatarData(lote.validade) : "Não expira"}
+                  {lote.validade ? formatarDataCurta(lote.validade) : "Não expira"}
                 </Text>
               </View>
               <View style={styles.campo}>

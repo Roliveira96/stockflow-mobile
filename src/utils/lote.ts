@@ -13,12 +13,18 @@ export function gerarCodigoLote(): string {
   return `LOTE-${ano}${mes}${dia}-${aleatorio}`;
 }
 
+export function calcularDiasParaVencer(validade: string): number {
+  const hoje = new Date();
+  const hojeSemHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const dataValidade = new Date(`${validade}T00:00:00`);
+
+  return Math.round((dataValidade.getTime() - hojeSemHora.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export function calcularStatusLote(validade: string | null): StatusLote {
   if (!validade) return "regular";
 
-  const hoje = new Date();
-  const dataValidade = new Date(validade);
-  const diasRestantes = Math.ceil((dataValidade.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+  const diasRestantes = calcularDiasParaVencer(validade);
 
   if (diasRestantes < 0) return "vencido";
   if (diasRestantes <= DIAS_LIMITE_VENCENDO) return "vencendo";

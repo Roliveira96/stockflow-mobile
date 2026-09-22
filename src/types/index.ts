@@ -56,6 +56,13 @@ export interface TabelaLotesProps {
   lotes: Lote[];
 }
 
+export interface SeletorDataProps {
+  label: string;
+  valor: string | null;
+  onSelecionar: (iso: string) => void;
+  erro?: string;
+}
+
 export interface Usuario {
   id: string;
   nome: string;
