@@ -91,14 +91,32 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: cores.textoSecundario,
   },
-  subtitulo: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: cores.textoPrimario,
-    marginBottom: 14,
+  abas: {
+    flexDirection: "row",
+    gap: 6,
+    backgroundColor: cores.neutroFundo,
+    borderRadius: raios.md,
+    padding: 4,
+    marginBottom: 20,
   },
-  subtituloComEspaco: {
-    marginTop: 8,
+  aba: {
+    flex: 1,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: raios.sm,
+  },
+  abaAtiva: {
+    backgroundColor: cores.superficie,
+    ...sombra.flutuante,
+  },
+  abaTexto: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: cores.textoTerciario,
+  },
+  abaTextoAtiva: {
+    color: cores.primaria,
   },
   logItem: {
     borderBottomWidth: 1,

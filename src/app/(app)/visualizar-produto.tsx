@@ -1,6 +1,14 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
 import { TabelaLotes } from "@/components/TabelaLotes";
@@ -12,6 +20,14 @@ import { formatarData } from "@/utils/data";
 import { calcularCustoMedioPonderado } from "@/utils/lote";
 import { formatarMoeda } from "@/utils/moeda";
 
+type Aba = "produto" | "lotes" | "log";
+
+const ABAS: { chave: Aba; rotulo: string }[] = [
+  { chave: "produto", rotulo: "Produto" },
+  { chave: "lotes", rotulo: "Lotes" },
+  { chave: "log", rotulo: "Log" },
+];
+
 export default function VisualizarProduto() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -20,6 +36,7 @@ export default function VisualizarProduto() {
   const [lotes, setLotes] = useState<Lote[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [excluindo, setExcluindo] = useState(false);
+  const [abaAtiva, setAbaAtiva] = useState<Aba>("produto");
 
   useFocusEffect(
     useCallback(() => {
@@ -120,36 +137,6 @@ export default function VisualizarProduto() {
           </View>
         </View>
 
-        <View style={styles.cartao}>
-          <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Código de barras</Text>
-            <Text style={styles.linhaValor}>{produto.codigoBarras}</Text>
-          </View>
-          <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Quantidade</Text>
-            <Text style={styles.linhaValor}>{produto.quantidade}</Text>
-          </View>
-          <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Preço de venda</Text>
-            <Text style={styles.linhaValor}>{formatarMoeda(produto.preco)}</Text>
-          </View>
-          <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Custo médio ponderado</Text>
-            <Text style={styles.linhaValor}>
-              {lotes.length > 0 ? formatarMoeda(calcularCustoMedioPonderado(lotes)) : "—"}
-            </Text>
-          </View>
-          <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Criado em</Text>
-            <Text style={styles.linhaValor}>{formatarData(produto.criadoEm)}</Text>
-          </View>
-          <View style={[styles.linha, styles.linhaSemBorda]}>
-            <Text style={styles.linhaRotulo}>Última atualização</Text>
-            <Text style={styles.linhaValor}>{formatarData(produto.atualizadoEm)}</Text>
-          </View>
-          {produto.descricao ? <Text style={styles.descricaoTexto}>{produto.descricao}</Text> : null}
-        </View>
-
         <View style={styles.acoes}>
           <CustomButton
             titulo="Excluir"
@@ -174,25 +161,80 @@ export default function VisualizarProduto() {
           />
         </View>
 
-        <Text style={styles.subtitulo}>Lotes cadastrados</Text>
-        <TabelaLotes lotes={lotes} />
+        <View style={styles.abas}>
+          {ABAS.map((aba) => {
+            const ativa = aba.chave === abaAtiva;
 
-        <Text style={[styles.subtitulo, styles.subtituloComEspaco]}>Histórico de alterações</Text>
-        {logs.length === 0 ? (
-          <Text style={styles.vazio}>Nenhuma alteração registrada ainda.</Text>
-        ) : (
-          logs.map((log) => (
-            <View key={log.id} style={styles.logItem}>
-              <Text style={styles.logData}>{formatarData(log.data)}</Text>
-              {log.alteracoes.map((alteracao, indice) => (
-                <Text key={indice} style={styles.logAlteracao}>
-                  <Text style={styles.logCampo}>{alteracao.campo}</Text>: {alteracao.de} →{" "}
-                  {alteracao.para}
+            return (
+              <TouchableOpacity
+                key={aba.chave}
+                style={[styles.aba, ativa ? styles.abaAtiva : undefined]}
+                onPress={() => setAbaAtiva(aba.chave)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: ativa }}
+                accessibilityLabel={`Aba ${aba.rotulo}`}
+              >
+                <Text style={[styles.abaTexto, ativa ? styles.abaTextoAtiva : undefined]}>
+                  {aba.rotulo}
                 </Text>
-              ))}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {abaAtiva === "produto" ? (
+          <View style={styles.cartao}>
+            <View style={styles.linha}>
+              <Text style={styles.linhaRotulo}>Código de barras</Text>
+              <Text style={styles.linhaValor}>{produto.codigoBarras}</Text>
             </View>
-          ))
-        )}
+            <View style={styles.linha}>
+              <Text style={styles.linhaRotulo}>Quantidade</Text>
+              <Text style={styles.linhaValor}>{produto.quantidade}</Text>
+            </View>
+            <View style={styles.linha}>
+              <Text style={styles.linhaRotulo}>Preço de venda</Text>
+              <Text style={styles.linhaValor}>{formatarMoeda(produto.preco)}</Text>
+            </View>
+            <View style={styles.linha}>
+              <Text style={styles.linhaRotulo}>Custo médio ponderado</Text>
+              <Text style={styles.linhaValor}>
+                {lotes.length > 0 ? formatarMoeda(calcularCustoMedioPonderado(lotes)) : "—"}
+              </Text>
+            </View>
+            <View style={styles.linha}>
+              <Text style={styles.linhaRotulo}>Criado em</Text>
+              <Text style={styles.linhaValor}>{formatarData(produto.criadoEm)}</Text>
+            </View>
+            <View style={[styles.linha, styles.linhaSemBorda]}>
+              <Text style={styles.linhaRotulo}>Última atualização</Text>
+              <Text style={styles.linhaValor}>{formatarData(produto.atualizadoEm)}</Text>
+            </View>
+            {produto.descricao ? (
+              <Text style={styles.descricaoTexto}>{produto.descricao}</Text>
+            ) : null}
+          </View>
+        ) : null}
+
+        {abaAtiva === "lotes" ? <TabelaLotes lotes={lotes} /> : null}
+
+        {abaAtiva === "log" ? (
+          logs.length === 0 ? (
+            <Text style={styles.vazio}>Nenhuma alteração registrada ainda.</Text>
+          ) : (
+            logs.map((log) => (
+              <View key={log.id} style={styles.logItem}>
+                <Text style={styles.logData}>{formatarData(log.data)}</Text>
+                {log.alteracoes.map((alteracao, indice) => (
+                  <Text key={indice} style={styles.logAlteracao}>
+                    <Text style={styles.logCampo}>{alteracao.campo}</Text>: {alteracao.de} →{" "}
+                    {alteracao.para}
+                  </Text>
+                ))}
+              </View>
+            ))
+          )
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
