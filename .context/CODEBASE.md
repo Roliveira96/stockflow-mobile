@@ -8,6 +8,10 @@
 **Fase 3 concluída.** Funcionalidades além da spec original, pedidas pelo usuário: editar produto, código de barras, descrição, máscara de preço em centavos, selo de "últimas unidades", busca com autocomplete e filtro por status. Ver seção própria abaixo.
 **Fase 4 concluída.** Tela de visualização de produto, campos `criadoEm`/`atualizadoEm`, e log de alterações (de/para) a cada edição. Validado com edição real feita pelo próprio usuário durante o desenvolvimento.
 **Fase 5 concluída.** Passada de UX/UI orientada por heurísticas conhecidas (Nielsen, WCAG, Apple HIG/Material Design). Ver seção própria abaixo.
+**Fase 6 concluída.** Redesign visual completo: usuário achou a Fase 5 "extremamente feia". Nova direção "moderno/vibrante" (paleta roxa, gradientes, cards flutuantes com sombra, botões de ação em círculo). Ver seção própria abaixo.
+
+## Backlog (pedido pelo usuário, explicitamente para depois — não iniciado)
+Gestão de estoque por **lote**: tela de detalhe do produto com aba/tabela de lotes (número do lote, validade, quantidade de entrada, saldo restante, custo unitário, status), modal "Adicionar Novo Estoque" (lote, validade ou "não expira", quantidade recebida, custo unitário, cálculo automático se informado valor total da nota), estoque total e custo médio ponderado nas métricas do produto, e um simulador de margem em tempo real (margem = (preço venda - custo) / preço venda) com sugestão de novo preço de venda para manter a margem alvo. Isso é uma mudança de modelo de dados relevante (produto passaria a ter lotes associados, não só um `preco`/`quantidade` únicos) — vale revisitar o `Produto`/`DadosProduto` em `src/types/index.ts` e o contrato da API mock quando essa fase começar.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -96,6 +100,19 @@ Orientada por heurísticas conhecidas, não por gosto pessoal:
 - **Teclado não cobre o formulário:** `KeyboardAvoidingView` adicionado nas telas de login, novo produto e editar produto.
 - **Acessibilidade para leitor de tela:** `accessibilityRole`/`accessibilityLabel`/`accessibilityState` adicionados em todos os elementos tocáveis (botões, chips, sugestões, switch, imagem do logo, indicadores de carregamento).
 - **Consistência (Nielsen #4) — tokens de design:** criado `src/constants/theme.ts` (`cores`, `espacamento`, `raios`, `ALVO_TOQUE_MINIMO`) como fonte única da paleta e das medidas, substituindo hex-codes espalhados pelos arquivos `styles.ts`.
+
+## Redesign Visual (Fase 6)
+
+**Motivo:** usuário testou a Fase 5 e achou "extremamente feio" — pediu explicitamente paleta/cards/espaçamento/tipografia/alinhamento revistos, direção "moderno/vibrante" (referências dadas: Notion, Linear, Revolut).
+
+- **Paleta trocada:** de azul/cinza corporativo para roxo/violeta vibrante (`cores.primaria` = `#6C5CE7`) com gradiente (`primaria` → `primariaClara`) em vez de cor sólida nos botões principais.
+- **`expo-linear-gradient` adicionado** (compatível com Expo Go e web, confirmado via docs antes de instalar) — usado no `CustomButton`, que agora tem `variante?: "primaria" | "perigo" | "neutro"` (cada uma com seu próprio gradiente em `cores.gradientes`) em vez de cor customizada via `estiloContainer`.
+- **Sombras via `boxShadow`:** o RN atual avisa que `shadowColor`/`shadowOffset`/`shadowOpacity`/`shadowRadius` estão obsoletos a favor de um único `boxShadow` (sintaxe CSS, cross-platform incluindo Android/web) — confirmado via docs oficiais. `src/constants/theme.ts` exporta `sombra.cartao`/`sombra.botao`/`sombra.flutuante` já nesse formato.
+- **Raios maiores:** escala `raios` subiu de 8/12 para 10/16/22 — visual mais arredondado/suave.
+- **`ProductCard` redesenhado** de layout em duas colunas (texto | botões empilhados) para: cabeçalho (nome + preço) → linha de detalhes com ícones (quantidade, código de barras) → rodapé com selos + 3 botões de ação **circulares só com ícone** (antes eram chips com ícone+texto, ocupavam muito espaço vertical).
+- **Bug real encontrado e corrigido nessa fase:** ao tornar o card inteiro clicável (tocar em qualquer lugar abre a visualização) envolvendo tudo — incluindo os botões de ação — num único `TouchableOpacity`, o React Native Web gera `<button>` HTML aninhado em `<button>`, que é HTML inválido; o browser reportava erro em tempo de execução ("`<button>` cannot contain a nested `<button>`"). Corrigido separando: só a área de conteúdo (nome/preço/detalhes) fica dentro do `TouchableOpacity` de "visualizar"; a barra de ações fica como `View` irmã, fora dele — sem aninhamento.
+- **Inputs "preenchidos":** `CustomInput` passou de borda cinza simples para fundo levemente tingido (`cores.neutroFundo`) que vira branco + borda colorida no foco — mesmo padrão visual usado por Linear/Material 3.
+- **Tela de login:** logo ganhou um cartão branco arredondado com sombra ao redor (em vez do ícone solto), título maior (32px, peso 800, letter-spacing negativo) para mais hierarquia.
 
 ## Backend Mock (Desenvolvimento Local)
 `json-server@0.17.4` (versão estável, não a v1 beta) lê `db.json` na raiz e expõe REST em `http://localhost:3000`, batendo com o fallback padrão de `src/services/api.ts`. Rodar com `npm run mock-api`. Seed inicial: 3 produtos em `db.json` (`produtos`).

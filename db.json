@@ -32,6 +32,17 @@
       "descricao": "Monitor Full HD com ajuste de altura.",
       "criadoEm": "2026-09-01T12:00:00.000Z",
       "atualizadoEm": "2026-09-01T12:00:00.000Z"
+    },
+    {
+      "nome": "teswetrwe",
+      "codigoBarras": "123123123123",
+      "quantidade": 12,
+      "preco": 1231.23,
+      "descricao": "123adasd ASD\nasdasdfsadf\nasdfasdfasdfsd",
+      "ativo": false,
+      "criadoEm": "2026-09-22T17:00:40.847Z",
+      "atualizadoEm": "2026-09-22T17:00:40.847Z",
+      "id": "hHh7r6d"
     }
   ],
   "logs": [
