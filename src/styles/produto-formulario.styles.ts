@@ -16,15 +16,7 @@ export const styles = StyleSheet.create({
     color: "#102A43",
     marginBottom: 20,
   },
-  linhaSwitch: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  rotuloSwitch: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1F2933",
+  carregando: {
+    marginTop: 40,
   },
 });

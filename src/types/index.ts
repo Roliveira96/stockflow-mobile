@@ -6,7 +6,11 @@ export interface Produto {
   quantidade: number;
   preco: number;
   ativo: boolean;
+  codigoBarras: string;
+  descricao?: string;
 }
+
+export type DadosProduto = Omit<Produto, "id">;
 
 export interface Usuario {
   id: string;
@@ -38,4 +42,22 @@ export interface CustomButtonProps {
 export interface ProductCardProps {
   produto: Produto;
   onExcluir: (id: string) => void;
+  onEditar: (id: string) => void;
+}
+
+export interface ProdutoFormProps {
+  valoresIniciais?: Produto;
+  enviando: boolean;
+  textoBotao: string;
+  aoEnviar: (dados: DadosProduto) => void;
+}
+
+export type StatusFiltro = "todos" | "ativos" | "sem-estoque" | "inativos";
+
+export interface FiltroProdutosProps {
+  produtos: Produto[];
+  busca: string;
+  aoMudarBusca: (texto: string) => void;
+  filtroStatus: StatusFiltro;
+  aoMudarFiltroStatus: (status: StatusFiltro) => void;
 }
