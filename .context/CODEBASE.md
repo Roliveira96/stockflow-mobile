@@ -23,7 +23,7 @@ A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`,
 - [x] `src/components/ProductCard/styles.ts` + `index.tsx`
 - [x] `src/contexts/AuthContext.tsx`
 - [x] `src/app/_layout.tsx`
-- [ ] `src/app/(auth)/_layout.tsx`, `styles.ts`, `login.tsx`
+- [x] `src/app/(auth)/_layout.tsx`, `styles.ts`, `login.tsx`
 - [ ] `src/app/(app)/_layout.tsx`
 - [ ] `src/app/(app)/styles.ts`, `index.tsx`
 - [ ] `src/app/(app)/novo-produto.styles.ts`, `novo-produto.tsx`
@@ -57,3 +57,4 @@ src/
 - `src/components/ProductCard/` — cartão com nome, quantidade, preço formatado (`Intl.NumberFormat` pt-BR/BRL), selo ativo/inativo e ação de remoção.
 - `src/contexts/AuthContext.tsx` — `AuthProvider`/`useAuth`; restaura sessão do `AsyncStorage` na montagem (`carregandoSessao` evita flash de rota errada), `login` valida campos e gera usuário/token local (ver decisão de autenticação acima), `logout` limpa as chaves.
 - `src/app/_layout.tsx` — raiz com `AuthProvider` + `Stack` usando `Stack.Protected` (padrão atual do Expo Router v57 para rotas protegidas) alternando entre os grupos `(app)` e `(auth)` conforme `token`; splash nativa escondida só após `carregandoSessao` finalizar.
+- `src/app/(auth)/` — `login.tsx` com logo (`assets/images/icon.png`), `CustomInput` de e-mail/senha e `CustomButton` que chama `login()` do `AuthContext`; erros de login exibidos via `Alert.alert`.
