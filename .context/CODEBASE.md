@@ -6,7 +6,8 @@
 **Fase 1 concluída.** Todos os 11 arquivos da ordem de execução da spec (seção 9) foram criados. `npx tsc --noEmit` e `npx expo lint` passam sem erros.
 **Fase 2 concluída.** Backend mock (`json-server`) configurado e testado manualmente (GET/POST/DELETE em `/produtos` confirmados). Fluxo completo (login → listar → criar → ver na lista) validado ponta a ponta com Playwright headless contra o dev server web real.
 **Fase 3 concluída.** Funcionalidades além da spec original, pedidas pelo usuário: editar produto, código de barras, descrição, máscara de preço em centavos, selo de "últimas unidades", busca com autocomplete e filtro por status. Ver seção própria abaixo.
-**Pendente (pedido pelo usuário, ainda não iniciado):** tela de visualização de produto (com botões de editar/excluir), campos `criadoEm`/`atualizadoEm`, log de alterações (de/para) a cada edição, e uma passada de UX/UI.
+**Fase 4 concluída.** Tela de visualização de produto, campos `criadoEm`/`atualizadoEm`, e log de alterações (de/para) a cada edição. Validado com edição real feita pelo próprio usuário durante o desenvolvimento.
+**Pendente:** passada de UX/UI.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -56,7 +57,8 @@ src/
 │       ├── _layout.tsx
 │       ├── index.tsx            # listagem + busca/autocomplete + filtro de status
 │       ├── novo-produto.tsx
-│       └── editar-produto.tsx   # busca produto por id (query param) e reusa ProdutoForm
+│       ├── editar-produto.tsx     # busca produto por id (query param) e reusa ProdutoForm
+│       └── visualizar-produto.tsx # detalhe + historico de alteracoes (log de-para)
 ├── components/
 │   ├── CustomInput/
 │   ├── CustomButton/
@@ -70,11 +72,14 @@ src/
 ├── styles/
 │   ├── login.styles.ts
 │   ├── produtos.styles.ts
-│   └── produto-formulario.styles.ts   # compartilhado por novo-produto e editar-produto
+│   ├── produto-formulario.styles.ts   # compartilhado por novo-produto e editar-produto
+│   └── visualizar-produto.styles.ts
 ├── types/
 │   └── index.ts
 └── utils/
-    └── moeda.ts                 # formatarMoeda, extrairDigitos, formatarCentavosComoTexto
+    ├── moeda.ts                 # formatarMoeda, extrairDigitos, formatarCentavosComoTexto
+    ├── data.ts                  # formatarData (pt-BR)
+    └── logProduto.ts            # compararProdutos (gera o log de-para)
 ```
 
 ## Backend Mock (Desenvolvimento Local)
@@ -103,3 +108,7 @@ src/
 - **`src/app/(app)/editar-produto.tsx`:** lê `id` via `useLocalSearchParams` (query param, sem rota dinâmica `[id].tsx`), busca `GET /produtos/:id` no efeito de montagem, reusa `ProdutoForm` com `valoresIniciais`, envia `PUT /produtos/:id` no submit.
 - **`ProductCard`:** agora mostra código de barras, descrição (se houver), selo extra "Últimas unidades" quando `0 < quantidade < 5`, e um botão "Editar" (além de "Remover") que aciona `onEditar(id)`.
 - **`src/components/FiltroProdutos/`:** campo de busca por nome com autocomplete (sugestões em dropdown, até 5 resultados, aparecem/somem com foco/blur/seleção) + chips de filtro por status (Todos/Ativos/Sem estoque/Inativos). A tela `(app)/index.tsx` combina busca + filtro via `useMemo` sobre a lista completa de produtos (filtragem no cliente, não uma nova chamada à API).
+- **`criadoEm`/`atualizadoEm`:** ISO strings geradas no cliente (`new Date().toISOString()`), já que o `json-server` não gera timestamps sozinho. `novo-produto.tsx` seta os dois iguais na criação; `editar-produto.tsx` preserva `criadoEm` do produto original e só atualiza `atualizadoEm`.
+- **Log de alterações (de/para):** nova coleção `logs` no `db.json` (recurso REST automático do `json-server`, filtrável via `GET /logs?produtoId=`). `src/utils/logProduto.ts` (`compararProdutos`) compara o produto antes/depois campo a campo (nome, código de barras, quantidade, preço, descrição, ativo) e monta a lista de alterações; `editar-produto.tsx` grava um log via `POST /logs` só quando algo de fato mudou.
+- **`src/app/(app)/visualizar-produto.tsx`:** tela de detalhe (nova rota, `id` via query param) — mostra todos os campos do produto, selos (ativo/inativo, últimas unidades), datas formatadas em pt-BR, botões Editar/Excluir, e o histórico de alterações (mais recente primeiro). Usa `useFocusEffect` para recarregar produto + logs sempre que a tela reganha foco (ex.: voltando da edição).
+- **`ProductCard`:** nome agora é clicável (abre a visualização) e ganhou um terceiro botão "Visualizar" ao lado de Editar/Remover.

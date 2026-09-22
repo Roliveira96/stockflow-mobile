@@ -1,13 +1,15 @@
 {
   "produtos": [
     {
-      "id": "1",
-      "nome": "Teclado Mecânico",
+      "nome": "Teclado Mecânico V3",
+      "codigoBarras": "7891234567891",
       "quantidade": 12,
-      "preco": 349.9,
+      "preco": 400,
+      "descricao": "Teclado mecânico ABNT2 com switches RGB.",
       "ativo": true,
-      "codigoBarras": "7891234567890",
-      "descricao": "Teclado mecânico ABNT2 com switches azuis."
+      "criadoEm": "2026-09-01T12:00:00.000Z",
+      "atualizadoEm": "2026-09-22T16:11:43.819Z",
+      "id": "1"
     },
     {
       "id": "2",
@@ -16,16 +18,94 @@
       "preco": 89.5,
       "ativo": true,
       "codigoBarras": "7891234567906",
-      "descricao": ""
+      "descricao": "",
+      "criadoEm": "2026-09-01T12:00:00.000Z",
+      "atualizadoEm": "2026-09-01T12:00:00.000Z"
     },
     {
       "id": "3",
       "nome": "Monitor 24 Polegadas",
       "quantidade": 0,
-      "preco": 799.0,
+      "preco": 799,
       "ativo": false,
       "codigoBarras": "7891234567913",
-      "descricao": "Monitor Full HD com ajuste de altura."
+      "descricao": "Monitor Full HD com ajuste de altura.",
+      "criadoEm": "2026-09-01T12:00:00.000Z",
+      "atualizadoEm": "2026-09-01T12:00:00.000Z"
+    }
+  ],
+  "logs": [
+    {
+      "produtoId": "1",
+      "produtoNome": "Teclado Mecânico",
+      "data": "2026-09-22T16:10:47.700Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade",
+          "de": "12",
+          "para": "123"
+        }
+      ],
+      "id": 1
+    },
+    {
+      "produtoId": "1",
+      "produtoNome": "Teclado Mecânico",
+      "data": "2026-09-22T16:11:02.520Z",
+      "alteracoes": [
+        {
+          "campo": "Preço",
+          "de": "R$ 349,91",
+          "para": "R$ 349,92"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "produtoId": "1",
+      "produtoNome": "Teclado Mecânico V2",
+      "data": "2026-09-22T16:11:14.635Z",
+      "alteracoes": [
+        {
+          "campo": "Nome",
+          "de": "Teclado Mecânico",
+          "para": "Teclado Mecânico V2"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "produtoId": "1",
+      "produtoNome": "Teclado Mecânico V3",
+      "data": "2026-09-22T16:11:43.819Z",
+      "alteracoes": [
+        {
+          "campo": "Nome",
+          "de": "Teclado Mecânico V2",
+          "para": "Teclado Mecânico V3"
+        },
+        {
+          "campo": "Código de barras",
+          "de": "7891234567890",
+          "para": "7891234567891"
+        },
+        {
+          "campo": "Quantidade",
+          "de": "123",
+          "para": "12"
+        },
+        {
+          "campo": "Preço",
+          "de": "R$ 349,92",
+          "para": "R$ 400,00"
+        },
+        {
+          "campo": "Descrição",
+          "de": "Teclado mecânico ABNT2 com switches azuis.",
+          "para": "Teclado mecânico ABNT2 com switches RGB."
+        }
+      ],
+      "id": 4
     }
   ]
 }
