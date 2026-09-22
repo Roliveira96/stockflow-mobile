@@ -127,6 +127,7 @@ export default function ListaDeProdutos() {
         <FlatList
           data={produtosFiltrados}
           keyExtractor={(produto) => produto.id}
+          style={styles.listaContainer}
           contentContainerStyle={styles.lista}
           renderItem={({ item }) => (
             <ProductCard

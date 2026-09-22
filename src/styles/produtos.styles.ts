@@ -29,6 +29,9 @@ export const styles = StyleSheet.create({
   carregando: {
     marginTop: 40,
   },
+  listaContainer: {
+    flex: 1,
+  },
   lista: {
     paddingHorizontal: 20,
     paddingBottom: 20,
