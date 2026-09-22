@@ -118,9 +118,20 @@ export interface ProdutoFormProps {
 export type StatusFiltro = "todos" | "ativos" | "sem-estoque" | "inativos";
 
 export interface FiltroProdutosProps {
-  produtos: Produto[];
+  sugestoes: Produto[];
   busca: string;
   aoMudarBusca: (texto: string) => void;
   filtroStatus: StatusFiltro;
   aoMudarFiltroStatus: (status: StatusFiltro) => void;
+}
+
+export interface RespostaPaginada<T> {
+  itens: T[];
+  paginaAtual: number;
+  itensPorPagina: number;
+  totalItens: number;
+  quantidadeNaPagina: number;
+  filtro: string;
+  ehPrimeiraPagina: boolean;
+  ehUltimaPagina: boolean;
 }

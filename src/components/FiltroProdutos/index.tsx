@@ -14,7 +14,7 @@ const OPCOES_STATUS: { valor: StatusFiltro; rotulo: string }[] = [
 ];
 
 export function FiltroProdutos({
-  produtos,
+  sugestoes,
   busca,
   aoMudarBusca,
   filtroStatus,
@@ -22,11 +22,7 @@ export function FiltroProdutos({
 }: FiltroProdutosProps) {
   const [sugestoesVisiveis, setSugestoesVisiveis] = useState(false);
 
-  const termo = busca.trim().toLowerCase();
-  const sugestoes =
-    sugestoesVisiveis && termo.length > 0
-      ? produtos.filter((produto) => produto.nome.toLowerCase().includes(termo)).slice(0, 5)
-      : [];
+  const sugestoesExibidas = sugestoesVisiveis ? sugestoes : [];
 
   function handleSelecionarSugestao(nome: string) {
     aoMudarBusca(nome);
@@ -47,10 +43,10 @@ export function FiltroProdutos({
           onBlur={() => setTimeout(() => setSugestoesVisiveis(false), 150)}
           placeholder="Digite o nome do produto"
         />
-        {sugestoes.length > 0 ? (
+        {sugestoesExibidas.length > 0 ? (
           <View style={styles.sugestoesContainer}>
             <FlatList
-              data={sugestoes}
+              data={sugestoesExibidas}
               keyExtractor={(produto) => produto.id}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (

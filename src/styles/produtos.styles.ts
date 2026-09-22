@@ -46,6 +46,16 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: cores.textoTerciario,
   },
+  carregandoMais: {
+    marginVertical: 16,
+  },
+  contador: {
+    textAlign: "center",
+    fontSize: 12,
+    fontWeight: "600",
+    color: cores.textoTerciario,
+    paddingBottom: 4,
+  },
   rodape: {
     paddingHorizontal: 20,
     paddingBottom: 20,

@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,6 +18,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { cores } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
+import { buscarProdutosPaginado, buscarSugestoesProdutos } from "@/services/produtos";
 import { styles } from "@/styles/produtos.styles";
 import type { Produto, StatusFiltro } from "@/types";
 
@@ -25,20 +26,63 @@ export default function ListaDeProdutos() {
   const router = useRouter();
   const { logout } = useAuth();
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [pagina, setPagina] = useState(1);
+  const [totalItens, setTotalItens] = useState(0);
+  const [temMaisPaginas, setTemMaisPaginas] = useState(false);
   const [carregando, setCarregando] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
   const [busca, setBusca] = useState("");
+  const [buscaDebounced, setBuscaDebounced] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<StatusFiltro>("todos");
+  const [sugestoes, setSugestoes] = useState<Produto[]>([]);
   const [menuAberto, setMenuAberto] = useState(false);
+
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBuscaDebounced(busca), 350);
+    return () => clearTimeout(temporizador);
+  }, [busca]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    const temporizador = setTimeout(async () => {
+      try {
+        const resultado = await buscarSugestoesProdutos(busca);
+        if (ativo) {
+          setSugestoes(resultado);
+        }
+      } catch {
+        if (ativo) {
+          setSugestoes([]);
+        }
+      }
+    }, 250);
+
+    return () => {
+      ativo = false;
+      clearTimeout(temporizador);
+    };
+  }, [busca]);
 
   useFocusEffect(
     useCallback(() => {
       let ativo = true;
 
-      async function buscarProdutos() {
+      async function carregarPrimeiraPagina() {
+        setCarregando(true);
+
         try {
-          const resposta = await api.get<Produto[]>("/produtos");
+          const resposta = await buscarProdutosPaginado({
+            pagina: 1,
+            busca: buscaDebounced,
+            filtroStatus,
+          });
+
           if (ativo) {
-            setProdutos(resposta.data);
+            setProdutos(resposta.itens);
+            setPagina(resposta.paginaAtual);
+            setTotalItens(resposta.totalItens);
+            setTemMaisPaginas(!resposta.ehUltimaPagina);
           }
         } catch {
           if (ativo) {
@@ -51,28 +95,36 @@ export default function ListaDeProdutos() {
         }
       }
 
-      buscarProdutos();
+      carregarPrimeiraPagina();
 
       return () => {
         ativo = false;
       };
-    }, [])
+    }, [buscaDebounced, filtroStatus])
   );
 
-  const produtosFiltrados = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
+  async function handleCarregarMais() {
+    if (carregando || carregandoMais || !temMaisPaginas) return;
 
-    return produtos.filter((produto) => {
-      if (termo.length > 0 && !produto.nome.toLowerCase().includes(termo)) {
-        return false;
-      }
+    setCarregandoMais(true);
 
-      if (filtroStatus === "ativos") return produto.ativo;
-      if (filtroStatus === "sem-estoque") return produto.quantidade === 0;
-      if (filtroStatus === "inativos") return !produto.ativo;
-      return true;
-    });
-  }, [produtos, busca, filtroStatus]);
+    try {
+      const proximaPagina = pagina + 1;
+      const resposta = await buscarProdutosPaginado({
+        pagina: proximaPagina,
+        busca: buscaDebounced,
+        filtroStatus,
+      });
+
+      setProdutos((atual) => [...atual, ...resposta.itens]);
+      setPagina(resposta.paginaAtual);
+      setTemMaisPaginas(!resposta.ehUltimaPagina);
+    } catch {
+      Alert.alert("Erro de conexão", "Não foi possível carregar mais produtos.");
+    } finally {
+      setCarregandoMais(false);
+    }
+  }
 
   function handleExcluir(id: string) {
     const produto = produtos.find((item) => item.id === id);
@@ -89,6 +141,7 @@ export default function ListaDeProdutos() {
             try {
               await api.delete(`/produtos/${id}`);
               setProdutos((atual) => atual.filter((item) => item.id !== id));
+              setTotalItens((atual) => Math.max(0, atual - 1));
             } catch {
               Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
             }
@@ -131,7 +184,7 @@ export default function ListaDeProdutos() {
       />
 
       <FiltroProdutos
-        produtos={produtos}
+        sugestoes={sugestoes}
         busca={busca}
         aoMudarBusca={setBusca}
         filtroStatus={filtroStatus}
@@ -147,7 +200,7 @@ export default function ListaDeProdutos() {
         />
       ) : (
         <FlatList
-          data={produtosFiltrados}
+          data={produtos}
           keyExtractor={(produto) => produto.id}
           style={styles.listaContainer}
           contentContainerStyle={styles.lista}
@@ -159,9 +212,27 @@ export default function ListaDeProdutos() {
               onVisualizar={handleVisualizar}
             />
           )}
+          onEndReached={handleCarregarMais}
+          onEndReachedThreshold={0.4}
           ListEmptyComponent={<Text style={styles.vazio}>Nenhum produto encontrado.</Text>}
+          ListFooterComponent={
+            carregandoMais ? (
+              <ActivityIndicator
+                style={styles.carregandoMais}
+                size="small"
+                color={cores.primaria}
+                accessibilityLabel="Carregando mais produtos"
+              />
+            ) : null
+          }
         />
       )}
+
+      {!carregando && totalItens > 0 ? (
+        <Text style={styles.contador}>
+          Mostrando {produtos.length} de {totalItens} produto{totalItens === 1 ? "" : "s"}
+        </Text>
+      ) : null}
 
       <View style={styles.rodape}>
         <CustomButton
