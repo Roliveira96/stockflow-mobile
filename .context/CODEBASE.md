@@ -13,7 +13,10 @@
 A spec (seção 5) só define contrato de API para `produtos` (GET/POST/DELETE); não há endpoint de autenticação especificado. Assumindo que o login é validado localmente no `AuthContext` (campos não vazios) e um token é gerado no cliente para fins do exame, já que não há backend de auth definido. Ajustar se um contrato real de login surgir.
 
 ## Configuração de Ambiente
-`src/services/api.ts` lê `EXPO_PUBLIC_API_URL` (padrão Expo para variáveis públicas). Sem esse valor definido em `.env`, cai para `http://localhost:3000` (porta padrão do `json-server`).
+`src/services/api.ts` lê `EXPO_PUBLIC_API_URL` (padrão Expo para variáveis públicas). Sem esse valor definido em `.env`, cai para `http://localhost:3000` (porta padrão do `json-server`). `.env` está no `.gitignore` (valor é específico da máquina/rede de cada um); `.env.example` documenta a variável e fica versionado.
+
+## Bug Corrigido: acesso via IP de rede (outra máquina/dispositivo)
+**Sintoma:** app acessado via `http://192.168.x.x:8095` (IP da máquina na rede, não `localhost`) não conseguia falar com a API. **Causa raiz (dois problemas):** (1) `json-server` escutava só em `127.0.0.1`, inacessível de fora da própria máquina; (2) o fallback `http://localhost:3000` em `src/services/api.ts`, do ponto de vista do dispositivo remoto, aponta pra ele mesmo, não para o host rodando o mock. **Correção:** `npm run mock-api` agora roda com `--host 0.0.0.0`; `.env` local aponta `EXPO_PUBLIC_API_URL` para o IP de rede da máquina host. Documentado no README ("Acessando de outro dispositivo na rede").
 
 ## Nota de Convenção
 A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`, `app/(app)/...`. Este projeto usa **`src/app/`** como raiz de rotas (Expo Router), conforme `AGENTS.md` e a estrutura real do repositório. Todos os caminhos da spec devem ser lidos com o prefixo `src/` adicionado.

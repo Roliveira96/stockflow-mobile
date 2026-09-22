@@ -78,10 +78,21 @@ O `json-server` já está nas `devDependencies` e o seed de dados vive em `db.js
 
 ### Apontando para outra API
 
-Para usar um backend diferente (remoto ou outra porta local), defina a variável de ambiente pública do Expo em um arquivo `.env` na raiz:
+Para usar um backend diferente (remoto ou outra porta local), copie `.env.example` para `.env` e defina a variável de ambiente pública do Expo:
 
 ```bash
 EXPO_PUBLIC_API_URL=https://sua-api.exemplo.com
 ```
 
-> No Android, ao rodar o mock local em outro dispositivo/emulador físico, use o IP da máquina na rede (ex.: `http://192.168.x.x:3000`) em vez de `localhost`.
+> **Reinicie `npx expo start` depois de mudar o `.env`** — variáveis `EXPO_PUBLIC_*` são embutidas no bundle na hora da compilação, não lidas em tempo de execução.
+
+### Acessando de outro dispositivo na rede (celular físico, outra máquina)
+
+Se você abrir o app pelo IP da máquina na rede (ex.: `http://192.168.x.x:8081`) em vez de `localhost`, duas coisas precisam mudar:
+
+1. O `json-server` precisa escutar em todas as interfaces, não só `localhost`. O script `npm run mock-api` já faz isso (`--host 0.0.0.0`).
+2. O app precisa apontar para o IP da máquina, não para `localhost` (que, do ponto de vista do outro dispositivo, é ele mesmo). Defina no `.env`:
+   ```bash
+   EXPO_PUBLIC_API_URL=http://192.168.x.x:3000
+   ```
+   e reinicie `npx expo start`.
