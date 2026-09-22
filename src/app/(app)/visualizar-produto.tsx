@@ -118,6 +118,27 @@ export default function VisualizarProduto() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.abas}>
+        {ABAS.map((aba) => {
+          const ativa = aba.chave === abaAtiva;
+
+          return (
+            <TouchableOpacity
+              key={aba.chave}
+              style={[styles.aba, ativa ? styles.abaAtiva : undefined]}
+              onPress={() => setAbaAtiva(aba.chave)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: ativa }}
+              accessibilityLabel={`Aba ${aba.rotulo}`}
+            >
+              <Text style={[styles.abaTexto, ativa ? styles.abaTextoAtiva : undefined]}>
+                {aba.rotulo}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
       <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo}>
         <View style={styles.cabecalho}>
           <Text style={styles.nome}>{produto.nome}</Text>
@@ -135,30 +156,6 @@ export default function VisualizarProduto() {
               </View>
             ) : null}
           </View>
-        </View>
-
-        <View style={styles.acoes}>
-          <CustomButton
-            titulo="Excluir"
-            onPress={handleExcluir}
-            carregando={excluindo}
-            estiloContainer={styles.botaoAcao}
-            icone="trash-outline"
-            variante="perigo"
-          />
-          <CustomButton
-            titulo="Editar"
-            onPress={() => router.push({ pathname: "/editar-produto", params: { id } })}
-            estiloContainer={styles.botaoAcao}
-            icone="create-outline"
-            variante="neutro"
-          />
-          <CustomButton
-            titulo="Estoque"
-            onPress={() => router.push({ pathname: "/adicionar-estoque", params: { id } })}
-            estiloContainer={styles.botaoAcao}
-            icone="add-circle-outline"
-          />
         </View>
 
         {abaAtiva === "produto" ? (
@@ -216,25 +213,28 @@ export default function VisualizarProduto() {
         ) : null}
       </ScrollView>
 
-      <View style={styles.abas}>
-        {ABAS.map((aba) => {
-          const ativa = aba.chave === abaAtiva;
-
-          return (
-            <TouchableOpacity
-              key={aba.chave}
-              style={[styles.aba, ativa ? styles.abaAtiva : undefined]}
-              onPress={() => setAbaAtiva(aba.chave)}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: ativa }}
-              accessibilityLabel={`Aba ${aba.rotulo}`}
-            >
-              <Text style={[styles.abaTexto, ativa ? styles.abaTextoAtiva : undefined]}>
-                {aba.rotulo}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View style={styles.acoes}>
+        <CustomButton
+          titulo="Excluir"
+          onPress={handleExcluir}
+          carregando={excluindo}
+          estiloContainer={styles.botaoAcao}
+          icone="trash-outline"
+          variante="perigo"
+        />
+        <CustomButton
+          titulo="Editar"
+          onPress={() => router.push({ pathname: "/editar-produto", params: { id } })}
+          estiloContainer={styles.botaoAcao}
+          icone="create-outline"
+          variante="neutro"
+        />
+        <CustomButton
+          titulo="Estoque"
+          onPress={() => router.push({ pathname: "/adicionar-estoque", params: { id } })}
+          estiloContainer={styles.botaoAcao}
+          icone="add-circle-outline"
+        />
       </View>
     </SafeAreaView>
   );
