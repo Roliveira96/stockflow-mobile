@@ -22,26 +22,31 @@ A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`,
 - [x] `src/components/CustomButton/styles.ts` + `index.tsx`
 - [x] `src/components/ProductCard/styles.ts` + `index.tsx`
 - [x] `src/contexts/AuthContext.tsx`
-- [ ] `src/app/_layout.tsx`
+- [x] `src/app/_layout.tsx`
 - [ ] `src/app/(auth)/_layout.tsx`, `styles.ts`, `login.tsx`
 - [ ] `src/app/(app)/_layout.tsx`
 - [ ] `src/app/(app)/styles.ts`, `index.tsx`
 - [ ] `src/app/(app)/novo-produto.styles.ts`, `novo-produto.tsx`
 
-## Estrutura Atual (real)
+## Limpeza do Template Padrão
+Removido todo o cluster do template `create-expo-app` (tabs de exemplo) que ficaria órfão ou colidiria em rota com a estrutura da spec: `src/app/index.tsx`, `src/app/explore.tsx`, `src/components/app-tabs*`, `animated-icon*`, `themed-text.tsx`, `themed-view.tsx`, `hint-row.tsx`, `external-link.tsx`, `web-badge.tsx`, `ui/collapsible.tsx`, `constants/theme.ts`, `hooks/use-color-scheme*`, `hooks/use-theme.ts`, `src/global.css`. Confirmado por grep que nenhum arquivo fora desse cluster os referenciava.
+
+## Estrutura Atual (real, em construção)
 
 ```text
 src/
 ├── app/
-│   ├── _layout.tsx        # template padrão Expo — será substituído
-│   ├── index.tsx          # template padrão Expo — será substituído
-│   └── explore.tsx        # template padrão Expo — avaliar remoção
-├── components/             # componentes do template padrão (animated-icon, app-tabs, etc.) — avaliar remoção
-├── constants/
-│   └── theme.ts
-└── hooks/
-    ├── use-color-scheme.ts
-    └── use-theme.ts
+│   └── _layout.tsx        # Stack.Protected por token de auth, splash controlado por carregandoSessao
+├── components/
+│   ├── CustomInput/
+│   ├── CustomButton/
+│   └── ProductCard/
+├── contexts/
+│   └── AuthContext.tsx
+├── services/
+│   └── api.ts
+└── types/
+    └── index.ts
 ```
 
 ## Arquivos Criados pela Spec
@@ -51,3 +56,4 @@ src/
 - `src/components/CustomButton/` — `TouchableOpacity` com estados de loading (`ActivityIndicator`) e desabilitado; não usa `Button` nativo.
 - `src/components/ProductCard/` — cartão com nome, quantidade, preço formatado (`Intl.NumberFormat` pt-BR/BRL), selo ativo/inativo e ação de remoção.
 - `src/contexts/AuthContext.tsx` — `AuthProvider`/`useAuth`; restaura sessão do `AsyncStorage` na montagem (`carregandoSessao` evita flash de rota errada), `login` valida campos e gera usuário/token local (ver decisão de autenticação acima), `logout` limpa as chaves.
+- `src/app/_layout.tsx` — raiz com `AuthProvider` + `Stack` usando `Stack.Protected` (padrão atual do Expo Router v57 para rotas protegidas) alternando entre os grupos `(app)` e `(auth)` conforme `token`; splash nativa escondida só após `carregandoSessao` finalizar.
