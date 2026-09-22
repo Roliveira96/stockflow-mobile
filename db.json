@@ -12,26 +12,26 @@
       "id": "1"
     },
     {
-      "id": "2",
       "nome": "Mouse sem Fio",
+      "codigoBarras": "7891234567906",
       "quantidade": 30,
       "preco": 89.5,
-      "ativo": true,
-      "codigoBarras": "7891234567906",
       "descricao": "",
+      "ativo": true,
       "criadoEm": "2026-09-01T12:00:00.000Z",
-      "atualizadoEm": "2026-09-01T12:00:00.000Z"
+      "atualizadoEm": "2026-09-01T12:00:00.000Z",
+      "id": "2"
     },
     {
-      "id": "3",
       "nome": "Monitor 24 Polegadas",
+      "codigoBarras": "7891234567913",
       "quantidade": 0,
       "preco": 799,
-      "ativo": false,
-      "codigoBarras": "7891234567913",
       "descricao": "Monitor Full HD com ajuste de altura.",
+      "ativo": false,
       "criadoEm": "2026-09-01T12:00:00.000Z",
-      "atualizadoEm": "2026-09-01T12:00:00.000Z"
+      "atualizadoEm": "2026-09-01T12:00:00.000Z",
+      "id": "3"
     },
     {
       "nome": "teswetrwe",
@@ -41,7 +41,7 @@
       "descricao": "123adasd ASD\nasdasdfsadf\nasdfasdfasdfsd",
       "ativo": false,
       "criadoEm": "2026-09-22T17:00:40.847Z",
-      "atualizadoEm": "2026-09-22T17:00:40.847Z",
+      "atualizadoEm": "2026-09-22T17:20:49.490Z",
       "id": "hHh7r6d"
     }
   ],
@@ -66,8 +66,8 @@
       "alteracoes": [
         {
           "campo": "Preço",
-          "de": "R$ 349,91",
-          "para": "R$ 349,92"
+          "de": "R$ 349,91",
+          "para": "R$ 349,92"
         }
       ],
       "id": 2
@@ -107,8 +107,8 @@
         },
         {
           "campo": "Preço",
-          "de": "R$ 349,92",
-          "para": "R$ 400,00"
+          "de": "R$ 349,92",
+          "para": "R$ 400,00"
         },
         {
           "campo": "Descrição",
@@ -118,5 +118,6 @@
       ],
       "id": 4
     }
-  ]
+  ],
+  "lotes": []
 }

@@ -9,9 +9,7 @@
 **Fase 4 concluída.** Tela de visualização de produto, campos `criadoEm`/`atualizadoEm`, e log de alterações (de/para) a cada edição. Validado com edição real feita pelo próprio usuário durante o desenvolvimento.
 **Fase 5 concluída.** Passada de UX/UI orientada por heurísticas conhecidas (Nielsen, WCAG, Apple HIG/Material Design). Ver seção própria abaixo.
 **Fase 6 concluída.** Redesign visual completo: usuário achou a Fase 5 "extremamente feia". Nova direção "moderno/vibrante" (paleta roxa, gradientes, cards flutuantes com sombra, botões de ação em círculo). Ver seção própria abaixo.
-
-## Backlog (pedido pelo usuário, explicitamente para depois — não iniciado)
-Gestão de estoque por **lote**: tela de detalhe do produto com aba/tabela de lotes (número do lote, validade, quantidade de entrada, saldo restante, custo unitário, status), modal "Adicionar Novo Estoque" (lote, validade ou "não expira", quantidade recebida, custo unitário, cálculo automático se informado valor total da nota), estoque total e custo médio ponderado nas métricas do produto, e um simulador de margem em tempo real (margem = (preço venda - custo) / preço venda) com sugestão de novo preço de venda para manter a margem alvo. Isso é uma mudança de modelo de dados relevante (produto passaria a ter lotes associados, não só um `preco`/`quantidade` únicos) — vale revisitar o `Produto`/`DadosProduto` em `src/types/index.ts` e o contrato da API mock quando essa fase começar.
+**Fase 7 concluída.** Gestão de estoque por lote (o que estava no backlog da Fase 6) — tabela de lotes no detalhe do produto, tela "Adicionar Estoque" com simulador de margem em tempo real. Ver seção própria abaixo.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -62,30 +60,36 @@ src/
 │       ├── index.tsx            # listagem + busca/autocomplete + filtro de status
 │       ├── novo-produto.tsx
 │       ├── editar-produto.tsx     # busca produto por id (query param) e reusa ProdutoForm
-│       └── visualizar-produto.tsx # detalhe + historico de alteracoes (log de-para)
+│       ├── visualizar-produto.tsx # detalhe + lotes + historico de alteracoes (log de-para)
+│       └── adicionar-estoque.tsx  # form de entrada de lote + simulador de margem
 ├── components/
 │   ├── CustomInput/
 │   ├── CustomButton/
 │   ├── ProductCard/
 │   ├── ProdutoForm/              # form compartilhado entre criar/editar
-│   └── FiltroProdutos/           # busca com autocomplete + chips de status
+│   ├── FiltroProdutos/           # busca com autocomplete + chips de status
+│   └── TabelaLotes/              # lista de lotes com selo de status (regular/vencendo/vencido)
 ├── constants/
-│   └── theme.ts                  # tokens: cores, espacamento, raios, ALVO_TOQUE_MINIMO
+│   └── theme.ts                  # tokens: cores, espacamento, raios, ALVO_TOQUE_MINIMO, sombra
 ├── contexts/
 │   └── AuthContext.tsx
+├── hooks/
+│   └── useCampoMoeda.ts          # mascara de centavos reutilizavel (preco do produto + custo do lote)
 ├── services/
 │   └── api.ts
 ├── styles/
 │   ├── login.styles.ts
 │   ├── produtos.styles.ts
 │   ├── produto-formulario.styles.ts   # compartilhado por novo-produto e editar-produto
-│   └── visualizar-produto.styles.ts
+│   ├── visualizar-produto.styles.ts
+│   └── adicionar-estoque.styles.ts
 ├── types/
 │   └── index.ts
 └── utils/
     ├── moeda.ts                 # formatarMoeda, extrairDigitos, formatarCentavosComoTexto
     ├── data.ts                  # formatarData (pt-BR)
-    └── logProduto.ts            # compararProdutos (gera o log de-para)
+    ├── logProduto.ts            # compararProdutos (gera o log de-para)
+    └── lote.ts                  # status do lote, custo medio ponderado, margem, preco sugerido
 ```
 
 ## Passada de UX/UI (Fase 5)
@@ -113,6 +117,19 @@ Orientada por heurísticas conhecidas, não por gosto pessoal:
 - **Bug real encontrado e corrigido nessa fase:** ao tornar o card inteiro clicável (tocar em qualquer lugar abre a visualização) envolvendo tudo — incluindo os botões de ação — num único `TouchableOpacity`, o React Native Web gera `<button>` HTML aninhado em `<button>`, que é HTML inválido; o browser reportava erro em tempo de execução ("`<button>` cannot contain a nested `<button>`"). Corrigido separando: só a área de conteúdo (nome/preço/detalhes) fica dentro do `TouchableOpacity` de "visualizar"; a barra de ações fica como `View` irmã, fora dele — sem aninhamento.
 - **Inputs "preenchidos":** `CustomInput` passou de borda cinza simples para fundo levemente tingido (`cores.neutroFundo`) que vira branco + borda colorida no foco — mesmo padrão visual usado por Linear/Material 3.
 - **Tela de login:** logo ganhou um cartão branco arredondado com sombra ao redor (em vez do ícone solto), título maior (32px, peso 800, letter-spacing negativo) para mais hierarquia.
+
+## Gestão de Estoque por Lote (Fase 7)
+
+**Decisão de escopo (importante):** o total em estoque continua sendo `produto.quantidade` — o mesmo campo já usado na listagem, nos filtros e no selo de "últimas unidades". Cada lote adicionado **soma** nesse total (`PUT /produtos/:id` com `quantidade` incrementada), em vez do total virar uma soma calculada dos lotes em tempo real. Isso evita quebrar produtos que não têm nenhum lote cadastrado (todos os produtos originais da spec) e mantém uma única fonte de verdade pro estoque. A tabela de lotes é um detalhe complementar (de onde veio o estoque e a que custo), não a fonte de verdade.
+
+- **`Lote`** (`src/types/index.ts`): `id`, `produtoId`, `codigo`, `validade` (ISO ou `null` = não expira), `quantidadeEntrada`, `saldoRestante` (= `quantidadeEntrada` na criação; não há fluxo de venda/consumo nesta app para decrementar), `custoUnitario`, `criadoEm`. Nova coleção `lotes` no `db.json` (recurso REST automático do `json-server`, filtrável via `GET /lotes?produtoId=`).
+- **`src/utils/lote.ts`:** `gerarCodigoLote()` (`LOTE-AAAAMMDD-XXXX`), `calcularStatusLote(validade)` (vencido / vencendo em até 30 dias / regular), `calcularCustoMedioPonderado(lotes)` (média ponderada pelo `saldoRestante`), `calcularMargem(precoVenda, custo)`, `sugerirPrecoVenda(custo, margemAlvo)`. `MARGEM_ALVO_PADRAO = 40` (%).
+- **`src/hooks/useCampoMoeda.ts`:** a lógica de máscara de centavos (antes só dentro do `ProdutoForm`) virou hook reutilizável — usada tanto no campo Preço do produto quanto no campo Custo Unitário do lote. Mesma correção de cursor da Fase 3 (força seleção no fim do texto via estado controlado) se aplica aqui também.
+- **`src/components/TabelaLotes/`:** lista os lotes de um produto com selo de status colorido (verde/amarelo/vermelho) e grade com validade, quantidade de entrada, saldo restante e custo unitário.
+- **`src/app/(app)/adicionar-estoque.tsx`** (nova rota, `id` via query param, mesmo padrão de `editar-produto.tsx`): código do lote (com botão "Gerar" automático), switch "Não expira" (esconde o campo de validade), validade em texto livre `AAAA-MM-DD` (sem date-picker nativo — decisão consciente para não adicionar uma dependência nova/nativa só para isso; pode ser revisitado com `@react-native-community/datetimepicker` se o usuário quiser um seletor de fato), quantidade recebida, custo unitário mascarado. Simulador de margem em tempo real: mostra preço de venda atual, margem do lote, margem alvo, e — só quando a margem fica abaixo do alvo — uma caixa de sugestão com o novo preço calculado e um switch "Atualizar preço de venda do catálogo".
+- **Fluxo de salvamento:** `POST /lotes` → `PUT /produtos/:id` (soma a quantidade recebida; atualiza `preco` só se o switch de atualizar catálogo estiver ligado) → reaproveita `compararProdutos` + `POST /logs` já existentes da Fase 4, então a entrada de estoque (e a eventual mudança de preço) aparece automaticamente no histórico de alterações do produto, sem código de log duplicado.
+- **`visualizar-produto.tsx`:** ganhou a métrica "Custo médio ponderado", a seção "Lotes cadastrados" (`TabelaLotes`) e um botão de destaque "Adicionar estoque" acima do par Editar/Excluir — igual à hierarquia descrita pelo usuário ("botão em evidência").
+- **Validado ponta a ponta com Playwright:** fluxo completo de adicionar lote sem validade (com "Não expira"), cálculo de custo médio, e o caminho de margem abaixo do alvo com atualização de preço via checkbox — confirmado que o produto, o lote e o log ficam consistentes entre si após o `POST`/`PUT`.
 
 ## Backend Mock (Desenvolvimento Local)
 `json-server@0.17.4` (versão estável, não a v1 beta) lê `db.json` na raiz e expõe REST em `http://localhost:3000`, batendo com o fallback padrão de `src/services/api.ts`. Rodar com `npm run mock-api`. Seed inicial: 3 produtos em `db.json` (`produtos`).
