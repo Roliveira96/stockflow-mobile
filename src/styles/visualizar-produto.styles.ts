@@ -97,6 +97,9 @@ export const styles = StyleSheet.create({
     color: cores.textoPrimario,
     marginBottom: 14,
   },
+  subtituloComEspaco: {
+    marginTop: 8,
+  },
   logItem: {
     borderBottomWidth: 1,
     borderBottomColor: cores.fundo,

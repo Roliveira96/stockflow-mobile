@@ -32,6 +32,30 @@ export interface LogEdicao {
   alteracoes: AlteracaoCampo[];
 }
 
+export interface Lote {
+  id: string;
+  produtoId: string;
+  codigo: string;
+  validade: string | null;
+  quantidadeEntrada: number;
+  saldoRestante: number;
+  custoUnitario: number;
+  criadoEm: string;
+}
+
+export type DadosLote = {
+  codigo: string;
+  validade: string | null;
+  quantidadeEntrada: number;
+  custoUnitario: number;
+};
+
+export type StatusLote = "regular" | "vencendo" | "vencido";
+
+export interface TabelaLotesProps {
+  lotes: Lote[];
+}
+
 export interface Usuario {
   id: string;
   nome: string;

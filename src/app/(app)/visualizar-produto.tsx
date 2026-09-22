@@ -3,11 +3,13 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, View } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
+import { TabelaLotes } from "@/components/TabelaLotes";
 import { cores } from "@/constants/theme";
 import { api } from "@/services/api";
 import { styles } from "@/styles/visualizar-produto.styles";
-import type { LogEdicao, Produto } from "@/types";
+import type { Lote, LogEdicao, Produto } from "@/types";
 import { formatarData } from "@/utils/data";
+import { calcularCustoMedioPonderado } from "@/utils/lote";
 import { formatarMoeda } from "@/utils/moeda";
 
 export default function VisualizarProduto() {
@@ -15,6 +17,7 @@ export default function VisualizarProduto() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [produto, setProduto] = useState<Produto | null>(null);
   const [logs, setLogs] = useState<LogEdicao[]>([]);
+  const [lotes, setLotes] = useState<Lote[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [excluindo, setExcluindo] = useState(false);
 
@@ -24,14 +27,16 @@ export default function VisualizarProduto() {
 
       async function buscarDados() {
         try {
-          const [respostaProduto, respostaLogs] = await Promise.all([
+          const [respostaProduto, respostaLogs, respostaLotes] = await Promise.all([
             api.get<Produto>(`/produtos/${id}`),
             api.get<LogEdicao[]>("/logs", { params: { produtoId: id } }),
+            api.get<Lote[]>("/lotes", { params: { produtoId: id } }),
           ]);
 
           if (ativo) {
             setProduto(respostaProduto.data);
             setLogs([...respostaLogs.data].reverse());
+            setLotes([...respostaLotes.data].reverse());
           }
         } catch {
           if (ativo) {
@@ -125,8 +130,14 @@ export default function VisualizarProduto() {
             <Text style={styles.linhaValor}>{produto.quantidade}</Text>
           </View>
           <View style={styles.linha}>
-            <Text style={styles.linhaRotulo}>Preço</Text>
+            <Text style={styles.linhaRotulo}>Preço de venda</Text>
             <Text style={styles.linhaValor}>{formatarMoeda(produto.preco)}</Text>
+          </View>
+          <View style={styles.linha}>
+            <Text style={styles.linhaRotulo}>Custo médio ponderado</Text>
+            <Text style={styles.linhaValor}>
+              {lotes.length > 0 ? formatarMoeda(calcularCustoMedioPonderado(lotes)) : "—"}
+            </Text>
           </View>
           <View style={styles.linha}>
             <Text style={styles.linhaRotulo}>Criado em</Text>
@@ -141,10 +152,17 @@ export default function VisualizarProduto() {
 
         <View style={styles.acoes}>
           <CustomButton
+            titulo="Estoque"
+            onPress={() => router.push({ pathname: "/adicionar-estoque", params: { id } })}
+            estiloContainer={styles.botaoAcao}
+            icone="add-circle-outline"
+          />
+          <CustomButton
             titulo="Editar"
             onPress={() => router.push({ pathname: "/editar-produto", params: { id } })}
             estiloContainer={styles.botaoAcao}
             icone="create-outline"
+            variante="neutro"
           />
           <CustomButton
             titulo="Excluir"
@@ -156,7 +174,10 @@ export default function VisualizarProduto() {
           />
         </View>
 
-        <Text style={styles.subtitulo}>Histórico de alterações</Text>
+        <Text style={styles.subtitulo}>Lotes cadastrados</Text>
+        <TabelaLotes lotes={lotes} />
+
+        <Text style={[styles.subtitulo, styles.subtituloComEspaco]}>Histórico de alterações</Text>
         {logs.length === 0 ? (
           <Text style={styles.vazio}>Nenhuma alteração registrada ainda.</Text>
         ) : (
