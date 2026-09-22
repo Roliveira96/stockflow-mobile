@@ -4,7 +4,9 @@
 
 ## Fase Atual
 **Fase 1 concluída.** Todos os 11 arquivos da ordem de execução da spec (seção 9) foram criados. `npx tsc --noEmit` e `npx expo lint` passam sem erros.
-**Fase 2 em andamento.** Backend mock (`json-server`) configurado e testado manualmente (GET/POST/DELETE em `/produtos` confirmados). Fluxo completo (login → listar → criar → ver na lista) validado ponta a ponta com Playwright headless contra o dev server web real.
+**Fase 2 concluída.** Backend mock (`json-server`) configurado e testado manualmente (GET/POST/DELETE em `/produtos` confirmados). Fluxo completo (login → listar → criar → ver na lista) validado ponta a ponta com Playwright headless contra o dev server web real.
+**Fase 3 concluída.** Funcionalidades além da spec original, pedidas pelo usuário: editar produto, código de barras, descrição, máscara de preço em centavos, selo de "últimas unidades", busca com autocomplete e filtro por status. Ver seção própria abaixo.
+**Pendente (pedido pelo usuário, ainda não iniciado):** tela de visualização de produto (com botões de editar/excluir), campos `criadoEm`/`atualizadoEm`, log de alterações (de/para) a cada edição, e uma passada de UX/UI.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -46,11 +48,21 @@ Removido todo o cluster do template `create-expo-app` (tabs de exemplo) que fica
 ```text
 src/
 ├── app/
-│   └── _layout.tsx        # Stack.Protected por token de auth, splash controlado por carregandoSessao
+│   ├── _layout.tsx              # Stack.Protected por token de auth, splash controlado por carregandoSessao
+│   ├── (auth)/
+│   │   ├── _layout.tsx
+│   │   └── login.tsx
+│   └── (app)/
+│       ├── _layout.tsx
+│       ├── index.tsx            # listagem + busca/autocomplete + filtro de status
+│       ├── novo-produto.tsx
+│       └── editar-produto.tsx   # busca produto por id (query param) e reusa ProdutoForm
 ├── components/
 │   ├── CustomInput/
 │   ├── CustomButton/
-│   └── ProductCard/
+│   ├── ProductCard/
+│   ├── ProdutoForm/              # form compartilhado entre criar/editar
+│   └── FiltroProdutos/           # busca com autocomplete + chips de status
 ├── contexts/
 │   └── AuthContext.tsx
 ├── services/
@@ -58,9 +70,11 @@ src/
 ├── styles/
 │   ├── login.styles.ts
 │   ├── produtos.styles.ts
-│   └── novo-produto.styles.ts
-└── types/
-    └── index.ts
+│   └── produto-formulario.styles.ts   # compartilhado por novo-produto e editar-produto
+├── types/
+│   └── index.ts
+└── utils/
+    └── moeda.ts                 # formatarMoeda, extrairDigitos, formatarCentavosComoTexto
 ```
 
 ## Backend Mock (Desenvolvimento Local)
@@ -78,4 +92,14 @@ src/
 - `src/components/CustomButton` — ganhou prop opcional `estiloContainer` (`StyleProp<ViewStyle>`) para permitir variações de tamanho/cor por tela (ex.: botão "Sair" compacto) sem estilos inline.
 - `src/app/(app)/_layout.tsx` — apenas declara o `Stack` do grupo; a checagem de autenticação já é feita pelo `Stack.Protected` na raiz, então não há verificação duplicada aqui.
 - `src/app/(app)/index.tsx` — busca `GET /produtos` em efeito de montagem, `FlatList` com `keyExtractor` por `id`, `ListEmptyComponent`, `ActivityIndicator` durante o carregamento, exclusão via `DELETE /produtos/:id` com atualização otimista da lista, botão "Sair" (`logout`) e botão para `novo-produto`.
-- `src/app/(app)/novo-produto.tsx` — 3 campos controlados (nome/quantidade/preço) com validação reativa em `useEffect` por campo (regra: nome ≥ 3 chars, quantidade ≥ 0, preço > 0) e `Switch` de "Ativo para venda"; botão de salvar desabilitado até formulário válido; `POST /produtos` com feedback via `Alert.alert` e retorno à listagem em caso de sucesso. **Nota:** os 3 `useEffect` de validação por campo violam a regra de lint `react-hooks/set-state-in-effect`; mantidos por decisão explícita do usuário porque o requisito 6 do edital exige literalmente um "efeito de monitoramento" via `useEffect`. Cada `setState` correspondente tem um `// eslint-disable-next-line` pontual — única exceção à regra de "nenhum comentário" do `ARCHITECTURE.md`, por ser diretiva de ferramenta, não explicação de código.
+- `src/app/(app)/novo-produto.tsx` — 3 campos controlados (nome/quantidade/preço) com validação reativa em `useEffect` por campo (regra: nome ≥ 3 chars, quantidade ≥ 0, preço > 0) e `Switch` de "Ativo para venda"; botão de salvar desabilitado até formulário válido; `POST /produtos` com feedback via `Alert.alert` e retorno à listagem em caso de sucesso. **Nota:** os `useEffect` de validação por campo violam a regra de lint `react-hooks/set-state-in-effect`; mantidos por decisão explícita do usuário porque o requisito 6 do edital exige literalmente um "efeito de monitoramento" via `useEffect`. Cada `setState` correspondente tem um `// eslint-disable-next-line` pontual — única exceção à regra de "nenhum comentário" do `ARCHITECTURE.md`, por ser diretiva de ferramenta, não explicação de código.
+
+## Funcionalidades Adicionais (pedidas pelo usuário, além da spec original)
+
+- **Tipo `Produto` estendido:** `codigoBarras: string` (obrigatório, 8–13 dígitos) e `descricao?: string` (opcional). `DadosProduto = Omit<Produto, "id">` criado para os payloads de criar/editar.
+- **`src/utils/moeda.ts`:** `formatarMoeda` (exibição com símbolo, usado no `ProductCard`), `extrairDigitos`, `formatarCentavosComoTexto` (máscara de centavos, sem símbolo, usada no formulário).
+- **`src/components/ProdutoForm/`:** componente de formulário compartilhado entre criar e editar (nome, código de barras, quantidade, preço mascarado, descrição opcional, switch ativo). Evita duplicar ~100 linhas de validação entre as duas telas.
+- **Máscara de preço em centavos:** digitar `1`,`9`,`9`,`0`,`0` produz `0,01` → `0,19` → `1,99` → `19,90` → `199,00`, com os últimos dígitos sempre representando os centavos. **Bug real encontrado e corrigido:** o campo é controlado (`value` = texto formatado), e sem forçar a posição do cursor no fim do campo a cada mudança, o texto digitado podia ser inserido no início ou no meio do valor (dependendo de como o foco chegou ao campo — clique vs. foco programático), inflando ou corrompendo o valor. Corrigido controlando `selection` como estado próprio (`selecaoPreco`), reforçado em `onFocus` e `onSelectionChange`, sempre apontando para o fim do texto. Validado com Playwright (digitação tecla-a-tecla, com e sem clique prévio no campo).
+- **`src/app/(app)/editar-produto.tsx`:** lê `id` via `useLocalSearchParams` (query param, sem rota dinâmica `[id].tsx`), busca `GET /produtos/:id` no efeito de montagem, reusa `ProdutoForm` com `valoresIniciais`, envia `PUT /produtos/:id` no submit.
+- **`ProductCard`:** agora mostra código de barras, descrição (se houver), selo extra "Últimas unidades" quando `0 < quantidade < 5`, e um botão "Editar" (além de "Remover") que aciona `onEditar(id)`.
+- **`src/components/FiltroProdutos/`:** campo de busca por nome com autocomplete (sugestões em dropdown, até 5 resultados, aparecem/somem com foco/blur/seleção) + chips de filtro por status (Todos/Ativos/Sem estoque/Inativos). A tela `(app)/index.tsx` combina busca + filtro via `useMemo` sobre a lista completa de produtos (filtragem no cliente, não uma nova chamada à API).
