@@ -1,0 +1,25 @@
+{
+  "produtos": [
+    {
+      "id": "1",
+      "nome": "Teclado Mecânico",
+      "quantidade": 12,
+      "preco": 349.9,
+      "ativo": true
+    },
+    {
+      "id": "2",
+      "nome": "Mouse sem Fio",
+      "quantidade": 30,
+      "preco": 89.5,
+      "ativo": true
+    },
+    {
+      "id": "3",
+      "nome": "Monitor 24 Polegadas",
+      "quantidade": 0,
+      "preco": 799.0,
+      "ativo": false
+    }
+  ]
+}
