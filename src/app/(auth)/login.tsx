@@ -4,8 +4,7 @@ import { Alert, Image, SafeAreaView, ScrollView, Text } from "react-native";
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { useAuth } from "@/contexts/AuthContext";
-
-import { styles } from "./styles";
+import { styles } from "@/styles/login.styles";
 
 export default function Login() {
   const { login } = useAuth();

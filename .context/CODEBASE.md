@@ -15,6 +15,9 @@ A spec (seção 5) só define contrato de API para `produtos` (GET/POST/DELETE);
 ## Nota de Convenção
 A spec (seção 9) referencia caminhos como `app/_layout.tsx`, `app/(auth)/...`, `app/(app)/...`. Este projeto usa **`src/app/`** como raiz de rotas (Expo Router), conforme `AGENTS.md` e a estrutura real do repositório. Todos os caminhos da spec devem ser lidos com o prefixo `src/` adicionado.
 
+## Desvio de Caminho: arquivos `styles.ts` das telas
+A spec pede `styles.ts`/`novo-produto.styles.ts` **dentro** de `src/app/(auth)/` e `src/app/(app)/`. Isso quebra o Expo Router: qualquer arquivo dentro de `src/app/` é tratado como rota, e o bundler emitiu warnings reais ("missing required default export") para cada um desses arquivos. Confirmado na documentação oficial (`docs.expo.dev`) e já previsto pelo `AGENTS.md` ("Keep non-route code ... outside `src/app/`"). Solução: os três arquivos de estilo das telas moraram para `src/styles/` (`login.styles.ts`, `produtos.styles.ts`, `novo-produto.styles.ts`), importados normalmente pelas telas via `@/styles/...`. Continuam 100% isolados em `StyleSheet.create`, só não ficam fisicamente "ao lado" do arquivo de rota.
+
 ## Checklist de Execução (ordem da spec, seção 9)
 
 - [x] `src/types/index.ts`
@@ -46,6 +49,10 @@ src/
 │   └── AuthContext.tsx
 ├── services/
 │   └── api.ts
+├── styles/
+│   ├── login.styles.ts
+│   ├── produtos.styles.ts
+│   └── novo-produto.styles.ts
 └── types/
     └── index.ts
 ```

@@ -6,9 +6,8 @@ import { CustomButton } from "@/components/CustomButton";
 import { ProductCard } from "@/components/ProductCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/services/api";
+import { styles } from "@/styles/produtos.styles";
 import type { Produto } from "@/types";
-
-import { styles } from "./styles";
 
 export default function ListaDeProdutos() {
   const router = useRouter();

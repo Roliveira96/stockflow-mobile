@@ -5,8 +5,7 @@ import { Alert, SafeAreaView, ScrollView, Switch, Text, View } from "react-nativ
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { api } from "@/services/api";
-
-import { styles } from "./novo-produto.styles";
+import { styles } from "@/styles/novo-produto.styles";
 
 export default function NovoProduto() {
   const router = useRouter();
