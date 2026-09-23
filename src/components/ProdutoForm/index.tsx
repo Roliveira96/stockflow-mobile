@@ -49,6 +49,8 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
   const [erroNome, setErroNome] = useState("");
   const [erroCodigoBarras, setErroCodigoBarras] = useState("");
   const [erroQuantidade, setErroQuantidade] = useState("");
+  const [erroPreco, setErroPreco] = useState("");
+  const [precoModificado, setPrecoModificado] = useState(false);
 
   useEffect(() => {
     async function carregarCategorias() {
@@ -94,6 +96,15 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
     );
   }, [quantidade, permiteQuantidadeNegativa]);
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setErroPreco(
+      precoModificado && campoPreco.centavos <= 0
+        ? "O preço deve ser maior que zero."
+        : ""
+    );
+  }, [campoPreco.centavos, precoModificado]);
+
   const formularioValido =
     nome.trim().length >= 3 &&
     !erroNome &&
@@ -102,6 +113,7 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
     quantidade.trim().length > 0 &&
     !erroQuantidade &&
     campoPreco.centavos > 0 &&
+    !erroPreco &&
     campoCusto.centavos > 0;
 
   const margemEstimada =
@@ -275,11 +287,16 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
               label="Preço de venda (R$)"
               obrigatorio
               value={campoPreco.texto}
-              onChangeText={campoPreco.aoMudarTexto}
+              onChangeText={(texto) => {
+                setPrecoModificado(true);
+                campoPreco.aoMudarTexto(texto);
+              }}
+              erro={erroPreco}
               keyboardType="numeric"
               selection={campoPreco.selecao}
               onSelectionChange={campoPreco.aoFocar}
               onFocus={campoPreco.aoFocar}
+              onBlur={() => setPrecoModificado(true)}
               monoespacado
             />
           </View>

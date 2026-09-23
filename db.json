@@ -3884,8 +3884,8 @@
       "desconto": 227.70100000000002,
       "total": 2054.309,
       "formaPagamento": "PIX",
-      "status": "AGUARDANDO",
-      "pagoEm": null,
+      "status": "PAGO",
+      "pagoEm": "2026-09-23T14:51:12.559Z",
       "eventos": [
         {
           "tipo": "criado",
@@ -3897,6 +3897,11 @@
           "data": "2026-09-23T14:43:50.753Z",
           "responsavel": "Ricardo",
           "descricao": "Desconto: R$ 0,00 → R$ 227,70; Observação atualizada"
+        },
+        {
+          "tipo": "pago",
+          "data": "2026-09-23T14:51:12.559Z",
+          "responsavel": "Ricardo"
         }
       ],
       "id": 2,
