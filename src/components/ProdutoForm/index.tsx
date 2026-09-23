@@ -50,7 +50,12 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
   const [erroCodigoBarras, setErroCodigoBarras] = useState("");
   const [erroQuantidade, setErroQuantidade] = useState("");
   const [erroPreco, setErroPreco] = useState("");
+  const [erroCusto, setErroCusto] = useState("");
+  const [nomeTocado, setNomeTocado] = useState(false);
+  const [codigoBarrasTocado, setCodigoBarrasTocado] = useState(false);
+  const [quantidadeTocada, setQuantidadeTocada] = useState(false);
   const [precoModificado, setPrecoModificado] = useState(false);
+  const [custoModificado, setCustoModificado] = useState(false);
 
   useEffect(() => {
     async function carregarCategorias() {
@@ -68,19 +73,25 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setErroNome(
-      nome.length > 0 && nome.trim().length < 3 ? "O nome deve ter ao menos 3 caracteres." : ""
+      nomeTocado && nome.trim().length === 0
+        ? "O nome é obrigatório."
+        : nome.length > 0 && nome.trim().length < 3
+          ? "O nome deve ter ao menos 3 caracteres."
+          : ""
     );
-  }, [nome]);
+  }, [nome, nomeTocado]);
 
   useEffect(() => {
     const digitos = extrairDigitos(codigoBarras);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setErroCodigoBarras(
-      digitos.length > 0 && (digitos.length < 8 || digitos.length > 13)
-        ? "O código de barras deve ter entre 8 e 13 dígitos."
-        : ""
+      codigoBarrasTocado && digitos.length === 0
+        ? "O código de barras é obrigatório."
+        : digitos.length > 0 && (digitos.length < 8 || digitos.length > 13)
+          ? "O código de barras deve ter entre 8 e 13 dígitos."
+          : ""
     );
-  }, [codigoBarras]);
+  }, [codigoBarras, codigoBarrasTocado]);
 
   const permiteQuantidadeNegativa = valoresIniciais !== undefined;
 
@@ -88,13 +99,15 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
     const valor = Number(quantidade);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setErroQuantidade(
-      quantidade.length > 0 && Number.isNaN(valor)
+      quantidadeTocada && quantidade.trim().length === 0
+        ? "A quantidade é obrigatória."
+        : quantidade.length > 0 && Number.isNaN(valor)
         ? "Informe um número válido."
         : quantidade.length > 0 && valor < 0 && !permiteQuantidadeNegativa
           ? "A quantidade não pode ser negativa."
           : ""
     );
-  }, [quantidade, permiteQuantidadeNegativa]);
+  }, [quantidade, quantidadeTocada, permiteQuantidadeNegativa]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -105,6 +118,15 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
     );
   }, [campoPreco.centavos, precoModificado]);
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setErroCusto(
+      custoModificado && campoCusto.centavos <= 0
+        ? "O preço de custo deve ser maior que zero."
+        : ""
+    );
+  }, [campoCusto.centavos, custoModificado]);
+
   const formularioValido =
     nome.trim().length >= 3 &&
     !erroNome &&
@@ -114,7 +136,8 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
     !erroQuantidade &&
     campoPreco.centavos > 0 &&
     !erroPreco &&
-    campoCusto.centavos > 0;
+    campoCusto.centavos > 0 &&
+    !erroCusto;
 
   const margemEstimada =
     campoPreco.centavos > 0 ? calcularMargem(campoPreco.valor, campoCusto.valor) : null;
@@ -162,7 +185,11 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
           contador={`${nome.length}/${LIMITE_NOME}`}
           maxLength={LIMITE_NOME}
           value={nome}
-          onChangeText={setNome}
+          onChangeText={(texto) => {
+            setNomeTocado(true);
+            setNome(texto);
+          }}
+          onBlur={() => setNomeTocado(true)}
           erro={erroNome}
           placeholder="Ex: Mouse gamer sem fio 16000 DPI"
         />
@@ -249,7 +276,11 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
               label="Código de barras (EAN)"
               obrigatorio
               value={codigoBarras}
-              onChangeText={setCodigoBarras}
+              onChangeText={(texto) => {
+                setCodigoBarrasTocado(true);
+                setCodigoBarras(texto);
+              }}
+              onBlur={() => setCodigoBarrasTocado(true)}
               erro={erroCodigoBarras}
               keyboardType="numeric"
               placeholder="Entre 8 e 13 dígitos"
@@ -305,11 +336,16 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
               label="Preço de custo (R$)"
               obrigatorio
               value={campoCusto.texto}
-              onChangeText={campoCusto.aoMudarTexto}
+              onChangeText={(texto) => {
+                setCustoModificado(true);
+                campoCusto.aoMudarTexto(texto);
+              }}
+              erro={erroCusto}
               keyboardType="numeric"
               selection={campoCusto.selecao}
               onSelectionChange={campoCusto.aoFocar}
               onFocus={campoCusto.aoFocar}
+              onBlur={() => setCustoModificado(true)}
               monoespacado
             />
           </View>
@@ -333,7 +369,11 @@ export function ProdutoForm({ valoresIniciais, enviando, textoBotao, aoEnviar }:
           label={valoresIniciais ? "Quantidade" : "Quantidade inicial"}
           obrigatorio
           value={quantidade}
-          onChangeText={setQuantidade}
+          onChangeText={(texto) => {
+            setQuantidadeTocada(true);
+            setQuantidade(texto);
+          }}
+          onBlur={() => setQuantidadeTocada(true)}
           erro={erroQuantidade}
           keyboardType={permiteQuantidadeNegativa ? "numbers-and-punctuation" : "numeric"}
           placeholder="0"

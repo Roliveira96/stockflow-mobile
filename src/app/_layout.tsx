@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useMemo } from "react";
+import { ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -22,7 +23,15 @@ function RootNavigator() {
   }, [carregandoSessao]);
 
   if (carregandoSessao) {
-    return null;
+    return (
+      <View style={styles.carregandoSessao}>
+        <ActivityIndicator
+          size="large"
+          color={cores.primaria}
+          accessibilityLabel="Restaurando sessão"
+        />
+      </View>
+    );
   }
 
   return (

@@ -7,5 +7,11 @@ export function criarEstilos(cores: Cores) {
     conteudoTela: {
       backgroundColor: cores.fundo,
     },
+    carregandoSessao: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: cores.fundo,
+    },
   });
 }
