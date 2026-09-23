@@ -4,25 +4,34 @@ import { formatarMoeda } from "@/utils/moeda";
 const ROTULOS_CAMPOS: Record<keyof DadosProduto, string> = {
   nome: "Nome",
   codigoBarras: "Código de barras",
+  codigoAuxiliar: "Código auxiliar",
   quantidade: "Quantidade",
   preco: "Preço",
+  precoCusto: "Preço de custo",
   descricao: "Descrição",
+  categoria: "Categoria",
+  categoriaIcone: "Ícone da categoria",
   ativo: "Ativo para venda",
 };
 
 const CAMPOS_COMPARADOS: (keyof DadosProduto)[] = [
   "nome",
   "codigoBarras",
+  "codigoAuxiliar",
   "quantidade",
   "preco",
+  "precoCusto",
   "descricao",
+  "categoria",
   "ativo",
 ];
 
 function formatarValorCampo(campo: keyof DadosProduto, valor: unknown): string {
   if (campo === "preco") return formatarMoeda(Number(valor));
+  if (campo === "precoCusto") return valor ? formatarMoeda(Number(valor)) : "(vazio)";
   if (campo === "ativo") return valor ? "Sim" : "Não";
-  if (campo === "descricao") return valor ? String(valor) : "(vazio)";
+  if (campo === "descricao" || campo === "codigoAuxiliar") return valor ? String(valor) : "(vazio)";
+  if (campo === "categoria") return valor ? String(valor) : "(nenhuma)";
   return String(valor);
 }
 

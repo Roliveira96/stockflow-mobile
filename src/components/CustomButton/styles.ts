@@ -1,30 +1,55 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios, sombra } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, raios, sombra, type Cores } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
-  wrapper: {
-    width: "100%",
-    borderRadius: raios.md,
-  },
-  sombra: {
-    ...sombra.botao,
-  },
-  botao: {
-    width: "100%",
-    height: ALVO_TOQUE_MINIMO,
-    borderRadius: raios.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  icone: {
-    marginRight: 8,
-  },
-  texto: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: cores.textoSobreCor,
-  },
-});
+export function criarEstilos(cores: Cores) {
+  return StyleSheet.create({
+    botao: {
+      width: "100%",
+      minHeight: 52,
+      borderRadius: raios.md,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingHorizontal: 16,
+    },
+    compacto: {
+      minHeight: ALVO_TOQUE_MINIMO + 2,
+      paddingHorizontal: 12,
+      gap: 6,
+    },
+    primaria: {
+      backgroundColor: cores.botaoPrimario,
+      ...sombra.botao,
+    },
+    sucesso: {
+      backgroundColor: cores.botaoSucesso,
+      ...sombra.botaoSucesso,
+    },
+    perigo: {
+      backgroundColor: cores.perigoFundo,
+    },
+    neutro: {
+      backgroundColor: cores.neutroFundoForte,
+    },
+    desabilitado: {
+      opacity: 0.45,
+      boxShadow: "none",
+    },
+    texto: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: cores.textoSobreCor,
+    },
+    textoCompacto: {
+      fontSize: 13,
+    },
+    textoPerigo: {
+      color: cores.perigo,
+    },
+    textoNeutro: {
+      color: cores.neutroTexto,
+    },
+  });
+}

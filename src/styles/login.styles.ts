@@ -1,8 +1,9 @@
 import { StyleSheet } from "react-native";
 
-import { cores, raios, sombra } from "@/constants/theme";
+import { raios, sombra, type Cores } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export function criarEstilos(cores: Cores) {
+  return StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: cores.fundo,
@@ -13,35 +14,57 @@ export const styles = StyleSheet.create({
   conteudo: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 32,
   },
-  logoContainer: {
-    width: 96,
-    height: 96,
+  cartao: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    padding: 20,
+    paddingBottom: 22,
     borderRadius: raios.lg,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+    ...sombra.cartao,
+  },
+  rodape: {
+    marginTop: 20,
+    textAlign: "center",
+    fontSize: 12,
+    color: cores.textoTerciario,
+  },
+  logoContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: raios.lg,
+    borderWidth: 1,
+    borderColor: cores.borda,
     backgroundColor: cores.superficie,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 16,
     ...sombra.cartao,
   },
   logo: {
-    width: 60,
-    height: 60,
+    width: 48,
+    height: 48,
   },
   titulo: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "800",
     letterSpacing: -0.5,
     color: cores.textoPrimario,
     textAlign: "center",
   },
   subtitulo: {
-    fontSize: 15,
-    color: cores.textoSecundario,
+    fontSize: 14,
+    color: cores.textoTerciario,
     textAlign: "center",
-    marginBottom: 36,
+    marginTop: 4,
+    marginBottom: 28,
   },
-});
+  });
+}

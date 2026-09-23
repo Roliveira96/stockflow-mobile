@@ -1,26 +1,27 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios, sombra } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, raios, sombra, type Cores } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export function criarEstilos(cores: Cores) {
+  return StyleSheet.create({
   container: {
     width: "100%",
-    marginBottom: 18,
+    marginBottom: 14,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     color: cores.textoSecundario,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   campo: {
     width: "100%",
-    height: ALVO_TOQUE_MINIMO,
-    borderWidth: 1.5,
+    height: ALVO_TOQUE_MINIMO + 2,
+    borderWidth: 1,
     borderColor: cores.borda,
     borderRadius: raios.sm,
-    paddingHorizontal: 16,
-    backgroundColor: cores.neutroFundo,
+    paddingHorizontal: 14,
+    backgroundColor: cores.superficieAlternativa,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -30,11 +31,12 @@ export const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   campoTexto: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "600",
     color: cores.textoPrimario,
   },
   campoPlaceholder: {
-    fontSize: 16,
+    fontSize: 14,
     color: cores.textoTerciario,
   },
   erro: {
@@ -48,7 +50,9 @@ export const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
     borderRadius: raios.md,
     padding: 12,
-    ...sombra.flutuante,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    ...sombra.cartao,
   },
   cabecalhoMes: {
     flexDirection: "row",
@@ -88,7 +92,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   celulaDiaSelecionada: {
-    backgroundColor: cores.primaria,
+    backgroundColor: cores.botaoPrimario,
     borderRadius: raios.pill,
   },
   celulaDiaTexto: {
@@ -103,4 +107,5 @@ export const styles = StyleSheet.create({
     color: cores.primaria,
     fontWeight: "800",
   },
-});
+  });
+}

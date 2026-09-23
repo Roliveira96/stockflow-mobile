@@ -1,11 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { cores } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
 import type { ProductCardProps } from "@/types";
+import { calcularNivelEstoque } from "@/utils/estoque";
 import { formatarMoeda } from "@/utils/moeda";
 
-import { styles } from "./styles";
+import { criarEstilos } from "./styles";
 
 export function ProductCard({
   produto,
@@ -14,8 +16,34 @@ export function ProductCard({
   onVisualizar,
   menuAberto,
   aoAlternarMenu,
+  vencimento,
 }: ProductCardProps) {
-  const ultimasUnidades = produto.quantidade > 0 && produto.quantidade < 5;
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
+  const nivel = calcularNivelEstoque(produto.quantidade);
+
+  const estiloSelo =
+    nivel === "critico"
+      ? styles.seloCritico
+      : nivel === "baixo"
+        ? styles.seloBaixo
+        : styles.seloNormal;
+  const estiloSeloTexto =
+    nivel === "critico"
+      ? styles.seloTextoCritico
+      : nivel === "baixo"
+        ? styles.seloTextoBaixo
+        : styles.seloTextoNormal;
+
+  const temVencido = (vencimento?.lotesVencidos.length ?? 0) > 0;
+  const prazoVencendo = vencimento?.menorPrazoDias ?? null;
+  const textoVencimento = temVencido
+    ? "Lote vencido"
+    : prazoVencendo === null
+      ? null
+      : prazoVencendo === 0
+        ? "Vence hoje"
+        : `Vence em ${prazoVencendo}d`;
 
   function handleAcao(acao: () => void) {
     aoAlternarMenu();
@@ -23,7 +51,7 @@ export function ProductCard({
   }
 
   return (
-    <View style={[styles.card, menuAberto ? styles.cardMenuAberto : undefined]}>
+    <View style={[styles.card, produto.ativo ? undefined : styles.cardInativo]}>
       <TouchableOpacity
         style={styles.conteudo}
         onPress={() => onVisualizar(produto.id)}
@@ -31,42 +59,66 @@ export function ProductCard({
         accessibilityRole="button"
         accessibilityLabel={`Ver detalhes de ${produto.nome}`}
       >
-        <View style={styles.linhaTopo}>
+        <View style={styles.iconeCategoria}>
+          <Text style={styles.iconeCategoriaTexto}>{produto.categoriaIcone ?? "📦"}</Text>
+        </View>
+
+        <View style={styles.textos}>
           <Text style={styles.nome} numberOfLines={1}>
             {produto.nome}
           </Text>
-          <Text style={styles.preco}>{formatarMoeda(produto.preco)}</Text>
-        </View>
-
-        <View style={styles.linhaDetalhes}>
-          <Text style={styles.detalheTexto} numberOfLines={1}>
-            {produto.quantidade} un. · {produto.codigoBarras}
-          </Text>
-
-          <View style={styles.selos}>
+          <View style={styles.linhaDetalhes}>
+            <View style={[styles.selo, estiloSelo]}>
+              <Text style={[styles.seloTexto, estiloSeloTexto]}>{produto.quantidade} un.</Text>
+            </View>
             {!produto.ativo ? (
               <View style={[styles.selo, styles.seloInativo]}>
                 <Text style={[styles.seloTexto, styles.seloTextoInativo]}>Inativo</Text>
               </View>
             ) : null}
-            {ultimasUnidades ? (
-              <View style={styles.seloAlerta}>
-                <Text style={styles.seloTextoAlerta}>Últimas unidades</Text>
+            {textoVencimento ? (
+              <View
+                style={[styles.seloVencimento, temVencido ? styles.seloVencido : undefined]}
+                accessibilityLabel={
+                  temVencido
+                    ? "Produto com lote vencido"
+                    : `Produto com lote perto do vencimento: ${textoVencimento}`
+                }
+              >
+                <Ionicons
+                  name={temVencido ? "alert-circle" : "time-outline"}
+                  size={11}
+                  color={temVencido ? cores.perigo : cores.alerta}
+                />
+                <Text
+                  style={[
+                    styles.seloTexto,
+                    temVencido ? styles.seloTextoCritico : styles.seloTextoBaixo,
+                  ]}
+                >
+                  {textoVencimento}
+                </Text>
               </View>
             ) : null}
+            <Text style={styles.separador}>•</Text>
+            <Text style={styles.codigo} numberOfLines={1}>
+              {produto.codigoBarras}
+            </Text>
           </View>
         </View>
+
+        <Text style={styles.preco}>{formatarMoeda(produto.preco)}</Text>
       </TouchableOpacity>
 
       <View style={styles.menuContainer}>
         <TouchableOpacity
-          style={styles.botaoMenu}
+          style={[styles.botaoMenu, menuAberto ? styles.botaoMenuAtivo : undefined]}
           onPress={aoAlternarMenu}
           accessibilityRole="button"
           accessibilityLabel={`Mais ações para ${produto.nome}`}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
         >
-          <Ionicons name="ellipsis-vertical" size={18} color={cores.textoTerciario} />
+          <Ionicons name="ellipsis-vertical" size={16} color={cores.textoTerciario} />
         </TouchableOpacity>
 
         {menuAberto ? (
@@ -77,7 +129,7 @@ export function ProductCard({
               accessibilityRole="button"
               accessibilityLabel={`Visualizar ${produto.nome}`}
             >
-              <Ionicons name="eye-outline" size={18} color={cores.textoSecundario} />
+              <Ionicons name="eye-outline" size={17} color={cores.textoSecundario} />
               <Text style={styles.menuItemTexto}>Visualizar</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -86,7 +138,7 @@ export function ProductCard({
               accessibilityRole="button"
               accessibilityLabel={`Editar ${produto.nome}`}
             >
-              <Ionicons name="create-outline" size={18} color={cores.primaria} />
+              <Ionicons name="create-outline" size={17} color={cores.primaria} />
               <Text style={[styles.menuItemTexto, styles.menuItemTextoPrimaria]}>Editar</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -95,7 +147,7 @@ export function ProductCard({
               accessibilityRole="button"
               accessibilityLabel={`Remover ${produto.nome}`}
             >
-              <Ionicons name="trash-outline" size={18} color={cores.perigo} />
+              <Ionicons name="trash-outline" size={17} color={cores.perigo} />
               <Text style={[styles.menuItemTexto, styles.menuItemTextoPerigo]}>Remover</Text>
             </TouchableOpacity>
           </View>

@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { CellRendererProps } from "@react-native/virtualized-lists";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,17 +15,29 @@ import {
 import { CustomButton } from "@/components/CustomButton";
 import { FiltroProdutos } from "@/components/FiltroProdutos";
 import { MenuLateral } from "@/components/MenuLateral";
+import { ModalCategoria } from "@/components/ModalCategoria";
 import { ProductCard } from "@/components/ProductCard";
-import { cores } from "@/constants/theme";
+import { CARGO_USUARIO, NOME_USUARIO } from "@/constants/usuario";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTema } from "@/contexts/TemaContext";
+import { useToast } from "@/contexts/ToastContext";
 import { api } from "@/services/api";
-import { buscarProdutosPaginado, buscarSugestoesProdutos } from "@/services/produtos";
-import { styles } from "@/styles/produtos.styles";
-import type { Produto, StatusFiltro } from "@/types";
+import { listarCategorias } from "@/services/categorias";
+import {
+  buscarLotesComValidadeProxima,
+  buscarProdutosPaginado,
+  buscarSugestoesProdutos,
+} from "@/services/produtos";
+import { criarEstilos } from "@/styles/produtos.styles";
+import type { Produto, ResumoVencimento, StatusFiltro } from "@/types";
+import { agruparVencimentosPorProduto } from "@/utils/lote";
 
 export default function ListaDeProdutos() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, usuario } = useAuth();
+  const { cores } = useTema();
+  const { mostrarToast } = useToast();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [pagina, setPagina] = useState(1);
   const [totalItens, setTotalItens] = useState(0);
@@ -38,6 +50,23 @@ export default function ListaDeProdutos() {
   const [sugestoes, setSugestoes] = useState<Produto[]>([]);
   const [menuAberto, setMenuAberto] = useState(false);
   const [produtoMenuAbertoId, setProdutoMenuAbertoId] = useState<string | null>(null);
+  const [totalCategorias, setTotalCategorias] = useState(0);
+  const [modalCategoriaVisivel, setModalCategoriaVisivel] = useState(false);
+  const [vencimentosPorProduto, setVencimentosPorProduto] = useState<
+    Record<string, ResumoVencimento>
+  >({});
+
+  useFocusEffect(
+    useCallback(() => {
+      listarCategorias()
+        .then((categorias) => setTotalCategorias(categorias.length))
+        .catch(() => setTotalCategorias(0));
+
+      buscarLotesComValidadeProxima()
+        .then((lotes) => setVencimentosPorProduto(agruparVencimentosPorProduto(lotes)))
+        .catch(() => setVencimentosPorProduto({}));
+    }, [])
+  );
 
   useEffect(() => {
     const temporizador = setTimeout(() => setBuscaDebounced(busca), 350);
@@ -144,6 +173,7 @@ export default function ListaDeProdutos() {
               await api.delete(`/produtos/${id}`);
               setProdutos((atual) => atual.filter((item) => item.id !== id));
               setTotalItens((atual) => Math.max(0, atual - 1));
+              mostrarToast("Produto excluído com sucesso");
             } catch {
               Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
             }
@@ -177,26 +207,29 @@ export default function ListaDeProdutos() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.cabecalho}>
+        <View style={styles.marca}>
+          <View style={styles.logo}>
+            <Ionicons name="cube" size={20} color={cores.textoSobreCor} />
+          </View>
+          <View>
+            <Text style={styles.titulo}>Produtos</Text>
+            <Text style={styles.subtitulo}>Inventário & Operações</Text>
+          </View>
+        </View>
+
         <TouchableOpacity
-          style={styles.botaoMenu}
+          style={styles.botaoUsuario}
           onPress={() => setMenuAberto(true)}
           accessibilityRole="button"
-          accessibilityLabel="Abrir menu"
+          accessibilityLabel="Abrir menu do usuário"
         >
-          <Ionicons name="menu" size={22} color={cores.textoPrimario} />
+          <View style={styles.avatar}>
+            <Text style={styles.avatarTexto}>{NOME_USUARIO[0]}</Text>
+            <View style={styles.indicadorOnline} />
+          </View>
+          <Ionicons name="menu" size={18} color={cores.textoTerciario} />
         </TouchableOpacity>
-        <Text style={styles.titulo}>Produtos</Text>
       </View>
-
-      <MenuLateral
-        visivel={menuAberto}
-        aoFechar={() => setMenuAberto(false)}
-        nomeUsuario="Ricardo"
-        aoSair={() => {
-          setMenuAberto(false);
-          logout();
-        }}
-      />
 
       <FiltroProdutos
         sugestoes={sugestoes}
@@ -204,6 +237,7 @@ export default function ListaDeProdutos() {
         aoMudarBusca={setBusca}
         filtroStatus={filtroStatus}
         aoMudarFiltroStatus={setFiltroStatus}
+        totalFiltrado={totalItens}
       />
 
       {carregando ? (
@@ -226,6 +260,7 @@ export default function ListaDeProdutos() {
               onEditar={handleEditar}
               onVisualizar={handleVisualizar}
               menuAberto={produtoMenuAbertoId === item.id}
+              vencimento={vencimentosPorProduto[item.id]}
               aoAlternarMenu={() =>
                 setProdutoMenuAbertoId((atual) => (atual === item.id ? null : item.id))
               }
@@ -234,7 +269,17 @@ export default function ListaDeProdutos() {
           CellRendererComponent={renderizarCelula}
           onEndReached={handleCarregarMais}
           onEndReachedThreshold={0.4}
-          ListEmptyComponent={<Text style={styles.vazio}>Nenhum produto encontrado.</Text>}
+          ListEmptyComponent={
+            <View style={styles.vazio}>
+              <View style={styles.vazioIcone}>
+                <Ionicons name="search" size={26} color={cores.textoTerciario} />
+              </View>
+              <Text style={styles.vazioTitulo}>Nenhum produto encontrado</Text>
+              <Text style={styles.vazioTexto}>
+                Tente buscar por outro termo ou remova os filtros.
+              </Text>
+            </View>
+          }
           ListFooterComponent={
             carregandoMais ? (
               <ActivityIndicator
@@ -243,24 +288,50 @@ export default function ListaDeProdutos() {
                 color={cores.primaria}
                 accessibilityLabel="Carregando mais produtos"
               />
+            ) : totalItens > 0 ? (
+              <Text style={styles.contador}>
+                Mostrando {produtos.length} de {totalItens} produto{totalItens === 1 ? "" : "s"}
+              </Text>
             ) : null
           }
         />
       )}
 
-      {!carregando && totalItens > 0 ? (
-        <Text style={styles.contador}>
-          Mostrando {produtos.length} de {totalItens} produto{totalItens === 1 ? "" : "s"}
-        </Text>
-      ) : null}
-
       <View style={styles.rodape}>
         <CustomButton
           titulo="Novo produto"
           onPress={() => router.push("/novo-produto")}
-          icone="add-circle-outline"
+          icone="add"
         />
       </View>
+
+      <MenuLateral
+        visivel={menuAberto}
+        aoFechar={() => setMenuAberto(false)}
+        nomeUsuario={NOME_USUARIO}
+        emailUsuario={usuario?.email ?? ""}
+        cargoUsuario={CARGO_USUARIO}
+        telaAtiva="produtos"
+        totalProdutos={totalItens}
+        totalCategorias={totalCategorias}
+        aoAbrirCategorias={() => {
+          setMenuAberto(false);
+          setModalCategoriaVisivel(true);
+        }}
+        aoSair={() => {
+          setMenuAberto(false);
+          logout();
+        }}
+      />
+
+      <ModalCategoria
+        visivel={modalCategoriaVisivel}
+        aoFechar={() => setModalCategoriaVisivel(false)}
+        aoCriar={(categoria) => {
+          setTotalCategorias((atual) => atual + 1);
+          mostrarToast(`Categoria "${categoria.nome}" criada com sucesso`);
+        }}
+      />
     </SafeAreaView>
   );
 }

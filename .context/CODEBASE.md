@@ -11,6 +11,7 @@
 **Fase 6 concluída.** Redesign visual completo: usuário achou a Fase 5 "extremamente feia". Nova direção "moderno/vibrante" (paleta roxa, gradientes, cards flutuantes com sombra, botões de ação em círculo). Ver seção própria abaixo.
 **Fase 7 concluída.** Gestão de estoque por lote (o que estava no backlog da Fase 6) — tabela de lotes no detalhe do produto, tela "Adicionar Estoque" com simulador de margem em tempo real. Ver seção própria abaixo.
 **Fase 8 concluída.** Calendário próprio para validade de lote com regras de vencido/vencendo. Menu lateral (drawer) com nome mocado e navegação. Correção de bug real (`FlatList` sem `flex:1`, lista ficava curta no celular). Listagem de produtos migrada para paginação real do servidor com scroll infinito. Ver seções próprias abaixo.
+**Fase 9 concluída.** Redesign a partir de um protótipo HTML/Tailwind entregue pelo usuário: paleta indigo/slate, tema claro/escuro, categorias, toast, formulários em blocos. Ver seção "Redesign pelo Protótipo (Fase 9)" abaixo.
 
 ## Bug Corrigido: produto criado não aparecia na lista
 **Sintoma relatado pelo usuário:** "criei um produto e não aconteceu nada". **Causa raiz:** `src/app/(app)/index.tsx` buscava produtos só no `useEffect` de montagem; como `router.back()` a partir de `novo-produto.tsx` não remonta a tela (mesma instância na pilha do `Stack`), a lista nunca era recarregada — o `POST` funcionava (confirmado via log de rede: `201`), só a UI ficava desatualizada. **Correção:** troquei o `useEffect` por `useFocusEffect` (importado de `expo-router`, confirmado via docs oficiais), que roda tanto na montagem quanto toda vez que a tela reganha foco — cobre login inicial, volta do formulário e volta depois de excluir.
@@ -69,15 +70,24 @@ src/
 │   ├── ProductCard/
 │   ├── ProdutoForm/              # form compartilhado entre criar/editar
 │   ├── FiltroProdutos/           # busca com autocomplete + chips de status
-│   └── TabelaLotes/              # lista de lotes com selo de status (regular/vencendo/vencido)
+│   ├── TabelaLotes/              # lista de lotes com selo de status (regular/vencendo/vencido)
+│   ├── BarraTopo/                # "‹ Voltar" + acao opcional a direita (telas internas)
+│   ├── MenuLateral/              # drawer pela direita: tema, usuario, navegacao, sair
+│   ├── ModalCategoria/           # bottom sheet (Modal nativo) para criar categoria
+│   ├── SeletorData/
+│   └── Toast/
 ├── constants/
-│   └── theme.ts                  # tokens: cores, espacamento, raios, ALVO_TOQUE_MINIMO, sombra
+│   └── theme.ts                  # coresClaro/coresEscuro, espacamento, raios, fonteMono, sombra
 ├── contexts/
-│   └── AuthContext.tsx
+│   ├── AuthContext.tsx
+│   ├── TemaContext.tsx            # modo claro/escuro persistido no AsyncStorage
+│   └── ToastContext.tsx           # mostrarToast(mensagem)
 ├── hooks/
 │   └── useCampoMoeda.ts          # mascara de centavos reutilizavel (preco do produto + custo do lote)
 ├── services/
-│   └── api.ts
+│   ├── api.ts
+│   ├── produtos.ts
+│   └── categorias.ts
 ├── styles/
 │   ├── login.styles.ts
 │   ├── produtos.styles.ts
@@ -90,7 +100,8 @@ src/
     ├── moeda.ts                 # formatarMoeda, extrairDigitos, formatarCentavosComoTexto
     ├── data.ts                  # formatarData (pt-BR)
     ├── logProduto.ts            # compararProdutos (gera o log de-para)
-    └── lote.ts                  # status do lote, custo medio ponderado, margem, preco sugerido
+    ├── lote.ts                  # status do lote, custo medio ponderado, margem, preco sugerido
+    └── estoque.ts               # nivel de estoque (critico < 5, baixo < 20, normal)
 ```
 
 ## Passada de UX/UI (Fase 5)
@@ -205,3 +216,82 @@ O usuário achou os cards grandes demais ("mostrar mais produtos na tela") e ped
 - **`ProductCard` reduzido de 3 linhas + rodapé com 3 botões circulares pra 2 linhas:** nome+preço em cima, quantidade+código+selos embaixo (só mostra selo "Inativo" quando de fato inativo — "Ativo" deixou de ser exibido, já que é o padrão esperado; menos badge = menos altura). Card caiu de ~140-160px pra ~70px de altura; cabem quase o dobro de itens na tela.
 - **Menu de contexto (`⋮`):** Visualizar/Editar/Remover viraram um painel flutuante que abre ao tocar no ícone `ellipsis-vertical`, mesmo padrão visual dos outros menus/seletores do app (`SeletorData`, select de status). `menuAberto`/`aoAlternarMenu` são controlados pela tela pai (`(app)/index.tsx` guarda qual produto tem o menu aberto por `id`), não pelo próprio `ProductCard` — garante que só um menu fica aberto por vez na lista inteira.
 - **Bug real de z-index encontrado e corrigido:** o painel do menu abria **atrás** do próximo card da lista, cobrindo as opções "Editar"/"Remover". Colocar `zIndex` no card em si não resolve porque o `FlatList` (via `VirtualizedList`) envolve cada linha num wrapper próprio pra virtualização/performance — é esse wrapper, não o `card`, que precisa do `zIndex` elevado pra vencer a ordem do DOM entre linhas irmãs. Corrigido com a prop `CellRendererComponent` do `FlatList` (mecanismo oficial documentado exatamente pra esse cenário — "elevar uma linha específica acima das vizinhas"), aplicando `zIndex`/`elevation` alto só na célula cujo produto tem o menu aberto no momento. Tipo `CellRendererProps<Produto>` importado de `@react-native/virtualized-lists` (dependência transitiva do `react-native`, não precisou instalar nada novo — confirmado lendo o `.d.ts` instalado, já que o pacote não está listado no `package.json` do projeto diretamente).
+
+## Redesign pelo Protótipo (Fase 9)
+
+O usuário entregou um protótipo HTML/Tailwind (catálogo, detalhe com abas, adicionar estoque, novo produto, modal de categoria, drawer com tema, toast) como referência visual. Uma sessão anterior começou a migração (contextos de tema/toast, categorias) mas parou no meio, com `tsc` quebrado; esta fase terminou tudo.
+
+- **Tema claro/escuro:** `src/constants/theme.ts` exporta `coresClaro`/`coresEscuro` (mesmas chaves, tipo `Cores`) em paleta Tailwind indigo/slate. `TemaContext` escolhe pelo `useColorScheme` e persiste a escolha manual em `@stockflow:tema`. **Padrão de estilos mudou:** todo `styles.ts` agora exporta `criarEstilos(cores: Cores)` (continua `StyleSheet.create`, só parametrizado pela paleta) e o componente faz `useMemo(() => criarEstilos(cores), [cores])`. Nenhum hex fora de `theme.ts`.
+- **`CustomButton` sem gradiente:** variantes `primaria` (indigo sólido + sombra), `perigo` (fundo rosado suave, texto vermelho) e `neutro` (cinza suave), como no protótipo; prop `compacto` para a barra de ações. `expo-linear-gradient` ficou sem uso no código (dependência mantida no `package.json`).
+- **`CustomInput`:** props `obrigatorio` (asterisco vermelho), `contador` ("15/80" à direita do rótulo) e `monoespacado` (EAN, preço, lote). Anel de foco via `boxShadow`. **Bug de web corrigido:** Chrome desenhava o anel de foco nativo por cima da borda customizada porque RN Web gera `outline-style: auto`, que ignora `outline-width: 0`; resolvido com `outlineStyle: "solid"` + `outlineWidth: 0`.
+- **Listagem:** header com logo + "Produtos / Inventário & Operações" e pílula de usuário que abre o drawer; busca com lupa e botão limpar; filtros de status voltaram a ser **chips**, agora em linha própria com rolagem horizontal (o motivo da troca por select na Fase 8 era falta de espaço ao lado da busca, que deixou de existir). O chip ativo mostra o total (`Todos (305)`). `ProductCard` com ícone da categoria, selo de estoque colorido por nível (`utils/estoque.ts`) e preço em mono à direita; menu ⋮ mantido.
+- **Drawer (`MenuLateral`) pela direita:** alternância de tema, iniciais do usuário + cargo + e-mail (do `AuthContext`), itens Produtos (total), Categorias (total, abre o `ModalCategoria`) e Vendas ("Em breve", só toast), botão "Sair da conta" no rodapé.
+- **Detalhe:** `BarraTopo` com selo Ativo/Inativo, nome + categoria + EAN e abas segmentadas fixas no topo (Produto / Lotes (n) / Histórico); aba Produto com 2 cards de métrica (preço + margem média sobre o custo médio ponderado; saldo + aviso por nível) e tabela de informações; aba Histórico virou uma timeline (valor antigo riscado → novo em destaque). Ações fixas no rodapé mantidas (Excluir / Editar / Estoque).
+- **Formulários (novo/editar produto, adicionar estoque):** campos agrupados em cartões por seção; "Gerar" para código de barras (`789` + 10 dígitos); "Limpar" no topo do novo produto (remonta o `ProdutoForm` via `key`).
+- **Categorias:** coleção `categorias` adicionada ao `db.json` com 5 seeds (Periféricos, Conectividade, Cabos, Acessórios, Outros). Sem ela o `json-server` devolvia 404 no `POST /categorias`.
+- **`ModalCategoria` agora usa `Modal` nativo:** antes era `position: absolute` renderizado dentro do `ScrollView` do formulário, então aparecia no fim do conteúdo em vez de cobrir a tela.
+- **Feedback:** sucesso de criar/editar/estoque continua com `Alert.alert` (item 207 da spec) **e** também mostra toast, porque no navegador (onde o usuário testa) `Alert.alert` não faz nada.
+- **Validado com Playwright** (390×844, sem `fullPage`): login, lista, menu ⋮, drawer, troca para escuro, detalhe/abas, adicionar estoque com simulador, novo produto → criar categoria no modal → salvar → toast → busca encontra o item com o ícone da categoria. Nenhum `pageerror`/erro de console. Dados de teste removidos depois.
+
+### Ajustes pós-Fase 9 (feedback do usuário)
+- **Bug real: a página inteira arrastava no celular (botão "Novo produto" subia e aparecia um branco embaixo).** Causa: ao mudar o `MenuLateral` para abrir pela **direita**, o painel fechado ficava em `translateX(+310)`, fora da tela, e isso alargava o documento (medido com Playwright emulando Pixel 7: `scrollWidth` 722 = 412 + 310). O navegador do celular então reduzia o zoom para caber tudo e deixava arrastar a página toda. Pela esquerda não acontecia porque não dá para rolar para coordenadas negativas. Correção: overlay + painel envolvidos num container `recorte` (absoluto, tela cheia, `overflow: "hidden"`, `pointerEvents="box-none"`). Depois disso a página mede exatamente o viewport (412×839) na lista e no detalhe. **Lição:** screenshots em viewport de desktop não pegam isso; testar com `devices['Pixel 7']` e checar `scrollWidth`/`scrollHeight` do documento.
+- **Fundo do tema na raiz (feito antes de achar a causa acima, mantido por ser correto):** o overscroll revelava o fundo por trás do app, que nunca recebia a cor do tema (branco padrão do `body` no web / view raiz no nativo). `TemaContext` agora chama `SystemUI.setBackgroundColorAsync(cores.fundo)` (`expo-system-ui`, já instalado; no web ele pinta o `body`) a cada troca de tema, e no web também pinta o `<html>` e aplica `overscroll-behavior: none` (evita o pull-to-refresh do navegador). Os três `Stack` (`_layout` raiz, `(app)`, `(auth)`) recebem `contentStyle` com o fundo do tema (`src/styles/layout.styles.ts`).
+- **Preço de custo no cadastro:** `Produto.precoCusto?: number` (opcional no tipo porque produtos antigos não têm). No `ProdutoForm` é **obrigatório** (> 0), lado a lado com o preço de venda, com caixa de "Margem estimada" ao vivo (verde ≥ alvo de 40%, âmbar abaixo, vermelho se venda < custo). Ao **criar** com quantidade > 0, `novo-produto.tsx` registra também um lote inicial (`POST /lotes`, validade `null`, custo = `precoCusto`), para o custo médio ponderado e a aba Lotes já nascerem consistentes. `precoCusto` entra no log de-para e é preservado em `adicionar-estoque.tsx`. No detalhe, a margem média usa o custo médio dos lotes e cai para `precoCusto` quando não há lotes.
+- **Filtros "Disponíveis p/ venda" e "Perto do vencimento"** (chips novos no `FiltroProdutos`, `StatusFiltro` ganhou `"disponiveis"` e `"vencendo"`), ambos paginados no servidor como os demais e combináveis com a busca:
+  - **Disponíveis:** `ativo=true&quantidade_gte=1`.
+  - **Perto do vencimento:** a validade mora nos lotes, não no produto. Então `buscarProdutosPaginado` primeiro busca `GET /lotes?validade_gte=<hoje>&validade_lte=<hoje+30>&saldoRestante_gte=1` (mesma janela de 30 dias do selo "vencendo", `DIAS_LIMITE_VENCENDO` agora exportado de `utils/lote.ts`, e `calcularJanelaVencendo()` monta as datas ISO), junta os `produtoId` sem repetir e pagina `GET /produtos?id=a&id=b...`. Os params viraram `URLSearchParams` porque o axios serializa arrays como `id[]=`, que o `json-server` não entende. Sem nenhum lote na janela, devolve a resposta vazia sem chamar `/produtos`. Lotes já vencidos e lotes sem saldo **não** entram. Confirmado via `curl` que o `json-server` 0.17 compara `validade_gte/_lte` como texto, o que funciona para ISO `AAAA-MM-DD`.
+  - Validado com Playwright (Pixel 7) usando dois lotes temporários (um vencendo em 10 dias, outro vencido): só o primeiro produto aparece, e a busca por nome restringe dentro do filtro. Lotes temporários removidos depois.
+- **Aviso de vencimento por lote (listagem + visualização):**
+  - `utils/lote.ts`: `resumirVencimentos(lotes)` considera só lotes com validade e saldo > 0 e separa `lotesVencendo` (0–30 dias) de `lotesVencidos`, cada um com `diasParaVencer`, ordenados do mais urgente. Também soma as unidades de cada grupo e guarda o menor prazo. `agruparVencimentosPorProduto` gera o mapa `produtoId → ResumoVencimento`, e `descreverPrazo(dias)` gera "vence em N dias" / "vence hoje" / "venceu há N dias". Tipos `LoteComPrazo`/`ResumoVencimento` em `types/index.ts`.
+  - **Listagem:** no `useFocusEffect`, **uma** chamada `buscarLotesComValidadeProxima()` (`GET /lotes?validade_lte=<hoje+30>&saldoRestante_gte=1`, que já exclui validade `null`, conferido via curl) monta o mapa. `ProductCard` recebe `vencimento` e mostra o selo "Vence em Nd" (âmbar) ou "Lote vencido" (vermelho, com prioridade).
+  - **Visualização (aba Produto):** cartão "Validade dos lotes" (âmbar se há lote vencendo, vermelho se há vencido) com as unidades perto do vencimento e quantos lotes são, as unidades já vencidas (se houver) e a lista de cada lote com **código**, data, prazo e saldo. Sem problemas: "Nenhum lote vence nos próximos 30 dias" ou "Nenhum lote com data de validade".
+  - **Aba Lotes:** o selo de cada lote passou de "Vencendo em breve"/"Vencido" genéricos para o prazo real ("Vence em 10 dias", "Venceu há 13 dias"). Lotes sem validade mostram "Não expira".
+  - Validado com Playwright (Pixel 7) com 4 lotes temporários (10 d, 25 d, 60 d, vencido): selos certos na lista, 12 un. em 2 lotes no detalhe (o de 60 dias ficou de fora), vencido em vermelho. Lotes removidos depois.
+- **Código auxiliar (pedido da equipe; normalmente o código do catálogo):** `Produto.codigoAuxiliar?: string`, **opcional**. No `ProdutoForm`, fica na seção Identificação logo abaixo do EAN (até 30 caracteres, com contador, teclado em maiúsculas, fonte mono; vazio é salvo como `undefined`). Aparece no cabeçalho da visualização (`EAN · código auxiliar`) e numa linha própria da tabela de informações, e entra no log de-para.
+  - **Bug latente corrigido junto:** `adicionar-estoque.tsx` montava o `DadosProduto` campo a campo antes do `PUT`, então qualquer campo novo seria **apagado** ao dar entrada de estoque (o `PUT` do json-server substitui o registro inteiro). Agora é `{ ...produto, quantidade, preco }`.
+  - Validado com Playwright: criar com `CAT-00123` → editar para `CAT-00999` (aparece no histórico) → entrada de 4 un. → o `codigoAuxiliar` e o `precoCusto` continuam salvos. Produto, lote e logs de teste removidos depois.
+
+## Módulo de Vendas / PDV (Fase 10, a partir do protótipo HTML do usuário)
+
+Nova rota `src/app/(app)/vendas.tsx`, acessada pelo menu lateral ("Vendas & Caixa"). O item deixou de ser "Em breve", e o `MenuLateral` agora recebe `telaAtiva: "produtos" | "vendas"` e navega com `router`; os contadores e o item Categorias viraram opcionais. Uma tela só, com 3 abas internas (estado local `abaAtiva`), como no protótipo:
+
+- **Catálogo:** busca por **nome, EAN ou código auxiliar** (sem acento/caixa), segmentado Em estoque / Sem estoque (padrão: em estoque) e chips de categoria. Lista só produtos **ativos** (`GET /produtos?ativo=true`, carregados inteiros e filtrados no cliente, porque o json-server 0.17 não faz OR entre campos). `CardProdutoVenda` com `SeletorQuantidade` (− n +) limitado ao estoque. Barra flutuante do carrinho quando há itens. Tocar no card abre a `ModalFichaProduto`, a "visão do cliente": preço, estoque e especificações, **sem custo, margem ou lotes**.
+- **Carrinho:** comprador (`ModalCliente`: "consumidor não identificado" ou nome + CPF opcional com máscara e validação dos dígitos verificadores, em `utils/venda.ts`), itens com seletor e remover, desconto geral em % ou R$ **limitado a 50%** (`DESCONTO_MAXIMO_PERCENTUAL`; acima disso aparece aviso vermelho e o valor é travado no teto), forma de pagamento (PIX / crédito / débito / dinheiro) e totais.
+- **Caixa:** fila Aguardando / Finalizados com `CardPedido`. A `ModalPedidoCaixa` faz a conferência de embalagem (checkbox por item, gravado via `PATCH`), mostra **de quais lotes saiu cada item**, adiciona itens de balcão (embalagem R$ 5, garantia R$ 25; `ITENS_BALCAO`) e confirma o recebimento (`status: "PAGO"`, `pagoEm`).
+- **Modais em folha inferior:** `FolhaInferior` (Modal nativo + cabeçalho + scroll + rodapé), base dos 3 modais novos.
+- **`CustomButton`** ganhou a variante `sucesso` (verde, usada em "Confirmar recebimento"). **`useCampoMoeda`** ganhou `redefinir(valor)`.
+
+**Regras de estoque (decisão tomada, a confirmar com o usuário):**
+- A baixa acontece **ao enviar o pedido ao caixa**, como no protótipo, e não no pagamento.
+- `services/vendas.ts > criarPedido` relê cada produto e seus lotes, recusa se o estoque atual for menor que o pedido ("Estoque insuficiente…", via `Alert`) e planeja a baixa por **FEFO** (`planejarBaixaFefo` em `utils/lote.ts`: validade mais próxima primeiro, lotes sem validade por último, empate por `criadoEm`).
+- Em seguida grava o pedido e, **em sequência**, `PATCH` na quantidade do produto, `PATCH` no `saldoRestante` de cada lote e um log "Quantidade (venda PED-000N)" no histórico do produto.
+- Produtos sem lotes (legados) só têm a quantidade baixada.
+- Não há transação no json-server: se a conexão cair no meio, a venda pode ficar parcial.
+
+**Bug real de infraestrutura encontrado:** com `json-server --watch`, várias gravações seguidas (e em paralelo) faziam o servidor ler o `db.json` no meio de uma escrita, achar que era mudança externa e **reiniciar**. As próximas requisições tomavam `ERR_CONNECTION_REFUSED` (capturado com Playwright), e a primeira venda ficou parcial: pedido e lotes gravados, produto não. Correções: gravações da venda em sequência, e **`--watch` removido do `npm run mock-api`**. O json-server continua persistindo no `db.json` sem ele; o `--watch` só recarregava edições externas. Consequência: edições manuais no `db.json` com o mock rodando exigem reiniciá-lo.
+
+Número do pedido: `PED-` + (total de pedidos + 1) com 4 dígitos. Coleção `pedidos` adicionada ao `db.json`. Tipos novos em `types/index.ts`: `Pedido`, `ItemPedido`, `BaixaLote`, `ItemBalcao`, `Cliente`, `ItemCarrinho`, `NovoPedido`, `FormaPagamento`, `StatusPedido`, `TipoDesconto` e props dos componentes. Constantes do usuário mocado em `src/constants/usuario.ts`.
+
+**Validado com Playwright (Pixel 7):** produto temporário com 10 un. em 2 lotes (4 un. vencendo em 05/10, 6 un. em 01/12). Fluxo: busca por `aux-77` → +5 → ficha do cliente (sem custo) → comprador com CPF (inválido bloqueia, válido libera) → desconto 60% (avisa e trava em 50%) → 10% + dinheiro → enviar → caixa → embalar → + embalagem → confirmar. Resultado no banco: produto 10→5, lotes 4→0 e 6→5, pedido PAGO com subtotal 505, desconto 50, total 455, log no histórico. Sem erros no console, página 412×839 sem overflow. Dados de teste removidos.
+
+**Fora desta versão:** leitor de código de barras por câmera (exigiria `expo-camera`, dependência nativa nova), cancelamento de pedido/estorno de estoque e fechamento de caixa.
+
+## Caixa Separado, Cancelamento, Estoque Negativo e Clientes (Fase 11)
+
+- **Caixa virou tela própria** (`src/app/(app)/caixa.tsx`, item "Caixa" no menu lateral com o número de pedidos aguardando), porque quem opera o caixa é outra pessoa. A tela de vendas ficou só com Catálogo e Carrinho; depois de enviar o pedido, o vendedor volta ao catálogo. O caixa tem métricas (na fila, recebido hoje), busca por nº do pedido, cliente ou início do CPF, e as filas Aguardando / Pagos / Cancelados. Atualiza sozinho a cada 15 s (`setInterval` dentro do `useFocusEffect`) e também ao puxar a lista (`RefreshControl`).
+- **Cancelar pedido** (só pedidos aguardando): motivo obrigatório, escolhido entre `MOTIVOS_CANCELAMENTO` ou "Outro motivo" com texto livre. `cancelarPedido` marca `CANCELADO` e grava `motivoCancelamento`, depois **devolve o estoque** ao produto e aos mesmos lotes registrados em `itens[].lotes`.
+- **Reabrir pedido cancelado:** `reabrirPedido` baixa o estoque de novo, com **FEFO recalculado no momento** (os lotes podem ter mudado nesse meio-tempo), atualiza `itens[].lotes`, zera o `embalado` e volta para `AGUARDANDO`.
+- **Histórico do pedido:** `Pedido.eventos[]` (`criado` / `pago` / `cancelado` / `reaberto`, com data, responsável e motivo), exibido na `ModalPedidoCaixa`. Cada movimentação também gera log no histórico do produto: "Quantidade (venda / cancelamento / reabertura PED-000N)".
+- **Venda sem estoque, estoque negativo** (pedido do usuário: erros de contagem):
+  - o catálogo deixou de bloquear; `SeletorQuantidade.maximo` virou opcional e o selo "Esgotado" saiu;
+  - o carrinho avisa "Estoque ficará em -N un.", e a ficha do cliente mostra um aviso de venda sem estoque;
+  - a quantidade do produto pode ficar negativa, mas o saldo dos lotes nunca passa de zero; o que falta simplesmente não tem lote.
+  - O filtro "Sem estoque" da listagem passou para `quantidade_lte=0`, para incluir os negativos.
+  - No `ProdutoForm`, a regra de quantidade ≥ 0 (item 5 da spec) continua no **cadastro**; na **edição** o negativo é aceito, senão um produto negativo não poderia mais ser editado.
+- **Clientes recorrentes:** coleção `clientes` (`id`, `nome`, `cpf` só com dígitos, `telefone?`, `criadoEm`), com 5 clientes de exemplo, CPFs válidos gerados (3 começando com 077). `services/clientes.ts`:
+  - `buscarClientes("cpf", "077.")` → `cpf_like=^077`, ou seja, **começa com**;
+  - `buscarClientes("nome", ...)` → `nome_like`, sem diferenciar maiúsculas, com os caracteres de regex escapados; mínimo de 2 letras, até 6 resultados;
+  - `salvarCliente` cria ou atualiza o cliente pelo CPF ao gerar um pedido; sem CPF, não salva.
+  - No `ModalCliente`, as sugestões aparecem abaixo do campo sendo digitado (espera de 250 ms), mostram nome, CPF e telefone, e ao tocar preenchem os três campos.
+- **Telefone do cliente** (opcional): máscara `(00) 0000-0000` ou `(00) 00000-0000` (`formatarTelefone` / `validarTelefone`), salvo no cliente e mostrado no pedido do caixa.
+- **Validado com Playwright (Pixel 7):** produto com 2 un. em 1 lote, venda de 3. Estoque: -1 e lote 0 → cancelado com motivo: 2 e 2 → reaberto: -1 e 0 → pago. Os eventos e os 3 logs estão corretos. Sugestões: "Ricardo Mar" traz 2 clientes; "077." traz 3, com telefone; selecionar preenche tudo. Sem erros. Dados de teste removidos, e o pedido real do usuário (PED-0001) ficou intocado.

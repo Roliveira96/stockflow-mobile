@@ -1,12 +1,12 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { cores } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
 import type { SeletorDataProps } from "@/types";
 import { formatarDataCurta } from "@/utils/data";
 
-import { styles } from "./styles";
+import { criarEstilos } from "./styles";
 
 const NOMES_MES = [
   "Janeiro",
@@ -32,6 +32,8 @@ function paraIso(data: Date): string {
 }
 
 export function SeletorData({ label, valor, onSelecionar, erro }: SeletorDataProps) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [aberto, setAberto] = useState(false);
   const dataSelecionada = valor ? new Date(`${valor}T00:00:00`) : null;
   const [mesExibido, setMesExibido] = useState(dataSelecionada ?? new Date());

@@ -22,6 +22,12 @@ export function useCampoMoeda(valorInicial = 0) {
     moverCursorParaFinal(texto);
   }
 
+  function redefinir(valor = 0) {
+    const novoValor = Math.round(valor * 100);
+    setCentavos(novoValor);
+    moverCursorParaFinal(formatarCentavosComoTexto(novoValor));
+  }
+
   return {
     valor: centavos / 100,
     centavos,
@@ -29,5 +35,6 @@ export function useCampoMoeda(valorInicial = 0) {
     selecao,
     aoMudarTexto,
     aoFocar,
+    redefinir,
   };
 }

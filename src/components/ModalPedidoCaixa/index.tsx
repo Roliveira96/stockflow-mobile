@@ -1,0 +1,427 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useMemo, useState } from "react";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+
+import { CustomButton } from "@/components/CustomButton";
+import { FolhaInferior } from "@/components/FolhaInferior";
+import { useTema } from "@/contexts/TemaContext";
+import { useToast } from "@/contexts/ToastContext";
+import {
+  atualizarPedido,
+  cancelarPedido,
+  confirmarPagamento,
+  reabrirPedido,
+} from "@/services/vendas";
+import type { ItemBalcao, ModalPedidoCaixaProps, Pedido, TipoEventoPedido } from "@/types";
+import { formatarData } from "@/utils/data";
+import { formatarMoeda } from "@/utils/moeda";
+import {
+  formatarCpf,
+  formatarTelefone,
+  ITENS_BALCAO,
+  MOTIVOS_CANCELAMENTO,
+  rotuloFormaPagamento,
+} from "@/utils/venda";
+
+import { criarEstilos } from "./styles";
+
+const MOTIVO_OUTRO = "Outro motivo";
+
+const ROTULO_EVENTO: Record<TipoEventoPedido, string> = {
+  criado: "Pedido criado",
+  pago: "Pagamento confirmado",
+  cancelado: "Pedido cancelado",
+  reaberto: "Pedido reaberto",
+};
+
+export function ModalPedidoCaixa({
+  pedido,
+  operador,
+  aoFechar,
+  aoAtualizar,
+}: ModalPedidoCaixaProps) {
+  const { cores } = useTema();
+  const { mostrarToast } = useToast();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
+  const [salvando, setSalvando] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
+  const [motivoSelecionado, setMotivoSelecionado] = useState<string | null>(null);
+  const [motivoLivre, setMotivoLivre] = useState("");
+
+  const status = pedido?.status;
+  const aguardando = status === "AGUARDANDO";
+  const embalados = pedido?.itens.filter((item) => item.embalado).length ?? 0;
+  const motivoFinal =
+    motivoSelecionado === MOTIVO_OUTRO ? motivoLivre.trim() : (motivoSelecionado ?? "");
+
+  function limparCancelamento() {
+    setCancelando(false);
+    setMotivoSelecionado(null);
+    setMotivoLivre("");
+  }
+
+  function handleFechar() {
+    limparCancelamento();
+    aoFechar();
+  }
+
+  async function executar(acao: () => Promise<Pedido>, mensagem?: string) {
+    setSalvando(true);
+
+    try {
+      const atualizado = await acao();
+      limparCancelamento();
+      aoAtualizar(atualizado);
+      if (mensagem) mostrarToast(mensagem);
+    } catch {
+      Alert.alert("Erro de conexão", "Não foi possível atualizar o pedido.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  function handleAlternarEmbalado(indice: number) {
+    if (!pedido || !aguardando) return;
+
+    executar(() =>
+      atualizarPedido(pedido.id, {
+        itens: pedido.itens.map((item, atual) =>
+          atual === indice ? { ...item, embalado: !item.embalado } : item
+        ),
+      })
+    );
+  }
+
+  function handleAdicionarBalcao(item: ItemBalcao) {
+    if (!pedido || !aguardando) return;
+
+    executar(
+      () =>
+        atualizarPedido(pedido.id, {
+          itensBalcao: [...pedido.itensBalcao, { nome: item.nome, preco: item.preco }],
+          subtotal: pedido.subtotal + item.preco,
+          total: pedido.total + item.preco,
+        }),
+      `${item.nome} adicionado ao pedido`
+    );
+  }
+
+  function renderizarTitulo() {
+    if (!pedido) return null;
+
+    const estiloSelo =
+      status === "PAGO"
+        ? styles.seloPago
+        : status === "CANCELADO"
+          ? styles.seloCancelado
+          : styles.seloAguardando;
+    const estiloTexto =
+      status === "PAGO"
+        ? styles.seloTextoPago
+        : status === "CANCELADO"
+          ? styles.seloTextoCancelado
+          : styles.seloTextoAguardando;
+    const rotulo =
+      status === "PAGO" ? "✓ Pago" : status === "CANCELADO" ? "Cancelado" : "Aguardando pagamento";
+
+    return (
+      <View style={styles.titulo}>
+        <Text style={styles.numero}>{pedido.numero}</Text>
+        <View style={[styles.selo, estiloSelo]}>
+          <Text style={[styles.seloTexto, estiloTexto]}>{rotulo}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  function renderizarRodape() {
+    if (!pedido) return undefined;
+
+    if (cancelando) {
+      return (
+        <>
+          <CustomButton
+            titulo="Voltar"
+            onPress={limparCancelamento}
+            variante="neutro"
+            compacto
+            estiloContainer={styles.botaoSecundario}
+          />
+          <CustomButton
+            titulo="Confirmar cancelamento"
+            onPress={() =>
+              executar(
+                () => cancelarPedido(pedido, motivoFinal, operador),
+                `Pedido ${pedido.numero} cancelado e estoque devolvido`
+              )
+            }
+            carregando={salvando}
+            desabilitado={motivoFinal.length === 0}
+            variante="perigo"
+            compacto
+            estiloContainer={styles.botaoPrincipal}
+          />
+        </>
+      );
+    }
+
+    if (status === "AGUARDANDO") {
+      return (
+        <>
+          <CustomButton
+            titulo="Cancelar"
+            onPress={() => setCancelando(true)}
+            variante="perigo"
+            icone="close-circle-outline"
+            compacto
+            estiloContainer={styles.botaoSecundario}
+          />
+          <CustomButton
+            titulo="Confirmar recebimento"
+            onPress={() =>
+              executar(
+                () => confirmarPagamento(pedido, operador),
+                `Venda ${pedido.numero} paga e concluída`
+              )
+            }
+            carregando={salvando}
+            icone="checkmark"
+            variante="sucesso"
+            compacto
+            estiloContainer={styles.botaoPrincipal}
+          />
+        </>
+      );
+    }
+
+    if (status === "CANCELADO") {
+      return (
+        <CustomButton
+          titulo="Reabrir pedido"
+          onPress={() =>
+            executar(
+              () => reabrirPedido(pedido, operador),
+              `Pedido ${pedido.numero} reaberto e estoque baixado novamente`
+            )
+          }
+          carregando={salvando}
+          icone="refresh"
+          compacto
+          estiloContainer={styles.botaoPrincipal}
+        />
+      );
+    }
+
+    return undefined;
+  }
+
+  return (
+    <FolhaInferior
+      visivel={pedido !== null}
+      aoFechar={handleFechar}
+      titulo={renderizarTitulo()}
+      subtitulo={
+        pedido
+          ? `Criado em ${formatarData(pedido.criadoEm)} · vendedor ${pedido.vendedor}`
+          : undefined
+      }
+      rodape={renderizarRodape()}
+    >
+      {pedido && cancelando ? (
+        <View style={styles.secao}>
+          <Text style={styles.secaoTitulo}>Por que o pedido será cancelado?</Text>
+          <Text style={styles.textoAjuda}>
+            O estoque dos {pedido.itens.length} ite{pedido.itens.length === 1 ? "m" : "ns"} volta
+            para os lotes de origem. O pedido pode ser reaberto depois.
+          </Text>
+          {[...MOTIVOS_CANCELAMENTO, MOTIVO_OUTRO].map((motivo) => {
+            const selecionado = motivoSelecionado === motivo;
+
+            return (
+              <TouchableOpacity
+                key={motivo}
+                style={[styles.opcaoMotivo, selecionado ? styles.opcaoMotivoAtiva : undefined]}
+                onPress={() => setMotivoSelecionado(motivo)}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selecionado }}
+                accessibilityLabel={motivo}
+              >
+                <Ionicons
+                  name={selecionado ? "radio-button-on" : "radio-button-off"}
+                  size={18}
+                  color={selecionado ? cores.perigo : cores.textoTerciario}
+                />
+                <Text
+                  style={[
+                    styles.opcaoMotivoTexto,
+                    selecionado ? styles.opcaoMotivoTextoAtiva : undefined,
+                  ]}
+                >
+                  {motivo}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+          {motivoSelecionado === MOTIVO_OUTRO ? (
+            <TextInput
+              style={styles.inputMotivo}
+              value={motivoLivre}
+              onChangeText={setMotivoLivre}
+              placeholder="Descreva o motivo do cancelamento"
+              placeholderTextColor={cores.textoTerciario}
+              multiline
+              maxLength={200}
+              accessibilityLabel="Descreva o motivo do cancelamento"
+            />
+          ) : null}
+        </View>
+      ) : null}
+
+      {pedido && !cancelando ? (
+        <>
+          {status === "CANCELADO" && pedido.motivoCancelamento ? (
+            <View style={styles.avisoCancelado}>
+              <Ionicons name="close-circle-outline" size={18} color={cores.perigo} />
+              <View style={styles.flex}>
+                <Text style={styles.avisoCanceladoTitulo}>Motivo do cancelamento</Text>
+                <Text style={styles.avisoCanceladoTexto}>{pedido.motivoCancelamento}</Text>
+              </View>
+            </View>
+          ) : null}
+
+          <View style={styles.caixaCliente}>
+            <Text style={styles.rotuloPequeno}>Cliente</Text>
+            <Text style={styles.clienteNome}>{pedido.cliente.nome}</Text>
+            <Text style={styles.clienteCpf}>
+              {pedido.cliente.cpf ? `CPF: ${formatarCpf(pedido.cliente.cpf)}` : "Sem CPF vinculado"}
+              {pedido.cliente.telefone ? ` · ${formatarTelefone(pedido.cliente.telefone)}` : ""}
+            </Text>
+          </View>
+
+          <View style={styles.secao}>
+            <View style={styles.secaoCabecalho}>
+              <Text style={styles.secaoTitulo}>Conferência & embalagem</Text>
+              <Text style={styles.secaoDica}>
+                {embalados}/{pedido.itens.length} embalados
+              </Text>
+            </View>
+
+            {pedido.itens.map((item, indice) => (
+              <TouchableOpacity
+                key={`${item.produtoId}-${indice}`}
+                style={[styles.item, item.embalado ? styles.itemEmbalado : undefined]}
+                onPress={() => handleAlternarEmbalado(indice)}
+                disabled={!aguardando || salvando}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: item.embalado, disabled: !aguardando }}
+                accessibilityLabel={`${item.nome}, ${item.quantidade} unidades`}
+              >
+                <Ionicons
+                  name={item.embalado ? "checkbox" : "square-outline"}
+                  size={20}
+                  color={item.embalado ? cores.sucesso : cores.textoTerciario}
+                />
+                <Text style={styles.itemIcone}>{item.icone}</Text>
+                <View style={styles.flex}>
+                  <Text
+                    style={[styles.itemNome, item.embalado ? styles.itemNomeEmbalado : undefined]}
+                    numberOfLines={1}
+                  >
+                    {item.nome}
+                  </Text>
+                  <Text style={styles.itemLotes} numberOfLines={2}>
+                    {item.lotes.length > 0
+                      ? item.lotes.map((lote) => `${lote.codigo} ×${lote.quantidade}`).join(" · ")
+                      : "Sem lote (estoque sem registro de lote)"}
+                  </Text>
+                </View>
+                <Text style={styles.itemQuantidade}>{item.quantidade} un.</Text>
+              </TouchableOpacity>
+            ))}
+
+            {pedido.itensBalcao.map((item, indice) => (
+              <View key={`balcao-${indice}`} style={[styles.item, styles.itemBalcao]}>
+                <Ionicons name="gift-outline" size={18} color={cores.primaria} />
+                <Text style={[styles.itemNome, styles.itemBalcaoNome, styles.flex]}>
+                  {item.nome}
+                </Text>
+                <Text style={styles.itemBalcaoPreco}>{formatarMoeda(item.preco)}</Text>
+              </View>
+            ))}
+          </View>
+
+          {aguardando ? (
+            <View style={styles.caixaBalcao}>
+              <Text style={styles.caixaBalcaoTitulo}>Adicionar itens de balcão</Text>
+              <View style={styles.opcoesBalcao}>
+                {ITENS_BALCAO.map((item) => (
+                  <TouchableOpacity
+                    key={item.nome}
+                    style={styles.opcaoBalcao}
+                    onPress={() => handleAdicionarBalcao(item)}
+                    disabled={salvando}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Adicionar ${item.nome}`}
+                  >
+                    <Text style={styles.opcaoBalcaoTexto}>
+                      + {item.icone} {item.nome} ({formatarMoeda(item.preco)})
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          <View style={styles.resumo}>
+            <View style={styles.resumoLinha}>
+              <Text style={styles.resumoRotulo}>Subtotal</Text>
+              <Text style={styles.resumoValor}>{formatarMoeda(pedido.subtotal)}</Text>
+            </View>
+            <View style={styles.resumoLinha}>
+              <Text style={styles.resumoRotulo}>Desconto</Text>
+              <Text style={[styles.resumoValor, styles.resumoDesconto]}>
+                - {formatarMoeda(pedido.desconto)}
+              </Text>
+            </View>
+            <View style={styles.resumoLinha}>
+              <Text style={styles.resumoRotulo}>Pagamento</Text>
+              <Text style={styles.resumoPagamento}>
+                {rotuloFormaPagamento(pedido.formaPagamento)}
+              </Text>
+            </View>
+            <View style={[styles.resumoLinha, styles.resumoTotalLinha]}>
+              <Text style={styles.resumoTotalRotulo}>Valor a cobrar</Text>
+              <Text style={styles.resumoTotal}>{formatarMoeda(pedido.total)}</Text>
+            </View>
+          </View>
+
+          {(pedido.eventos ?? []).length > 0 ? (
+            <View style={styles.secao}>
+              <Text style={styles.secaoTitulo}>Histórico do pedido</Text>
+              {[...pedido.eventos].reverse().map((evento, indice) => (
+                <View key={`${evento.tipo}-${evento.data}-${indice}`} style={styles.evento}>
+                  <View
+                    style={[
+                      styles.eventoPonto,
+                      evento.tipo === "cancelado" ? styles.eventoPontoPerigo : undefined,
+                      evento.tipo === "pago" ? styles.eventoPontoSucesso : undefined,
+                    ]}
+                  />
+                  <View style={styles.flex}>
+                    <Text style={styles.eventoTitulo}>
+                      {ROTULO_EVENTO[evento.tipo]} · {evento.responsavel}
+                    </Text>
+                    <Text style={styles.eventoData}>{formatarData(evento.data)}</Text>
+                    {evento.motivo ? (
+                      <Text style={styles.eventoMotivo}>Motivo: {evento.motivo}</Text>
+                    ) : null}
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </>
+      ) : null}
+    </FolhaInferior>
+  );
+}

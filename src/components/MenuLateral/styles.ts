@@ -1,90 +1,206 @@
 import { StyleSheet } from "react-native";
 
-import { cores, raios, sombra } from "@/constants/theme";
+import { raios, sombra, type Cores } from "@/constants/theme";
 
-export const LARGURA_MENU = 280;
+export const LARGURA_MENU = 310;
 
-export const styles = StyleSheet.create({
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#151328",
-    zIndex: 20,
-  },
-  overlayPressable: {
-    flex: 1,
-  },
-  painel: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: LARGURA_MENU,
-    backgroundColor: cores.superficie,
-    paddingTop: 24,
-    paddingHorizontal: 20,
-    zIndex: 21,
-    ...sombra.cartao,
-  },
-  cabecalhoUsuario: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingBottom: 20,
-    marginBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: cores.fundo,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: raios.pill,
-    backgroundColor: cores.primaria,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nomeUsuario: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: cores.textoPrimario,
-  },
-  menuLista: {
-    flex: 1,
-  },
-  itemMenu: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    height: 44,
-    paddingHorizontal: 12,
-    borderRadius: raios.sm,
-  },
-  itemMenuAtivo: {
-    backgroundColor: cores.primariaFundo,
-  },
-  itemMenuTexto: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: cores.textoSecundario,
-  },
-  itemMenuTextoAtivo: {
-    color: cores.primaria,
-  },
-  botaoSair: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    height: 44,
-    paddingHorizontal: 12,
-    marginBottom: 24,
-    borderRadius: raios.sm,
-  },
-  botaoSairTexto: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: cores.perigo,
-  },
-});
+export function criarEstilos(cores: Cores) {
+  return StyleSheet.create({
+    recorte: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      overflow: "hidden",
+      zIndex: 20,
+    },
+    overlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: cores.overlay,
+      zIndex: 20,
+    },
+    overlayPressable: {
+      flex: 1,
+    },
+    painel: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: LARGURA_MENU,
+      backgroundColor: cores.superficie,
+      borderLeftWidth: 1,
+      borderLeftColor: cores.borda,
+      paddingTop: 16,
+      zIndex: 21,
+      ...sombra.flutuante,
+    },
+    topo: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: cores.bordaSuave,
+    },
+    botaoTema: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      height: 36,
+      paddingHorizontal: 12,
+      borderRadius: raios.sm,
+      backgroundColor: cores.neutroFundo,
+    },
+    botaoTemaTexto: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: cores.textoSecundario,
+    },
+    botaoFechar: {
+      width: 32,
+      height: 32,
+      borderRadius: raios.pill,
+      backgroundColor: cores.neutroFundo,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cabecalhoUsuario: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 18,
+      borderBottomWidth: 1,
+      borderBottomColor: cores.bordaSuave,
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: raios.md,
+      backgroundColor: cores.botaoPrimario,
+      borderWidth: 2,
+      borderColor: cores.primariaFundoForte,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    avatarTexto: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: cores.textoSobreCor,
+    },
+    infoUsuario: {
+      flex: 1,
+    },
+    nomeUsuario: {
+      fontSize: 15,
+      fontWeight: "800",
+      color: cores.textoPrimario,
+    },
+    cargoUsuario: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: cores.primaria,
+      marginTop: 1,
+    },
+    emailUsuario: {
+      fontSize: 11,
+      color: cores.textoTerciario,
+      marginTop: 1,
+    },
+    menuLista: {
+      flex: 1,
+      paddingHorizontal: 12,
+      paddingTop: 12,
+      gap: 4,
+    },
+    itemMenu: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      height: 50,
+      paddingHorizontal: 12,
+      borderRadius: raios.md,
+    },
+    itemMenuAtivo: {
+      backgroundColor: cores.primariaFundo,
+    },
+    itemMenuConteudo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    itemMenuTexto: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: cores.textoSecundario,
+    },
+    itemMenuTextoAtivo: {
+      color: cores.primaria,
+    },
+    contadorItem: {
+      minWidth: 22,
+      paddingHorizontal: 6,
+      height: 20,
+      borderRadius: raios.pill,
+      backgroundColor: cores.neutroFundo,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    contadorItemTexto: {
+      fontSize: 11,
+      fontWeight: "700",
+      color: cores.textoSecundario,
+    },
+    contadorItemAtivo: {
+      backgroundColor: cores.primariaFundoForte,
+    },
+    contadorItemTextoAtivo: {
+      color: cores.textoPrimario,
+    },
+    seloPendentes: {
+      minWidth: 22,
+      paddingHorizontal: 7,
+      height: 20,
+      borderRadius: raios.pill,
+      backgroundColor: cores.alertaFundo,
+      borderWidth: 1,
+      borderColor: cores.alertaBorda,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    seloPendentesTexto: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: cores.alerta,
+    },
+    rodape: {
+      padding: 16,
+      paddingBottom: 24,
+      borderTopWidth: 1,
+      borderTopColor: cores.bordaSuave,
+    },
+    botaoSair: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      height: 48,
+      borderRadius: raios.md,
+      borderWidth: 1,
+      borderColor: cores.perigoBorda,
+      backgroundColor: cores.perigoFundo,
+    },
+    botaoSairTexto: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: cores.perigo,
+    },
+  });
+}

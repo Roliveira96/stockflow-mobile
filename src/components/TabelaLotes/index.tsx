@@ -1,19 +1,19 @@
+import { useMemo } from "react";
 import { Text, View } from "react-native";
 
+import { useTema } from "@/contexts/TemaContext";
 import type { TabelaLotesProps } from "@/types";
 import { formatarDataCurta } from "@/utils/data";
-import { calcularStatusLote } from "@/utils/lote";
+import { calcularDiasParaVencer, calcularStatusLote, descreverPrazo } from "@/utils/lote";
 import { formatarMoeda } from "@/utils/moeda";
 
-import { styles } from "./styles";
+import { criarEstilos } from "./styles";
 
-const ROTULO_STATUS = {
-  regular: "Regular",
-  vencendo: "Vencendo em breve",
-  vencido: "Vencido",
-};
 
 export function TabelaLotes({ lotes }: TabelaLotesProps) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
+
   if (lotes.length === 0) {
     return <Text style={styles.vazio}>Nenhum lote registrado ainda.</Text>;
   }
@@ -22,11 +22,22 @@ export function TabelaLotes({ lotes }: TabelaLotesProps) {
     <View>
       {lotes.map((lote) => {
         const status = calcularStatusLote(lote.validade);
+        const rotuloStatus =
+          lote.validade && status !== "regular"
+            ? descreverPrazo(calcularDiasParaVencer(lote.validade))
+            : lote.validade
+              ? "Regular"
+              : "Não expira";
 
         return (
-          <View key={lote.id} style={styles.linha}>
+          <View
+            key={lote.id}
+            style={[styles.linha, lote.saldoRestante === 0 ? styles.linhaEsgotada : undefined]}
+          >
             <View style={styles.linhaTopo}>
-              <Text style={styles.codigo}>{lote.codigo}</Text>
+              <Text style={styles.codigo} numberOfLines={1}>
+                {lote.codigo}
+              </Text>
               <View
                 style={[
                   styles.selo,
@@ -41,7 +52,7 @@ export function TabelaLotes({ lotes }: TabelaLotesProps) {
                     status === "vencido" ? styles.seloTextoVencido : undefined,
                   ]}
                 >
-                  {ROTULO_STATUS[status]}
+                  {rotuloStatus.charAt(0).toUpperCase() + rotuloStatus.slice(1)}
                 </Text>
               </View>
             </View>

@@ -1,11 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
+import { useMemo } from "react";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 
-import { cores, gradientes } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
 import type { CustomButtonProps } from "@/types";
 
-import { styles } from "./styles";
+import { criarEstilos } from "./styles";
 
 export function CustomButton({
   titulo,
@@ -15,37 +15,53 @@ export function CustomButton({
   estiloContainer,
   icone,
   variante = "primaria",
+  compacto,
 }: CustomButtonProps) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const bloqueado = desabilitado || carregando;
-  const cor = bloqueado ? gradientes.desabilitado : gradientes[variante];
+
+  const corConteudo =
+    variante === "perigo"
+      ? cores.perigo
+      : variante === "neutro"
+        ? cores.neutroTexto
+        : cores.textoSobreCor;
 
   return (
     <TouchableOpacity
-      style={[styles.wrapper, bloqueado ? undefined : styles.sombra, estiloContainer]}
+      style={[
+        styles.botao,
+        styles[variante],
+        compacto ? styles.compacto : undefined,
+        bloqueado ? styles.desabilitado : undefined,
+        estiloContainer,
+      ]}
       onPress={onPress}
       disabled={bloqueado}
-      activeOpacity={0.85}
+      activeOpacity={0.8}
       accessibilityRole="button"
       accessibilityLabel={titulo}
       accessibilityState={{ disabled: bloqueado, busy: carregando }}
     >
-      <LinearGradient
-        colors={cor}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.botao}
-      >
-        {carregando ? (
-          <ActivityIndicator color={cores.textoSobreCor} />
-        ) : (
-          <>
-            {icone ? (
-              <Ionicons name={icone} size={18} color={cores.textoSobreCor} style={styles.icone} />
-            ) : null}
-            <Text style={styles.texto}>{titulo}</Text>
-          </>
-        )}
-      </LinearGradient>
+      {carregando ? (
+        <ActivityIndicator color={corConteudo} />
+      ) : (
+        <>
+          {icone ? <Ionicons name={icone} size={18} color={corConteudo} /> : null}
+          <Text
+            style={[
+              styles.texto,
+              compacto ? styles.textoCompacto : undefined,
+              variante === "perigo" ? styles.textoPerigo : undefined,
+              variante === "neutro" ? styles.textoNeutro : undefined,
+            ]}
+            numberOfLines={1}
+          >
+            {titulo}
+          </Text>
+        </>
+      )}
     </TouchableOpacity>
   );
 }

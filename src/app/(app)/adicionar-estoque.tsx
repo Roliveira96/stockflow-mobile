@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,13 +14,15 @@ import {
   View,
 } from "react-native";
 
+import { BarraTopo } from "@/components/BarraTopo";
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { SeletorData } from "@/components/SeletorData";
-import { cores } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useCampoMoeda } from "@/hooks/useCampoMoeda";
 import { api } from "@/services/api";
-import { styles } from "@/styles/adicionar-estoque.styles";
+import { criarEstilos } from "@/styles/adicionar-estoque.styles";
 import type { DadosProduto, Produto } from "@/types";
 import { compararProdutos } from "@/utils/logProduto";
 import {
@@ -34,6 +36,9 @@ import { formatarMoeda } from "@/utils/moeda";
 
 export default function AdicionarEstoque() {
   const router = useRouter();
+  const { cores } = useTema();
+  const { mostrarToast } = useToast();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const [produto, setProduto] = useState<Produto | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -111,12 +116,9 @@ export default function AdicionarEstoque() {
       });
 
       const dadosAtualizados: DadosProduto = {
-        nome: produto.nome,
-        codigoBarras: produto.codigoBarras,
+        ...produto,
         quantidade: produto.quantidade + quantidade,
         preco: atualizarPrecoCatalogo ? Number(precoSugerido.toFixed(2)) : produto.preco,
-        descricao: produto.descricao,
-        ativo: produto.ativo,
       };
 
       const alteracoes = compararProdutos(produto, dadosAtualizados);
@@ -137,6 +139,7 @@ export default function AdicionarEstoque() {
       }
 
       Alert.alert("Estoque adicionado", "O lote foi registrado com sucesso.");
+      mostrarToast(`+${quantidade} unidades adicionadas ao estoque`);
       router.back();
     } catch {
       Alert.alert("Erro de conexão", "Não foi possível adicionar o estoque.");
@@ -160,6 +163,11 @@ export default function AdicionarEstoque() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <BarraTopo
+        rotuloVoltar="Cancelar"
+        aoVoltar={() => router.back()}
+        direita={<Text style={styles.rotuloTopo}>Entrada de mercadoria</Text>}
+      />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -168,81 +176,105 @@ export default function AdicionarEstoque() {
           <Text style={styles.titulo}>Adicionar estoque</Text>
           <Text style={styles.subtitulo}>{produto.nome}</Text>
 
-          <View style={styles.linhaCodigo}>
-            <View style={styles.campoCodigo}>
-              <CustomInput label="Código do lote" value={codigo} onChangeText={setCodigo} />
+          <View style={styles.secao}>
+            <Text style={styles.secaoTitulo}>Lote</Text>
+            <View style={styles.linhaCodigo}>
+              <View style={styles.flex}>
+                <CustomInput
+                  label="Código do lote"
+                  value={codigo}
+                  onChangeText={setCodigo}
+                  monoespacado
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.botaoGerar}
+                onPress={() => setCodigo(gerarCodigoLote())}
+                accessibilityRole="button"
+                accessibilityLabel="Gerar código automático"
+              >
+                <Text style={styles.botaoGerarTexto}>Gerar</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.botaoGerar}
-              onPress={() => setCodigo(gerarCodigoLote())}
-              accessibilityRole="button"
-              accessibilityLabel="Gerar código automático"
-            >
-              <Text style={styles.botaoGerarTexto}>Gerar</Text>
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.linhaSwitch}>
-            <Text style={styles.rotuloSwitch}>Não expira</Text>
-            <Switch
-              value={naoExpira}
-              onValueChange={setNaoExpira}
-              trackColor={{ true: cores.primaria }}
-              accessibilityLabel="Não expira"
-              accessibilityRole="switch"
-            />
-          </View>
-
-          {naoExpira ? null : (
-            <>
-              <SeletorData
-                label="Validade"
-                valor={validade || null}
-                onSelecionar={setValidade}
+            <View style={styles.linhaSwitch}>
+              <View style={styles.flex}>
+                <Text style={styles.rotuloSwitch}>Não expira</Text>
+                <Text style={styles.dicaSwitch}>Lotes sem data de validade</Text>
+              </View>
+              <Switch
+                value={naoExpira}
+                onValueChange={setNaoExpira}
+                trackColor={{ true: cores.botaoPrimario, false: cores.neutroFundoForte }}
+                thumbColor={cores.superficie}
+                accessibilityLabel="Não expira"
+                accessibilityRole="switch"
               />
-              {avisoValidade ? (
-                <View
-                  style={[
-                    styles.avisoCaixa,
-                    statusValidade === "vencido" ? styles.avisoCaixaPerigo : undefined,
-                  ]}
-                >
-                  <Ionicons
-                    name={statusValidade === "vencido" ? "alert-circle-outline" : "time-outline"}
-                    size={18}
-                    color={statusValidade === "vencido" ? cores.perigo : cores.alerta}
-                  />
-                  <Text
+            </View>
+
+            {naoExpira ? null : (
+              <>
+                <SeletorData
+                  label="Validade do lote"
+                  valor={validade || null}
+                  onSelecionar={setValidade}
+                />
+                {avisoValidade ? (
+                  <View
                     style={[
-                      styles.avisoTexto,
-                      statusValidade === "vencido" ? styles.avisoTextoPerigo : undefined,
+                      styles.avisoCaixa,
+                      statusValidade === "vencido" ? styles.avisoCaixaPerigo : undefined,
                     ]}
                   >
-                    {avisoValidade}
-                  </Text>
-                </View>
-              ) : null}
-            </>
-          )}
+                    <Ionicons
+                      name={statusValidade === "vencido" ? "alert-circle-outline" : "time-outline"}
+                      size={18}
+                      color={statusValidade === "vencido" ? cores.perigo : cores.alerta}
+                    />
+                    <Text
+                      style={[
+                        styles.avisoTexto,
+                        statusValidade === "vencido" ? styles.avisoTextoPerigo : undefined,
+                      ]}
+                    >
+                      {avisoValidade}
+                    </Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+          </View>
 
-          <CustomInput
-            label="Quantidade recebida"
-            value={quantidadeEntrada}
-            onChangeText={setQuantidadeEntrada}
-            erro={erroQuantidade}
-            keyboardType="numeric"
-            placeholder="0"
-          />
-
-          <CustomInput
-            label="Custo unitário"
-            value={campoCusto.texto}
-            onChangeText={campoCusto.aoMudarTexto}
-            keyboardType="numeric"
-            selection={campoCusto.selecao}
-            onSelectionChange={campoCusto.aoFocar}
-            onFocus={campoCusto.aoFocar}
-          />
+          <View style={styles.secao}>
+            <Text style={styles.secaoTitulo}>Entrada</Text>
+            <View style={styles.linhaDupla}>
+              <View style={styles.flex}>
+                <CustomInput
+                  label="Qtd. recebida"
+                  obrigatorio
+                  value={quantidadeEntrada}
+                  onChangeText={setQuantidadeEntrada}
+                  erro={erroQuantidade}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  monoespacado
+                />
+              </View>
+              <View style={styles.flex}>
+                <CustomInput
+                  label="Custo unitário (R$)"
+                  obrigatorio
+                  value={campoCusto.texto}
+                  onChangeText={campoCusto.aoMudarTexto}
+                  keyboardType="numeric"
+                  selection={campoCusto.selecao}
+                  onSelectionChange={campoCusto.aoFocar}
+                  onFocus={campoCusto.aoFocar}
+                  monoespacado
+                />
+              </View>
+            </View>
+          </View>
 
           {mostrarSimulador ? (
             <View style={styles.simulador}>
@@ -257,6 +289,7 @@ export default function AdicionarEstoque() {
                 <Text
                   style={[
                     styles.simuladorValor,
+                    styles.simuladorValorDestaque,
                     margemAtual < MARGEM_ALVO_PADRAO
                       ? styles.simuladorValorAlerta
                       : styles.simuladorValorOk,
@@ -287,7 +320,8 @@ export default function AdicionarEstoque() {
                     <Switch
                       value={atualizarPrecoCatalogo}
                       onValueChange={setAtualizarPrecoCatalogo}
-                      trackColor={{ true: cores.primaria }}
+                      trackColor={{ true: cores.botaoPrimario, false: cores.neutroFundoForte }}
+                      thumbColor={cores.superficie}
                     />
                     <Text style={styles.checkboxTexto}>
                       Atualizar preço de venda do catálogo para {formatarMoeda(precoSugerido)}
@@ -303,7 +337,7 @@ export default function AdicionarEstoque() {
             onPress={handleSalvar}
             carregando={enviando}
             desabilitado={!formularioValido}
-            icone="cube-outline"
+            icone="checkmark"
           />
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   Image,
@@ -13,9 +13,12 @@ import {
 import { CustomButton } from "@/components/CustomButton";
 import { CustomInput } from "@/components/CustomInput";
 import { useAuth } from "@/contexts/AuthContext";
-import { styles } from "@/styles/login.styles";
+import { useTema } from "@/contexts/TemaContext";
+import { criarEstilos } from "@/styles/login.styles";
 
 export default function Login() {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -54,33 +57,37 @@ export default function Login() {
           <Text style={styles.titulo}>StockFlow</Text>
           <Text style={styles.subtitulo}>Entre para gerenciar seu estoque</Text>
 
-          <CustomInput
-            label="E-mail"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-            textContentType="emailAddress"
-            placeholder="voce@empresa.com"
-          />
-          <CustomInput
-            label="Senha"
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry
-            autoComplete="password"
-            textContentType="password"
-            placeholder="Sua senha"
-          />
+          <View style={styles.cartao}>
+            <CustomInput
+              label="E-mail"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              textContentType="emailAddress"
+              placeholder="voce@empresa.com"
+            />
+            <CustomInput
+              label="Senha"
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry
+              autoComplete="password"
+              textContentType="password"
+              placeholder="Sua senha"
+            />
 
-          <CustomButton
-            titulo="Entrar"
-            onPress={handleEntrar}
-            carregando={carregando}
-            desabilitado={!podeEntrar}
-            icone="log-in-outline"
-          />
+            <CustomButton
+              titulo="Entrar"
+              onPress={handleEntrar}
+              carregando={carregando}
+              desabilitado={!podeEntrar}
+              icone="log-in-outline"
+            />
+          </View>
+
+          <Text style={styles.rodape}>Inventário & Operações</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

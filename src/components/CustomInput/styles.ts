@@ -1,41 +1,70 @@
 import { StyleSheet } from "react-native";
 
-import { ALVO_TOQUE_MINIMO, cores, raios } from "@/constants/theme";
+import { ALVO_TOQUE_MINIMO, fonteMono, raios, type Cores } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    marginBottom: 18,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: cores.textoSecundario,
-    marginBottom: 8,
-  },
-  input: {
-    width: "100%",
-    height: ALVO_TOQUE_MINIMO,
-    borderWidth: 1.5,
-    borderColor: cores.borda,
-    borderRadius: raios.sm,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: cores.textoPrimario,
-    backgroundColor: cores.neutroFundo,
-  },
-  inputFocado: {
-    borderColor: cores.primaria,
-    backgroundColor: cores.superficie,
-  },
-  inputComErro: {
-    borderColor: cores.perigo,
-    backgroundColor: cores.superficie,
-  },
-  erro: {
-    marginTop: 6,
-    fontSize: 12,
-    fontWeight: "600",
-    color: cores.perigo,
-  },
-});
+export function criarEstilos(cores: Cores) {
+  return StyleSheet.create({
+    container: {
+      width: "100%",
+      marginBottom: 14,
+    },
+    linhaLabel: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 6,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: cores.textoSecundario,
+    },
+    obrigatorio: {
+      color: cores.perigo,
+    },
+    contador: {
+      fontSize: 11,
+      fontFamily: fonteMono,
+      color: cores.textoTerciario,
+    },
+    input: {
+      width: "100%",
+      minHeight: ALVO_TOQUE_MINIMO + 2,
+      borderWidth: 1,
+      borderColor: cores.borda,
+      borderRadius: raios.sm,
+      paddingHorizontal: 14,
+      fontSize: 14,
+      fontWeight: "500",
+      color: cores.textoPrimario,
+      backgroundColor: cores.superficieAlternativa,
+      outlineStyle: "solid",
+      outlineWidth: 0,
+    },
+    inputMultilinha: {
+      minHeight: 110,
+      paddingTop: 12,
+      paddingBottom: 12,
+      fontWeight: "400",
+      lineHeight: 20,
+    },
+    inputMono: {
+      fontFamily: fonteMono,
+    },
+    inputFocado: {
+      borderColor: cores.primaria,
+      backgroundColor: cores.superficie,
+      boxShadow: `0px 0px 0px 3px ${cores.primariaFundo}`,
+    },
+    inputComErro: {
+      borderColor: cores.perigo,
+      backgroundColor: cores.superficie,
+    },
+    erro: {
+      marginTop: 6,
+      fontSize: 12,
+      fontWeight: "600",
+      color: cores.perigo,
+    },
+  });
+}

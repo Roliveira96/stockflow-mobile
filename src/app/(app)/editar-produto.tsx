@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -10,15 +10,20 @@ import {
   Text,
 } from "react-native";
 
+import { BarraTopo } from "@/components/BarraTopo";
 import { ProdutoForm } from "@/components/ProdutoForm";
-import { cores } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
+import { useToast } from "@/contexts/ToastContext";
 import { api } from "@/services/api";
-import { styles } from "@/styles/produto-formulario.styles";
+import { criarEstilos } from "@/styles/produto-formulario.styles";
 import type { DadosProduto, Produto } from "@/types";
 import { compararProdutos } from "@/utils/logProduto";
 
 export default function EditarProduto() {
   const router = useRouter();
+  const { cores } = useTema();
+  const { mostrarToast } = useToast();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const [produto, setProduto] = useState<Produto | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -65,6 +70,7 @@ export default function EditarProduto() {
       }
 
       Alert.alert("Produto atualizado", "As alterações foram salvas com sucesso.");
+      mostrarToast("Alterações salvas com sucesso");
       router.back();
     } catch {
       Alert.alert("Erro de conexão", "Não foi possível atualizar o produto.");
@@ -88,15 +94,17 @@ export default function EditarProduto() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <BarraTopo rotuloVoltar="Voltar" aoVoltar={() => router.back()} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
           <Text style={styles.titulo}>Editar produto</Text>
+          <Text style={styles.subtitulo}>{produto.nome}</Text>
           <ProdutoForm
             valoresIniciais={produto}
-            textoBotao="Atualizar"
+            textoBotao="Salvar alterações"
             enviando={enviando}
             aoEnviar={handleAtualizar}
           />

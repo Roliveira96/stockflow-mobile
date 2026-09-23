@@ -1,15 +1,16 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { CustomInput } from "@/components/CustomInput";
-import { cores } from "@/constants/theme";
+import { useTema } from "@/contexts/TemaContext";
 import type { FiltroProdutosProps, StatusFiltro } from "@/types";
 
-import { styles } from "./styles";
+import { criarEstilos } from "./styles";
 
 const OPCOES_STATUS: { valor: StatusFiltro; rotulo: string }[] = [
   { valor: "todos", rotulo: "Todos" },
+  { valor: "disponiveis", rotulo: "Disponíveis p/ venda" },
+  { valor: "vencendo", rotulo: "Perto do vencimento" },
   { valor: "ativos", rotulo: "Ativos" },
   { valor: "sem-estoque", rotulo: "Sem estoque" },
   { valor: "inativos", rotulo: "Inativos" },
@@ -21,113 +22,106 @@ export function FiltroProdutos({
   aoMudarBusca,
   filtroStatus,
   aoMudarFiltroStatus,
+  totalFiltrado,
 }: FiltroProdutosProps) {
+  const { cores } = useTema();
+  const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [sugestoesVisiveis, setSugestoesVisiveis] = useState(false);
-  const [selectAberto, setSelectAberto] = useState(false);
+  const [focado, setFocado] = useState(false);
 
   const sugestoesExibidas = sugestoesVisiveis ? sugestoes : [];
-  const opcaoAtual =
-    OPCOES_STATUS.find((opcao) => opcao.valor === filtroStatus) ?? OPCOES_STATUS[0];
 
   function handleSelecionarSugestao(nome: string) {
     aoMudarBusca(nome);
     setSugestoesVisiveis(false);
   }
 
-  function handleSelecionarStatus(valor: StatusFiltro) {
-    aoMudarFiltroStatus(valor);
-    setSelectAberto(false);
-  }
-
   return (
     <View style={styles.container}>
-      <View style={styles.linha}>
-        <View style={styles.buscaContainer}>
-          <CustomInput
-            label="Buscar produto"
+      <View style={styles.buscaContainer}>
+        <View style={[styles.campoBusca, focado ? styles.campoBuscaFocado : undefined]}>
+          <Ionicons name="search" size={17} color={cores.textoTerciario} />
+          <TextInput
+            style={styles.inputBusca}
             value={busca}
             onChangeText={(texto) => {
               aoMudarBusca(texto);
               setSugestoesVisiveis(texto.trim().length > 0);
             }}
-            onFocus={() => setSugestoesVisiveis(busca.trim().length > 0)}
-            onBlur={() => setTimeout(() => setSugestoesVisiveis(false), 150)}
-            placeholder="Digite o nome do produto"
+            onFocus={() => {
+              setFocado(true);
+              setSugestoesVisiveis(busca.trim().length > 0);
+            }}
+            onBlur={() => {
+              setFocado(false);
+              setTimeout(() => setSugestoesVisiveis(false), 150);
+            }}
+            placeholder="Buscar por nome do produto..."
+            placeholderTextColor={cores.textoTerciario}
+            accessibilityLabel="Buscar produto"
+            returnKeyType="search"
           />
-          {sugestoesExibidas.length > 0 ? (
-            <View style={styles.sugestoesContainer}>
-              <FlatList
-                data={sugestoesExibidas}
-                keyExtractor={(produto) => produto.id}
-                keyboardShouldPersistTaps="handled"
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.sugestaoItem}
-                    onPress={() => handleSelecionarSugestao(item.nome)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Selecionar ${item.nome}`}
-                  >
-                    <Text style={styles.sugestaoTexto}>{item.nome}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
+          {busca.length > 0 ? (
+            <TouchableOpacity
+              style={styles.botaoLimpar}
+              onPress={() => {
+                aoMudarBusca("");
+                setSugestoesVisiveis(false);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Limpar busca"
+            >
+              <Ionicons name="close" size={16} color={cores.textoTerciario} />
+            </TouchableOpacity>
           ) : null}
         </View>
 
-        <View style={styles.selectContainer}>
-          <Text style={styles.selectLabel}>Status</Text>
-          <TouchableOpacity
-            style={styles.selectCampo}
-            onPress={() => setSelectAberto((atual) => !atual)}
-            accessibilityRole="button"
-            accessibilityLabel={`Filtro de status: ${opcaoAtual.rotulo}`}
-          >
-            <Text style={styles.selectTexto} numberOfLines={1}>
-              {opcaoAtual.rotulo}
-            </Text>
-            <Ionicons
-              name={selectAberto ? "chevron-up" : "chevron-down"}
-              size={16}
-              color={cores.textoSecundario}
-            />
-          </TouchableOpacity>
-
-          {selectAberto ? (
-            <View style={styles.selectPainel}>
-              {OPCOES_STATUS.map((opcao) => {
-                const selecionado = opcao.valor === filtroStatus;
-
-                return (
-                  <TouchableOpacity
-                    key={opcao.valor}
-                    style={[
-                      styles.selectOpcao,
-                      selecionado ? styles.selectOpcaoSelecionada : undefined,
-                    ]}
-                    onPress={() => handleSelecionarStatus(opcao.valor)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Filtrar por ${opcao.rotulo}`}
-                    accessibilityState={{ selected: selecionado }}
-                  >
-                    <Text
-                      style={[
-                        styles.selectOpcaoTexto,
-                        selecionado ? styles.selectOpcaoTextoSelecionada : undefined,
-                      ]}
-                    >
-                      {opcao.rotulo}
-                    </Text>
-                    {selecionado ? (
-                      <Ionicons name="checkmark" size={16} color={cores.primaria} />
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ) : null}
-        </View>
+        {sugestoesExibidas.length > 0 ? (
+          <View style={styles.sugestoesContainer}>
+            {sugestoesExibidas.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.sugestaoItem}
+                onPress={() => handleSelecionarSugestao(item.nome)}
+                accessibilityRole="button"
+                accessibilityLabel={`Selecionar ${item.nome}`}
+              >
+                <Text style={styles.sugestaoIcone}>{item.categoriaIcone ?? "📦"}</Text>
+                <Text style={styles.sugestaoTexto} numberOfLines={1}>
+                  {item.nome}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : null}
       </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.chips}
+        keyboardShouldPersistTaps="handled"
+      >
+        {OPCOES_STATUS.map((opcao) => {
+          const selecionado = opcao.valor === filtroStatus;
+
+          return (
+            <TouchableOpacity
+              key={opcao.valor}
+              style={[styles.chip, selecionado ? styles.chipSelecionado : undefined]}
+              onPress={() => aoMudarFiltroStatus(opcao.valor)}
+              hitSlop={{ top: 6, bottom: 6 }}
+              accessibilityRole="button"
+              accessibilityLabel={`Filtrar por ${opcao.rotulo}`}
+              accessibilityState={{ selected: selecionado }}
+            >
+              <Text style={[styles.chipTexto, selecionado ? styles.chipTextoSelecionado : undefined]}>
+                {selecionado ? `${opcao.rotulo} (${totalFiltrado})` : opcao.rotulo}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
