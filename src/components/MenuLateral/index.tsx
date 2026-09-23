@@ -110,6 +110,35 @@ export function MenuLateral({
 
         <View style={styles.menuLista}>
           <TouchableOpacity
+            style={[styles.itemMenu, telaAtiva === "dashboard" ? styles.itemMenuAtivo : undefined]}
+            onPress={() => {
+              aoFechar();
+              if (telaAtiva !== "dashboard") {
+                router.navigate({ pathname: "/dashboard", params: { intro: "1" } });
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Dashboard"
+            accessibilityState={{ selected: telaAtiva === "dashboard" }}
+          >
+            <View style={styles.itemMenuConteudo}>
+              <Ionicons
+                name="grid-outline"
+                size={20}
+                color={telaAtiva === "dashboard" ? cores.primaria : cores.textoSecundario}
+              />
+              <Text
+                style={[
+                  styles.itemMenuTexto,
+                  telaAtiva === "dashboard" ? styles.itemMenuTextoAtivo : undefined,
+                ]}
+              >
+                Dashboard
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.itemMenu, telaAtiva === "produtos" ? styles.itemMenuAtivo : undefined]}
             onPress={() => {
               aoFechar();

@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   Alert,
@@ -17,6 +18,7 @@ import { useTema } from "@/contexts/TemaContext";
 import { criarEstilos } from "@/styles/login.styles";
 
 export default function Login() {
+  const router = useRouter();
   const { cores } = useTema();
   const styles = useMemo(() => criarEstilos(cores), [cores]);
   const { login } = useAuth();
@@ -31,6 +33,7 @@ export default function Login() {
 
     try {
       await login(email, senha);
+      router.replace({ pathname: "/dashboard", params: { intro: "1" } });
     } catch (erro) {
       const mensagem = erro instanceof Error ? erro.message : "Não foi possível entrar.";
       Alert.alert("Erro ao entrar", mensagem);

@@ -12,21 +12,29 @@ Aplicativo móvel completo para gestão de estoque, controle de lotes, catálogo
 
 ## Módulos da Aplicação
 
-### 1. Autenticação e Sessão
+### 1. Dashboard Executivo & Acolhimento Animado
+- **Tela de Acolhimento e Loading:** sequência animada suave exibindo saudação personalizada com o nome do operador ("Bom dia, Ricardo!"), seguida da transição "Estamos preparando o seu ambiente..." antes de abrir os indicadores.
+- **Métricas do Dia em Tempo Real:** total de vendas faturadas hoje (R$), ticket médio por venda, contagem de itens vendidos e pedidos aguardando no caixa.
+- **Vendas em Nome do Operador:** indicador dedicado registrando o volume de pedidos e valor total vendido em nome do usuário no dia.
+- **Vendas por Meio de Pagamento:** divisão analítica e barras percentuais para PIX, Cartão de Crédito, Cartão de Débito e Dinheiro.
+- **Alertas Operacionais & Ações Rápidas:** cartões de atenção para produtos com estoque crítico (< 5 un.), lotes vencidos/a vencer e atalhos rápidos para Frente de Caixa, Produtos e Vendas.
+- **Pedidos Recentes de Hoje:** lista dos atendimentos finalizados no dia com cliente, horário, valor e status de pagamento.
+
+### 2. Autenticação e Sessão
 - Fluxo de login com autenticação de usuário e chave de acesso.
 - Persistência segura de credenciais localmente no dispositivo via `AsyncStorage`.
 - Controle automático de rotas protegidas sem flash visual na inicialização.
 - Encerramento de sessão (Logout) com limpeza total do armazenamento.
 
-### 2. Catálogo de Produtos & Inventário
+### 3. Catálogo de Produtos & Inventário
 - **Paginação Real no Servidor:** consumo otimizado via `FlatList` com paginação remota e scroll infinito (`onEndReached`).
 - **Busca e Autocomplete:** campo de pesquisa com *debounce* de 350ms e sugestões em tempo real vindas do servidor.
-- **Filtros por Status:** seletor compacto para filtrar itens ativos, inativos, sem estoque ou com lotes vencendo.
+- **Filtros por Status:** chips com rolagem horizontal para filtrar todos, ativos, disponíveis para venda, sem estoque, inativos ou com lotes perto do vencimento.
 - **Card de Produto Otimizado:** exibição clara de nome, categoria, código de barras EAN, quantidade e preço formatado em BRL.
 - **Menu de Ações Flutuante (`⋮`):** ações rápidas de Visualizar, Editar e Excluir com elevação de `z-index` e diálogo de confirmação destrutiva.
 - **Indicadores Inteligentes de Estoque:** badges visuais para estoque crítico (< 5 un.), baixo (< 20 un.), normal e alerta de lote vencido ou próximo do vencimento.
 
-### 3. Cadastro e Edição com Formulário Avançado
+### 4. Cadastro e Edição com Formulário Avançado
 - Validação reativa em tempo real com feedback visual imediato abaixo de cada campo inconsistente.
 - Máscara monetária em centavos para Preço de Venda e Preço de Custo.
 - Cálculo de margem estimada em tempo real em relação à margem alvo padrão (40%).
@@ -35,39 +43,39 @@ Aplicativo móvel completo para gestão de estoque, controle de lotes, catálogo
 - Chave seletora (`Switch`) para ativação/desativação do produto no catálogo.
 - Histórico de edições (Log de-para): rastreamento de alterações com data e comparação de valores anteriores e novos.
 
-### 4. Gestão de Estoque por Lotes & Validade
+### 5. Gestão de Estoque por Lotes & Validade
 - **Tabela de Rastreabilidade:** visualização de lotes com código, quantidade de entrada, saldo restante e custo unitário.
 - **Custo Médio Ponderado:** cálculo automático da média ponderada de custo dos lotes ativos exibido na ficha do produto.
 - **Entrada de Estoque / Novo Lote:** tela dedicada para dar entrada em mercadorias com gerador de código de lote e switch "Não expira".
 - **Calendário Customizado (`SeletorData`):** seletor de data próprio em React Native puro (sem quebra cross-platform) com regras visuais de validade (aviso âmbar para itens vencendo em até 30 dias e vermelho para lotes vencidos).
 - **Simulador de Margem na Entrada:** alerta quando o custo do novo lote reduz a margem abaixo do alvo, sugerindo novo preço de venda com opção de atualizar o catálogo automaticamente.
 
-### 5. Frente de Caixa (PDV) & Pedidos
+### 6. Frente de Caixa (PDV) & Pedidos
 - Painel de caixa com fila de pedidos aguardando pagamento e atendimento.
 - **Conferência e Edição de Pedido:** tela dedicada (`pedido-caixa.tsx`) para identificação do cliente, adição e remoção de itens com controle de estoque.
 - **Descontos Flexíveis:** aplicação de desconto tanto por porcentagem (`%`) quanto por valor fixo (`R$`).
 - **Múltiplos Meios de Pagamento:** suporte a PIX, Cartão de Crédito, Cartão de Débito e Dinheiro em espécie.
 - Observações adicionais do pedido salvas no registro da venda.
 
-### 6. Cobrança PIX & Integração com WhatsApp
+### 7. Cobrança PIX & Integração com WhatsApp
 - Geração dinâmica de QR Code PIX fictício em formato vetorial SVG (`qrcode` + `react-native-svg`).
 - Botão para cópia rápida do código PIX Copia e Cola.
 - Animação de conferência e simulação de confirmação instantânea de recebimento.
-- Envio direto da mensagem de cobrança com os dados do pedido para o WhatsApp do cliente via `expo-linking`.
+- Envio direto da mensagem de cobrança com os dados do pedido para o WhatsApp do cliente via `Linking` do React Native (abre em nova aba no navegador, sem sair do app).
 
-### 7. Comprovante de Venda em PDF
+### 8. Comprovante de Venda em PDF
 - Geração de cupom fiscal/comprovante estilizado em PDF a partir de template HTML responsivo (`expo-print`).
 - Compartilhamento nativo do arquivo PDF gerado (`expo-sharing`) por e-mail, WhatsApp ou salvamento no dispositivo.
 
-### 8. Gestão de Clientes
+### 9. Gestão de Clientes
 - Cadastro de clientes com validação e máscaras de CPF e Telefone.
-- Aba "Já comprou": histórico de compras anteriores do cliente identificado exibido durante o atendimento no caixa.
+- Aba "Já comprou": histórico de compras anteriores do cliente identificado exibido durante o atendimento na tela de vendas.
 
-### 9. Histórico de Vendas & Baixa de Estoque
-- Registro e listagem de vendas realizadas com totais faturados e data.
-- Baixa automática nos lotes correspondentes e abatimento no estoque geral.
+### 10. Histórico de Pedidos & Baixa de Estoque
+- Filas de pedidos Aguardando, Pagos e Cancelados no caixa, com histórico de eventos de cada pedido (criado, editado, pago, cancelado, reaberto).
+- Baixa automática no estoque geral e nos lotes por FEFO (validade mais próxima primeiro), com estorno ao cancelar ou editar o pedido.
 
-### 10. Design System, Tema Escuro e Navegação
+### 11. Design System, Tema Escuro e Navegação
 - **Modo Claro / Modo Escuro (Dark Mode):** alternância com persistência de preferência via `TemaContext` e paleta com tokens unificados.
 - **Notificações Toast:** feedback flutuante animado via `ToastContext` para ações de sucesso ou aviso.
 - **Menu Lateral (Drawer):** menu animado customizado para alternar entre Módulos (Produtos, Caixa, Vendas), consultar dados do operador e alternar tema.
@@ -87,7 +95,6 @@ Aplicativo móvel completo para gestão de estoque, controle de lotes, catálogo
 - [expo-print](https://docs.expo.dev/versions/latest/sdk/print/) (Geração de PDFs de comprovante de venda)
 - [expo-sharing](https://docs.expo.dev/versions/latest/sdk/sharing/) (Compartilhamento nativo de arquivos)
 - [qrcode](https://www.npmjs.com/package/qrcode) & [react-native-svg](https://github.com/software-mansion/react-native-svg) (Renderização de QR Code PIX vetorial)
-- [expo-linking](https://docs.expo.dev/versions/latest/sdk/linking/) (Disparo de mensagens para WhatsApp)
 - [@expo/vector-icons](https://icons.expo.fyi/) (Ícones Ionicons)
 
 ---
@@ -119,13 +126,14 @@ src/
 │   └── (app)/
 │       ├── _layout.tsx              # Stack protegido
 │       ├── index.tsx                # Catálogo de produtos com paginação, busca e filtros
+│       ├── dashboard.tsx            # Dashboard com acolhimento animado e métricas do dia
 │       ├── novo-produto.tsx         # Formulário de cadastro de novo item
 │       ├── editar-produto.tsx       # Edição com log de alterações
 │       ├── visualizar-produto.tsx   # Ficha completa em abas (Produto, Lotes, Log)
 │       ├── adicionar-estoque.tsx    # Entrada de lote, seletor de data e simulador de margem
-│       ├── caixa.tsx                # Frente de Caixa (PDV), pedidos e pagamento PIX
-│       ├── pedido-caixa.tsx         # Conferência/edição de pedido, carrinho e cliente
-│       └── vendas.tsx               # Histórico e relatórios de vendas
+│       ├── caixa.tsx                # Fila do caixa: aguardando, pagos e cancelados
+│       ├── pedido-caixa.tsx         # Conferência/edição do pedido, PIX, recebimento e comprovante
+│       └── vendas.tsx               # PDV: catálogo, carrinho, cliente e aba "Já comprou"
 ├── components/
 │   ├── CustomButton/                # Botão interativo com loading e variantes
 │   ├── CustomInput/                 # Input controlado com label, erro visual e contador
@@ -208,3 +216,11 @@ Por padrão, a aplicação aponta para `http://localhost:3000`. Para apontar par
    EXPO_PUBLIC_API_URL=http://192.168.x.x:3000
    ```
 3. Reinicie o servidor Expo (`npx expo start`) após editar o `.env`.
+
+> Variáveis `EXPO_PUBLIC_*` são embutidas no bundle na hora da compilação, não lidas em tempo de execução. Por isso é preciso reiniciar o Expo depois de mudar o `.env`.
+
+### Acessando de outro dispositivo na rede (celular físico, outra máquina)
+Se você abrir o app pelo IP da máquina na rede (ex.: `http://192.168.x.x:8081`) em vez de `localhost`, duas coisas precisam mudar:
+
+1. O `json-server` precisa escutar em todas as interfaces, não só em `localhost`. O script `npm run mock-api` já faz isso (`--host 0.0.0.0`).
+2. O app precisa apontar para o IP da máquina, não para `localhost` (que, do ponto de vista do outro dispositivo, é ele mesmo). Defina `EXPO_PUBLIC_API_URL=http://192.168.x.x:3000` no `.env` e reinicie `npx expo start`.

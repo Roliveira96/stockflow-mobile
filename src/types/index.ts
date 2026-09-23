@@ -98,7 +98,7 @@ export interface MenuLateralProps {
   emailUsuario: string;
   cargoUsuario: string;
   aoSair: () => void;
-  telaAtiva: "produtos" | "vendas" | "caixa";
+  telaAtiva: "dashboard" | "produtos" | "vendas" | "caixa";
   aoAbrirCategorias?: () => void;
   totalProdutos?: number;
   totalCategorias?: number;
