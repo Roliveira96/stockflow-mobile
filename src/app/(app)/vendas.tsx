@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -24,9 +24,22 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTema } from "@/contexts/TemaContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useCampoMoeda } from "@/hooks/useCampoMoeda";
-import { criarPedido, listarPedidos, listarProdutosVendaveis } from "@/services/vendas";
+import {
+  criarPedido,
+  listarPedidos,
+  listarProdutosCompradosPorCliente,
+  listarProdutosVendaveis,
+} from "@/services/vendas";
 import { criarEstilos } from "@/styles/vendas.styles";
-import type { Cliente, FormaPagamento, ItemCarrinho, Produto, TipoDesconto } from "@/types";
+import type {
+  Cliente,
+  FormaPagamento,
+  ItemCarrinho,
+  Produto,
+  ProdutoComprado,
+  TipoDesconto,
+} from "@/types";
+import { formatarDataCurta } from "@/utils/data";
 import { formatarMoeda } from "@/utils/moeda";
 import { normalizarTexto } from "@/utils/texto";
 import {
@@ -38,7 +51,7 @@ import {
   NOME_CONSUMIDOR_PADRAO,
 } from "@/utils/venda";
 
-type AbaVenda = "catalogo" | "carrinho";
+type AbaVenda = "catalogo" | "carrinho" | "historico";
 type FiltroEstoque = "em-estoque" | "sem-estoque";
 
 export default function Vendas() {
@@ -67,6 +80,32 @@ export default function Vendas() {
   const [enviando, setEnviando] = useState(false);
 
   const [pedidosPendentes, setPedidosPendentes] = useState(0);
+  const [historico, setHistorico] = useState<{ cpf: string; itens: ProdutoComprado[] } | null>(
+    null
+  );
+
+  const cpfCliente = cliente?.cpf ?? null;
+
+  useEffect(() => {
+    if (!cpfCliente) return;
+
+    let ativo = true;
+
+    listarProdutosCompradosPorCliente(cpfCliente)
+      .then((itens) => {
+        if (ativo) setHistorico({ cpf: cpfCliente, itens });
+      })
+      .catch(() => {
+        if (ativo) setHistorico({ cpf: cpfCliente, itens: [] });
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [cpfCliente]);
+
+  const carregandoHistorico = cpfCliente !== null && historico?.cpf !== cpfCliente;
+  const itensHistorico = cpfCliente && historico?.cpf === cpfCliente ? historico.itens : [];
 
   const carregarDados = useCallback(async () => {
     try {
@@ -176,7 +215,11 @@ export default function Vendas() {
     setCliente(novoCliente);
     setModalClienteVisivel(false);
     mostrarToast(
-      novoCliente ? "Cliente vinculado ao pedido" : "Consumidor mantido como não identificado"
+      novoCliente?.cpf
+        ? "Cliente vinculado · veja o que ele já comprou"
+        : novoCliente
+          ? "Cliente vinculado ao pedido"
+          : "Consumidor mantido como não identificado"
     );
   }
 
@@ -222,12 +265,101 @@ export default function Vendas() {
   const abas: {
     chave: AbaVenda;
     rotulo: string;
-    icone: "bag-outline" | "cart-outline";
+    icone: "bag-outline" | "cart-outline" | "time-outline";
     contador: number;
   }[] = [
     { chave: "catalogo", rotulo: "Catálogo", icone: "bag-outline", contador: 0 },
     { chave: "carrinho", rotulo: "Carrinho", icone: "cart-outline", contador: totalItensCarrinho },
+    ...(cpfCliente
+      ? [
+          {
+            chave: "historico" as const,
+            rotulo: "Já comprou",
+            icone: "time-outline" as const,
+            contador: itensHistorico.length,
+          },
+        ]
+      : []),
   ];
+
+  const abaExibida: AbaVenda = abaAtiva === "historico" && !cpfCliente ? "catalogo" : abaAtiva;
+
+  function renderizarHistorico() {
+    return (
+      <View style={styles.flex}>
+        <View style={styles.cabecalhoHistorico}>
+          <Ionicons name="person-circle-outline" size={22} color={cores.primaria} />
+          <View style={styles.flex}>
+            <Text style={styles.textoForte}>{cliente?.nome}</Text>
+            <Text style={styles.textoMono}>
+              {cpfCliente ? `CPF ${formatarCpf(cpfCliente)} · ` : ""}
+              {itensHistorico.length} produto{itensHistorico.length === 1 ? "" : "s"} já comprado
+              {itensHistorico.length === 1 ? "" : "s"}
+            </Text>
+          </View>
+        </View>
+
+        {carregandoHistorico ? (
+          <ActivityIndicator
+            style={styles.carregando}
+            size="large"
+            color={cores.primaria}
+            accessibilityLabel="Carregando histórico do cliente"
+          />
+        ) : (
+          <FlatList
+            data={itensHistorico}
+            keyExtractor={(item) => item.produtoId}
+            style={styles.flex}
+            contentContainerStyle={styles.lista}
+            renderItem={({ item }) => {
+              const produtoAtual = produtos.find((produto) => produto.id === item.produtoId);
+              const resumo = `Comprou ${item.vezes}× · ${item.quantidadeTotal} un. · última em ${formatarDataCurta(item.ultimaCompra.slice(0, 10))}`;
+
+              if (!produtoAtual) {
+                return (
+                  <View style={[styles.cartao, styles.itemIndisponivel]}>
+                    <Text style={styles.itemCarrinhoIcone}>{item.icone}</Text>
+                    <View style={styles.flex}>
+                      <Text style={styles.textoForte} numberOfLines={1}>
+                        {item.nome}
+                      </Text>
+                      <Text style={styles.textoMono}>{resumo}</Text>
+                      <Text style={styles.linkPerigo}>Produto indisponível para venda</Text>
+                    </View>
+                  </View>
+                );
+              }
+
+              return (
+                <CardProdutoVenda
+                  produto={produtoAtual}
+                  quantidadeNoCarrinho={quantidadePorProduto.get(produtoAtual.id) ?? 0}
+                  aoAumentar={() => handleAumentar(produtoAtual)}
+                  aoDiminuir={() => handleDiminuir(produtoAtual)}
+                  aoAbrirFicha={() => setProdutoFicha(produtoAtual)}
+                  detalheExtra={
+                    item.ultimoPreco !== produtoAtual.preco
+                      ? `${resumo} · pagou ${formatarMoeda(item.ultimoPreco)}`
+                      : resumo
+                  }
+                />
+              );
+            }}
+            ListEmptyComponent={
+              <View style={styles.vazio}>
+                <Ionicons name="bag-outline" size={26} color={cores.textoTerciario} />
+                <Text style={styles.vazioTitulo}>Primeira compra deste cliente</Text>
+                <Text style={styles.vazioTexto}>
+                  Ainda não há compras pagas registradas para este CPF.
+                </Text>
+              </View>
+            }
+          />
+        )}
+      </View>
+    );
+  }
 
   function renderizarCatalogo() {
     return (
@@ -653,7 +785,7 @@ export default function Vendas() {
 
         <View style={styles.abas} accessibilityRole="tablist">
           {abas.map((aba) => {
-            const ativa = aba.chave === abaAtiva;
+            const ativa = aba.chave === abaExibida;
 
             return (
               <TouchableOpacity
@@ -685,8 +817,9 @@ export default function Vendas() {
         </View>
       </View>
 
-      {abaAtiva === "catalogo" ? renderizarCatalogo() : null}
-      {abaAtiva === "carrinho" ? renderizarCarrinho() : null}
+      {abaExibida === "catalogo" ? renderizarCatalogo() : null}
+      {abaExibida === "carrinho" ? renderizarCarrinho() : null}
+      {abaExibida === "historico" ? renderizarHistorico() : null}
 
       <MenuLateral
         visivel={menuAberto}

@@ -92,12 +92,12 @@
       "id": "seed-4",
       "nome": "Adaptador Ergonômico 4",
       "codigoBarras": "7890575760661",
-      "quantidade": 89,
+      "quantidade": 88,
       "preco": 234.65,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T13:46:28.646Z"
+      "atualizadoEm": "2026-09-23T14:22:34.893Z"
     },
     {
       "id": "seed-5",
@@ -664,12 +664,12 @@
       "id": "seed-56",
       "nome": "Adaptador Ergonômico 56",
       "codigoBarras": "7891211028655",
-      "quantidade": 60,
+      "quantidade": 59,
       "preco": 742.3,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T13:46:28.646Z"
+      "atualizadoEm": "2026-09-23T14:22:34.893Z"
     },
     {
       "id": "seed-57",
@@ -2787,12 +2787,12 @@
       "id": "seed-249",
       "nome": "Adaptador Compacto 249",
       "codigoBarras": "7898017784614",
-      "quantidade": 12,
+      "quantidade": 11,
       "preco": 847.83,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:01:56.146Z"
+      "atualizadoEm": "2026-09-23T14:22:34.893Z"
     },
     {
       "id": "seed-250",
@@ -3590,6 +3590,45 @@
         }
       ],
       "id": 15
+    },
+    {
+      "produtoId": "seed-249",
+      "produtoNome": "Adaptador Compacto 249",
+      "data": "2026-09-23T14:22:34.893Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (edição PED-0001)",
+          "de": "12",
+          "para": "11"
+        }
+      ],
+      "id": 16
+    },
+    {
+      "produtoId": "seed-4",
+      "produtoNome": "Adaptador Ergonômico 4",
+      "data": "2026-09-23T14:22:34.893Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (edição PED-0001)",
+          "de": "89",
+          "para": "88"
+        }
+      ],
+      "id": 17
+    },
+    {
+      "produtoId": "seed-56",
+      "produtoNome": "Adaptador Ergonômico 56",
+      "data": "2026-09-23T14:22:34.893Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (edição PED-0001)",
+          "de": "60",
+          "para": "59"
+        }
+      ],
+      "id": 18
     }
   ],
   "lotes": [
@@ -3657,7 +3696,9 @@
       "criadoEm": "2026-09-23T14:01:56.146Z",
       "vendedor": "Ricardo",
       "cliente": {
-        "nome": "Consumidor não identificado"
+        "nome": "Mariana Costa",
+        "cpf": "07701661301",
+        "telefone": "21998877665"
       },
       "itens": [
         {
@@ -3665,7 +3706,7 @@
           "nome": "Adaptador Compacto 249",
           "icone": "📦",
           "precoUnitario": 847.83,
-          "quantidade": 1,
+          "quantidade": 2,
           "embalado": false,
           "lotes": []
         },
@@ -3686,23 +3727,53 @@
           "quantidade": 1,
           "embalado": false,
           "lotes": []
+        },
+        {
+          "produtoId": "seed-4",
+          "nome": "Adaptador Ergonômico 4",
+          "icone": "📦",
+          "precoUnitario": 234.65,
+          "quantidade": 1,
+          "embalado": false,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-56",
+          "nome": "Adaptador Ergonômico 56",
+          "icone": "📦",
+          "precoUnitario": 742.3,
+          "quantidade": 1,
+          "embalado": false,
+          "lotes": []
         }
       ],
       "itensBalcao": [],
-      "subtotal": 1587.5900000000001,
-      "desconto": 0,
-      "total": 1587.5900000000001,
-      "formaPagamento": "PIX",
-      "status": "AGUARDANDO",
-      "pagoEm": null,
+      "subtotal": 3412.37,
+      "desconto": 12,
+      "total": 3400.37,
+      "formaPagamento": "CARTAO_CREDITO",
+      "status": "PAGO",
+      "pagoEm": "2026-09-23T14:23:12.090Z",
       "eventos": [
         {
           "tipo": "criado",
           "data": "2026-09-23T14:01:56.146Z",
           "responsavel": "Ricardo"
+        },
+        {
+          "tipo": "editado",
+          "data": "2026-09-23T14:22:34.893Z",
+          "responsavel": "Ricardo",
+          "descricao": "Adaptador Compacto 249: 1 → 2 un.; + Adaptador Ergonômico 4 (1 un.); + Adaptador Ergonômico 56 (1 un.); Cliente: Consumidor não identificado → Mariana Costa (CPF); Pagamento: PIX → Cartão crédito; Desconto: R$ 0,00 → R$ 12,00; Observação atualizada"
+        },
+        {
+          "tipo": "pago",
+          "data": "2026-09-23T14:23:12.090Z",
+          "responsavel": "Ricardo"
         }
       ],
-      "id": 1
+      "id": 1,
+      "observacao": "Tal coisa"
     }
   ],
   "clientes": [

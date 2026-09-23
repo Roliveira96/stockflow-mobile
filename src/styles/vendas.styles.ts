@@ -276,6 +276,25 @@ export function criarEstilos(cores: Cores) {
     listaComBarra: {
       paddingBottom: 96,
     },
+    cabecalhoHistorico: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginHorizontal: 16,
+      marginTop: 12,
+      marginBottom: 10,
+      padding: 12,
+      borderRadius: raios.md,
+      borderWidth: 1,
+      borderColor: cores.primariaFundoForte,
+      backgroundColor: cores.primariaFundo,
+    },
+    itemIndisponivel: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 10,
+      opacity: 0.7,
+    },
     vazio: {
       alignItems: "center",
       gap: 6,

@@ -8,6 +8,7 @@ import type {
   NovoPedido,
   Pedido,
   Produto,
+  ProdutoComprado,
   RascunhoPedido,
 } from "@/types";
 import { mesclarBaixas, planejarBaixaFefo, planejarEstornoParcial } from "@/utils/lote";
@@ -347,4 +348,42 @@ export async function editarPedido(
   await salvarCliente(rascunho.cliente).catch(() => undefined);
 
   return atualizado;
+}
+
+export async function listarProdutosCompradosPorCliente(cpf: string): Promise<ProdutoComprado[]> {
+  const resposta = await api.get<Pedido[]>("/pedidos", {
+    params: { "cliente.cpf": cpf, status: "PAGO" },
+  });
+  const porProduto = new Map<string, ProdutoComprado>();
+
+  resposta.data.forEach((pedido) => {
+    const dataCompra = pedido.pagoEm ?? pedido.criadoEm;
+
+    pedido.itens.forEach((item) => {
+      const atual = porProduto.get(item.produtoId);
+
+      if (!atual) {
+        porProduto.set(item.produtoId, {
+          produtoId: item.produtoId,
+          nome: item.nome,
+          icone: item.icone,
+          vezes: 1,
+          quantidadeTotal: item.quantidade,
+          ultimaCompra: dataCompra,
+          ultimoPreco: item.precoUnitario,
+        });
+        return;
+      }
+
+      atual.vezes += 1;
+      atual.quantidadeTotal += item.quantidade;
+
+      if (dataCompra > atual.ultimaCompra) {
+        atual.ultimaCompra = dataCompra;
+        atual.ultimoPreco = item.precoUnitario;
+      }
+    });
+  });
+
+  return [...porProduto.values()].sort((a, b) => b.ultimaCompra.localeCompare(a.ultimaCompra));
 }

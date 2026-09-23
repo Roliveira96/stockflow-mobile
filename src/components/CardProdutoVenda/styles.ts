@@ -72,6 +72,12 @@ export function criarEstilos(cores: Cores) {
     estoqueEsgotado: {
       color: cores.perigo,
     },
+    detalheExtra: {
+      marginTop: 3,
+      fontSize: 11,
+      fontWeight: "600",
+      color: cores.primaria,
+    },
     preco: {
       marginTop: 3,
       fontSize: 14,

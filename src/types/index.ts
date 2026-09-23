@@ -338,6 +338,7 @@ export interface CardProdutoVendaProps {
   aoAumentar: () => void;
   aoDiminuir: () => void;
   aoAbrirFicha: () => void;
+  detalheExtra?: string;
 }
 
 export interface ModalFichaProdutoProps {
@@ -382,4 +383,14 @@ export interface QrCodeProps {
 export interface PagamentoPixProps {
   valor: number;
   numeroPedido: string;
+}
+
+export interface ProdutoComprado {
+  produtoId: string;
+  nome: string;
+  icone: string;
+  vezes: number;
+  quantidadeTotal: number;
+  ultimaCompra: string;
+  ultimoPreco: number;
 }

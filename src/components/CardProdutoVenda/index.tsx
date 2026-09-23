@@ -14,6 +14,7 @@ export function CardProdutoVenda({
   aoAumentar,
   aoDiminuir,
   aoAbrirFicha,
+  detalheExtra,
 }: CardProdutoVendaProps) {
   const { cores } = useTema();
   const styles = useMemo(() => criarEstilos(cores), [cores]);
@@ -50,6 +51,7 @@ export function CardProdutoVenda({
             </Text>
           </View>
           <Text style={styles.preco}>{formatarMoeda(produto.preco)}</Text>
+          {detalheExtra ? <Text style={styles.detalheExtra}>{detalheExtra}</Text> : null}
         </View>
       </TouchableOpacity>
 
