@@ -3675,7 +3675,7 @@
           "icone": "📦",
           "precoUnitario": 284.99,
           "quantidade": 1,
-          "embalado": true,
+          "embalado": false,
           "lotes": []
         },
         {
@@ -3684,7 +3684,7 @@
           "icone": "📦",
           "precoUnitario": 454.77,
           "quantidade": 1,
-          "embalado": true,
+          "embalado": false,
           "lotes": []
         }
       ],

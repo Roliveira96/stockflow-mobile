@@ -309,3 +309,11 @@ O caixa pode, em pedidos **aguardando**, identificar o cliente e incluir CPF na 
 - **`Pedido.observacao`** aparece no card (📝) e no detalhe. **`normalizarTexto`** foi para `utils/texto.ts`, compartilhado pela tela de vendas e pelo editor.
 - **Bug corrigido:** na tela Caixa, qualquer atualização do pedido (marcar como embalado, adicionar item de balcão) fechava o modal. Agora ele só fecha quando o status muda.
 - **Validado com Playwright (Pixel 7):** Alfa com 5 un. (A1=3, A2=2) e Beta com 0. Venda de 2 Alfa → Alfa 3, A1 1. Edição 1 (Alfa 4, +1 Beta, cliente por "077.", dinheiro, R$ 20, observação) → Alfa 1, A1 0, A2 1, Beta -1. Edição 2 (Alfa 1, −Beta) → Alfa 4, A1 2, A2 2, Beta 0. Pagamento recebido. Total final: R$ 100 − 20 = R$ 80. Histórico com as 2 edições descritas. Sem erros. Dados de teste removidos.
+
+### Pedido do caixa virou tela (pedido do usuário)
+A `ModalPedidoCaixa` foi substituída pela rota **`src/app/(app)/pedido-caixa.tsx`** (`id` via query param, mesmo padrão de `visualizar-produto`). O conteúdo e as regras são os mesmos (conferência, balcão, editar, cancelar com motivo, reabrir, receber, histórico), agora em `SafeAreaView` com `BarraTopo`, cabeçalho com número e status, `ScrollView` e rodapé fixo com as ações. Estilos em `src/styles/pedido-caixa.styles.ts`.
+- Carrega o pedido por `GET /pedidos/:id` no `useFocusEffect`.
+- "Voltar" é contextual: em edição, "Sair da edição"; em cancelamento, "Voltar ao pedido"; fora deles, "Voltar ao caixa".
+- Depois de **receber** ou **cancelar**, volta à fila (`router.back()`). Ao **reabrir**, ou em qualquer ação que não muda o status, continua na tela.
+- A fila do caixa (`caixa.tsx`) só navega (`router.push`) e recarrega sozinha ao ganhar foco.
+- Validado com Playwright (Pixel 7): abrir, embalar, entrar e sair da edição, cancelar, abrir pelos cancelados, reabrir e receber. Todas as rotas e retornos estão certos, sem erros.

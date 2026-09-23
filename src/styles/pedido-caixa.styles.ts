@@ -4,6 +4,40 @@ import { fonteMono, raios, type Cores } from "@/constants/theme";
 
 export function criarEstilos(cores: Cores) {
   return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: cores.fundo,
+    },
+    carregando: {
+      marginTop: 40,
+    },
+    cabecalho: {
+      gap: 2,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: cores.bordaSuave,
+    },
+    subtitulo: {
+      fontSize: 11,
+      color: cores.textoTerciario,
+    },
+    conteudo: {
+      gap: 14,
+      padding: 16,
+      paddingBottom: 28,
+    },
+    rodape: {
+      flexDirection: "row",
+      gap: 8,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 16,
+      borderTopWidth: 1,
+      borderTopColor: cores.borda,
+      backgroundColor: cores.fundo,
+    },
     flex: {
       flex: 1,
     },

@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   Alert,
@@ -14,7 +14,6 @@ import {
 
 import { CardPedido } from "@/components/CardPedido";
 import { MenuLateral } from "@/components/MenuLateral";
-import { ModalPedidoCaixa } from "@/components/ModalPedidoCaixa";
 import { NOME_USUARIO } from "@/constants/usuario";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTema } from "@/contexts/TemaContext";
@@ -37,6 +36,7 @@ function ehHoje(iso: string | null) {
 }
 
 export default function Caixa() {
+  const router = useRouter();
   const { logout, usuario } = useAuth();
   const { cores } = useTema();
   const styles = useMemo(() => criarEstilos(cores), [cores]);
@@ -45,16 +45,12 @@ export default function Caixa() {
   const [atualizando, setAtualizando] = useState(false);
   const [filtro, setFiltro] = useState<StatusPedido>("AGUARDANDO");
   const [busca, setBusca] = useState("");
-  const [pedidoAberto, setPedidoAberto] = useState<Pedido | null>(null);
   const [menuAberto, setMenuAberto] = useState(false);
 
   const carregarPedidos = useCallback(async (silencioso = false) => {
     try {
       const lista = await listarPedidos();
       setPedidos(lista);
-      setPedidoAberto((atual) =>
-        atual ? (lista.find((pedido) => pedido.id === atual.id) ?? atual) : null
-      );
     } catch {
       if (!silencioso) {
         Alert.alert("Erro de conexão", "Não foi possível carregar os pedidos.");
@@ -74,18 +70,6 @@ export default function Caixa() {
     setAtualizando(true);
     await carregarPedidos();
     setAtualizando(false);
-  }
-
-  function handlePedidoAtualizado(pedido: Pedido) {
-    const statusAnterior = pedidos.find((item) => item.id === pedido.id)?.status;
-    setPedidos((atual) => atual.map((item) => (item.id === pedido.id ? pedido : item)));
-
-    if (statusAnterior !== pedido.status) {
-      setPedidoAberto(null);
-      setFiltro(pedido.status);
-    } else {
-      setPedidoAberto(pedido);
-    }
   }
 
   const contagem = useMemo(
@@ -214,7 +198,10 @@ export default function Caixa() {
           />
         }
         renderItem={({ item }) => (
-          <CardPedido pedido={item} aoAbrir={() => setPedidoAberto(item)} />
+          <CardPedido
+            pedido={item}
+            aoAbrir={() => router.push({ pathname: "/pedido-caixa", params: { id: item.id } })}
+          />
         )}
         ListEmptyComponent={
           <View style={styles.vazio}>
@@ -243,13 +230,6 @@ export default function Caixa() {
           setMenuAberto(false);
           logout();
         }}
-      />
-
-      <ModalPedidoCaixa
-        pedido={pedidoAberto}
-        operador={NOME_USUARIO}
-        aoFechar={() => setPedidoAberto(null)}
-        aoAtualizar={handlePedidoAtualizado}
       />
     </SafeAreaView>
   );

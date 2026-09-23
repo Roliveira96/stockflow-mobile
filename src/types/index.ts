@@ -358,12 +358,6 @@ export interface CardPedidoProps {
   aoAbrir: () => void;
 }
 
-export interface ModalPedidoCaixaProps {
-  pedido: Pedido | null;
-  operador: string;
-  aoFechar: () => void;
-  aoAtualizar: (pedido: Pedido) => void;
-}
 
 export interface FolhaInferiorProps {
   visivel: boolean;
