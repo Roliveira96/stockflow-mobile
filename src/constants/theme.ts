@@ -41,6 +41,8 @@ export const coresClaro = {
   overlayTranslucido: "rgba(15, 23, 42, 0.6)",
   toastFundo: "#0F172A",
   toastTexto: "#FFFFFF",
+  qrFundo: "#FFFFFF",
+  qrModulo: "#000000",
 } as const;
 
 export type Cores = Record<keyof typeof coresClaro, string>;
@@ -86,6 +88,8 @@ export const coresEscuro: Cores = {
   overlayTranslucido: "rgba(0, 0, 0, 0.75)",
   toastFundo: "#F8FAFC",
   toastTexto: "#0F172A",
+  qrFundo: "#FFFFFF",
+  qrModulo: "#000000",
 };
 
 export type ModoTema = "claro" | "escuro";

@@ -373,3 +373,13 @@ export interface SugestoesClienteProps {
   sugestoes: ClienteCadastrado[];
   aoSelecionar: (cliente: ClienteCadastrado) => void;
 }
+
+export interface QrCodeProps {
+  valor: string;
+  tamanho: number;
+}
+
+export interface PagamentoPixProps {
+  valor: number;
+  numeroPedido: string;
+}

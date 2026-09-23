@@ -17,10 +17,12 @@ import {
 import { BarraTopo } from "@/components/BarraTopo";
 import { CustomButton } from "@/components/CustomButton";
 import { EditorPedido } from "@/components/EditorPedido";
+import { PagamentoPix } from "@/components/PagamentoPix";
 import { NOME_USUARIO } from "@/constants/usuario";
 import { useTema } from "@/contexts/TemaContext";
 import { useToast } from "@/contexts/ToastContext";
 import { api } from "@/services/api";
+import { gerarComprovante } from "@/services/comprovante";
 import {
   atualizarPedido,
   cancelarPedido,
@@ -57,6 +59,7 @@ export default function PedidoCaixa() {
   const { mostrarToast } = useToast();
   const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [salvando, setSalvando] = useState(false);
+  const [gerandoComprovante, setGerandoComprovante] = useState(false);
   const [cancelando, setCancelando] = useState(false);
   const [editando, setEditando] = useState(false);
   const [motivoSelecionado, setMotivoSelecionado] = useState<string | null>(null);
@@ -78,12 +81,28 @@ export default function PedidoCaixa() {
     }, [carregarPedido])
   );
 
+  async function handleGerarComprovante(alvo: Pedido) {
+    setGerandoComprovante(true);
+
+    try {
+      await gerarComprovante(alvo);
+    } catch {
+      Alert.alert("Comprovante", "Não foi possível gerar o comprovante em PDF.");
+    } finally {
+      setGerandoComprovante(false);
+    }
+  }
+
   function aoAtualizar(atualizado: Pedido) {
     const statusAnterior = pedido?.status;
     setPedido(atualizado);
 
-    if (atualizado.status !== statusAnterior && atualizado.status !== "AGUARDANDO") {
+    if (atualizado.status === statusAnterior) return;
+
+    if (atualizado.status === "CANCELADO") {
       router.back();
+    } else if (atualizado.status === "PAGO") {
+      handleGerarComprovante(atualizado);
     }
   }
 
@@ -267,6 +286,19 @@ export default function PedidoCaixa() {
       );
     }
 
+    if (status === "PAGO") {
+      return (
+        <CustomButton
+          titulo="Comprovante (PDF)"
+          onPress={() => handleGerarComprovante(pedido)}
+          carregando={gerandoComprovante}
+          icone="document-text-outline"
+          compacto
+          estiloContainer={styles.botaoPrincipal}
+        />
+      );
+    }
+
     return undefined;
   }
 
@@ -405,6 +437,10 @@ export default function PedidoCaixa() {
                 </Text>
               </View>
 
+              {aguardando && pedido.formaPagamento === "PIX" ? (
+                <PagamentoPix valor={pedido.total} numeroPedido={pedido.numero} />
+              ) : null}
+
               <View style={styles.secao}>
                 <View style={styles.secaoCabecalho}>
                   <Text style={styles.secaoTitulo}>Conferência & embalagem</Text>
@@ -480,6 +516,19 @@ export default function PedidoCaixa() {
                         </Text>
                       </TouchableOpacity>
                     ))}
+                  </View>
+                </View>
+              ) : null}
+
+              {status === "PAGO" ? (
+                <View style={styles.faixaPago}>
+                  <Ionicons name="checkmark-circle" size={20} color={cores.sucesso} />
+                  <View style={styles.flex}>
+                    <Text style={styles.faixaPagoTitulo}>Venda concluída</Text>
+                    <Text style={styles.faixaPagoTexto}>
+                      {pedido.pagoEm ? `Pago em ${formatarData(pedido.pagoEm)}. ` : ""}
+                      Use o botão abaixo para gerar ou reenviar o comprovante.
+                    </Text>
                   </View>
                 </View>
               ) : null}

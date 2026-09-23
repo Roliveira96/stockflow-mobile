@@ -28,6 +28,27 @@ export function criarEstilos(cores: Cores) {
       padding: 16,
       paddingBottom: 28,
     },
+    faixaPago: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+      padding: 12,
+      borderRadius: raios.md,
+      borderWidth: 1,
+      borderColor: cores.sucessoBorda,
+      backgroundColor: cores.sucessoFundo,
+    },
+    faixaPagoTitulo: {
+      fontSize: 13,
+      fontWeight: "800",
+      color: cores.sucesso,
+    },
+    faixaPagoTexto: {
+      marginTop: 2,
+      fontSize: 12,
+      lineHeight: 17,
+      color: cores.textoSecundario,
+    },
     rodape: {
       flexDirection: "row",
       gap: 8,
