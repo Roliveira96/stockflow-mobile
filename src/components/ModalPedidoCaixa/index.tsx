@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { CustomButton } from "@/components/CustomButton";
+import { EditorPedido } from "@/components/EditorPedido";
 import { FolhaInferior } from "@/components/FolhaInferior";
 import { useTema } from "@/contexts/TemaContext";
 import { useToast } from "@/contexts/ToastContext";
@@ -32,6 +33,7 @@ const ROTULO_EVENTO: Record<TipoEventoPedido, string> = {
   pago: "Pagamento confirmado",
   cancelado: "Pedido cancelado",
   reaberto: "Pedido reaberto",
+  editado: "Pedido editado",
 };
 
 export function ModalPedidoCaixa({
@@ -45,6 +47,7 @@ export function ModalPedidoCaixa({
   const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [salvando, setSalvando] = useState(false);
   const [cancelando, setCancelando] = useState(false);
+  const [editando, setEditando] = useState(false);
   const [motivoSelecionado, setMotivoSelecionado] = useState<string | null>(null);
   const [motivoLivre, setMotivoLivre] = useState("");
 
@@ -62,6 +65,7 @@ export function ModalPedidoCaixa({
 
   function handleFechar() {
     limparCancelamento();
+    setEditando(false);
     aoFechar();
   }
 
@@ -135,7 +139,7 @@ export function ModalPedidoCaixa({
   }
 
   function renderizarRodape() {
-    if (!pedido) return undefined;
+    if (!pedido || editando) return undefined;
 
     if (cancelando) {
       return (
@@ -172,12 +176,19 @@ export function ModalPedidoCaixa({
             titulo="Cancelar"
             onPress={() => setCancelando(true)}
             variante="perigo"
-            icone="close-circle-outline"
             compacto
             estiloContainer={styles.botaoSecundario}
           />
           <CustomButton
-            titulo="Confirmar recebimento"
+            titulo="Editar"
+            onPress={() => setEditando(true)}
+            variante="neutro"
+            icone="create-outline"
+            compacto
+            estiloContainer={styles.botaoSecundario}
+          />
+          <CustomButton
+            titulo="Receber"
             onPress={() =>
               executar(
                 () => confirmarPagamento(pedido, operador),
@@ -277,7 +288,19 @@ export function ModalPedidoCaixa({
         </View>
       ) : null}
 
-      {pedido && !cancelando ? (
+      {pedido && editando ? (
+        <EditorPedido
+          pedido={pedido}
+          operador={operador}
+          aoSalvar={(atualizado) => {
+            setEditando(false);
+            aoAtualizar(atualizado);
+          }}
+          aoDescartar={() => setEditando(false)}
+        />
+      ) : null}
+
+      {pedido && !cancelando && !editando ? (
         <>
           {status === "CANCELADO" && pedido.motivoCancelamento ? (
             <View style={styles.avisoCancelado}>
@@ -285,6 +308,16 @@ export function ModalPedidoCaixa({
               <View style={styles.flex}>
                 <Text style={styles.avisoCanceladoTitulo}>Motivo do cancelamento</Text>
                 <Text style={styles.avisoCanceladoTexto}>{pedido.motivoCancelamento}</Text>
+              </View>
+            </View>
+          ) : null}
+
+          {pedido.observacao ? (
+            <View style={styles.observacao}>
+              <Ionicons name="document-text-outline" size={16} color={cores.alerta} />
+              <View style={styles.flex}>
+                <Text style={styles.observacaoTitulo}>Observação</Text>
+                <Text style={styles.observacaoTexto}>{pedido.observacao}</Text>
               </View>
             </View>
           ) : null}
@@ -414,6 +447,9 @@ export function ModalPedidoCaixa({
                     <Text style={styles.eventoData}>{formatarData(evento.data)}</Text>
                     {evento.motivo ? (
                       <Text style={styles.eventoMotivo}>Motivo: {evento.motivo}</Text>
+                    ) : null}
+                    {evento.descricao ? (
+                      <Text style={styles.eventoMotivo}>{evento.descricao}</Text>
                     ) : null}
                   </View>
                 </View>

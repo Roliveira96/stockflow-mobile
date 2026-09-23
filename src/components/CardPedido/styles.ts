@@ -63,6 +63,10 @@ export function criarEstilos(cores: Cores) {
       color: cores.textoTerciario,
       textDecorationLine: "line-through",
     },
+    observacao: {
+      fontSize: 12,
+      color: cores.alerta,
+    },
     motivo: {
       fontSize: 12,
       color: cores.perigo,

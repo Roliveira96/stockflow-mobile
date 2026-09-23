@@ -77,9 +77,15 @@ export default function Caixa() {
   }
 
   function handlePedidoAtualizado(pedido: Pedido) {
+    const statusAnterior = pedidos.find((item) => item.id === pedido.id)?.status;
     setPedidos((atual) => atual.map((item) => (item.id === pedido.id ? pedido : item)));
-    setPedidoAberto(null);
-    setFiltro(pedido.status);
+
+    if (statusAnterior !== pedido.status) {
+      setPedidoAberto(null);
+      setFiltro(pedido.status);
+    } else {
+      setPedidoAberto(pedido);
+    }
   }
 
   const contagem = useMemo(

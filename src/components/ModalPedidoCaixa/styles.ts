@@ -109,6 +109,27 @@ export function criarEstilos(cores: Cores) {
       fontSize: 13,
       color: cores.textoPrimario,
     },
+    observacao: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 8,
+      padding: 12,
+      borderRadius: raios.md,
+      borderWidth: 1,
+      borderColor: cores.alertaBorda,
+      backgroundColor: cores.alertaFundo,
+    },
+    observacaoTitulo: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: cores.alerta,
+    },
+    observacaoTexto: {
+      marginTop: 2,
+      fontSize: 13,
+      lineHeight: 19,
+      color: cores.textoPrimario,
+    },
     evento: {
       flexDirection: "row",
       alignItems: "flex-start",
@@ -147,7 +168,7 @@ export function criarEstilos(cores: Cores) {
       width: undefined,
     },
     botaoPrincipal: {
-      flex: 1.6,
+      flex: 1.4,
       width: undefined,
     },
     caixaCliente: {

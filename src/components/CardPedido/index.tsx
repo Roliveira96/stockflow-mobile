@@ -65,6 +65,12 @@ export function CardPedido({ pedido, aoAbrir }: CardPedidoProps) {
         </Text>
       </View>
 
+      {pedido.observacao ? (
+        <Text style={styles.observacao} numberOfLines={1}>
+          📝 {pedido.observacao}
+        </Text>
+      ) : null}
+
       {cancelado && pedido.motivoCancelamento ? (
         <Text style={styles.motivo} numberOfLines={2}>
           Motivo: {pedido.motivoCancelamento}

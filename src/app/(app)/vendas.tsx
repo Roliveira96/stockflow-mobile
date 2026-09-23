@@ -28,6 +28,7 @@ import { criarPedido, listarPedidos, listarProdutosVendaveis } from "@/services/
 import { criarEstilos } from "@/styles/vendas.styles";
 import type { Cliente, FormaPagamento, ItemCarrinho, Produto, TipoDesconto } from "@/types";
 import { formatarMoeda } from "@/utils/moeda";
+import { normalizarTexto } from "@/utils/texto";
 import {
   calcularDesconto,
   calcularSubtotal,
@@ -39,14 +40,6 @@ import {
 
 type AbaVenda = "catalogo" | "carrinho";
 type FiltroEstoque = "em-estoque" | "sem-estoque";
-
-function normalizar(texto: string) {
-  return texto
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
 
 export default function Vendas() {
   const { logout, usuario } = useAuth();
@@ -115,7 +108,7 @@ export default function Vendas() {
   const totalSemEstoque = produtos.length - totalEmEstoque;
 
   const produtosFiltrados = useMemo(() => {
-    const termo = normalizar(busca);
+    const termo = normalizarTexto(busca);
 
     return produtos.filter((produto) => {
       const temEstoque = produto.quantidade > 0;
@@ -124,7 +117,7 @@ export default function Vendas() {
       if (!termo) return true;
 
       return [produto.nome, produto.codigoBarras, produto.codigoAuxiliar ?? ""].some((campo) =>
-        normalizar(campo).includes(termo)
+        normalizarTexto(campo).includes(termo)
       );
     });
   }, [produtos, busca, filtroEstoque, categoria]);

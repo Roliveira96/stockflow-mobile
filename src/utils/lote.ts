@@ -23,7 +23,11 @@ function formatarDataIso(data: Date): string {
 
 export function calcularJanelaVencendo(): { inicio: string; fim: string } {
   const hoje = new Date();
-  const limite = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + DIAS_LIMITE_VENCENDO);
+  const limite = new Date(
+    hoje.getFullYear(),
+    hoje.getMonth(),
+    hoje.getDate() + DIAS_LIMITE_VENCENDO
+  );
 
   return { inicio: formatarDataIso(hoje), fim: formatarDataIso(limite) };
 }
@@ -140,4 +144,44 @@ export function planejarBaixaFefo(lotes: Lote[], quantidade: number): BaixaLote[
   }
 
   return baixas;
+}
+
+export function mesclarBaixas(atuais: BaixaLote[], novas: BaixaLote[]): BaixaLote[] {
+  const resultado = atuais.map((baixa) => ({ ...baixa }));
+
+  novas.forEach((nova) => {
+    const existente = resultado.find((baixa) => baixa.loteId === nova.loteId);
+    if (existente) {
+      existente.quantidade += nova.quantidade;
+    } else {
+      resultado.push({ ...nova });
+    }
+  });
+
+  return resultado;
+}
+
+export function planejarEstornoParcial(
+  quantidadeItem: number,
+  lotes: BaixaLote[],
+  quantidadeDevolvida: number
+): { devolucoes: BaixaLote[]; lotesRestantes: BaixaLote[] } {
+  const semLote = Math.max(
+    0,
+    quantidadeItem - lotes.reduce((soma, lote) => soma + lote.quantidade, 0)
+  );
+  let restante = Math.max(0, quantidadeDevolvida - semLote);
+  const lotesRestantes = lotes.map((lote) => ({ ...lote }));
+  const devolucoes: BaixaLote[] = [];
+
+  for (let indice = lotesRestantes.length - 1; indice >= 0 && restante > 0; indice -= 1) {
+    const lote = lotesRestantes[indice];
+    const devolvido = Math.min(lote.quantidade, restante);
+
+    devolucoes.push({ ...lote, quantidade: devolvido });
+    lote.quantidade -= devolvido;
+    restante -= devolvido;
+  }
+
+  return { devolucoes, lotesRestantes: lotesRestantes.filter((lote) => lote.quantidade > 0) };
 }

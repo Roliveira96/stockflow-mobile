@@ -295,3 +295,17 @@ Número do pedido: `PED-` + (total de pedidos + 1) com 4 dígitos. Coleção `pe
   - No `ModalCliente`, as sugestões aparecem abaixo do campo sendo digitado (espera de 250 ms), mostram nome, CPF e telefone, e ao tocar preenchem os três campos.
 - **Telefone do cliente** (opcional): máscara `(00) 0000-0000` ou `(00) 00000-0000` (`formatarTelefone` / `validarTelefone`), salvo no cliente e mostrado no pedido do caixa.
 - **Validado com Playwright (Pixel 7):** produto com 2 un. em 1 lote, venda de 3. Estoque: -1 e lote 0 → cancelado com motivo: 2 e 2 → reaberto: -1 e 0 → pago. Os eventos e os 3 logs estão corretos. Sugestões: "Ricardo Mar" traz 2 clientes; "077." traz 3, com telefone; selecionar preenche tudo. Sem erros. Dados de teste removidos, e o pedido real do usuário (PED-0001) ficou intocado.
+
+### Edição do pedido pelo caixa (pedido do usuário)
+O caixa pode, em pedidos **aguardando**, identificar o cliente e incluir CPF na nota (mesmo em pedidos de consumidor não identificado), adicionar e remover itens, alterar quantidades, trocar a forma de pagamento, alterar ou dar desconto e incluir uma observação. Rodapé da `ModalPedidoCaixa`: **Cancelar · Editar · Receber**.
+
+- **`EditorPedido`** (novo): rascunho local, e **nada é gravado até "Salvar alterações"**. Carrega os produtos ativos para mostrar o estoque e avisar "Estoque ficará em -N". A busca de produto usa nome, EAN ou código auxiliar. Tem itens de balcão removíveis, desconto em % ou R$ (pré-carregado em R$ com o valor dado pelo vendedor, máximo de 50%), observação (até 300 caracteres) e o novo total. Não salva um pedido sem itens; nesse caso o caminho é cancelar.
+- **`FormularioCliente`** (novo): o corpo do antigo `ModalCliente`, com sugestões por CPF e nome e o telefone, agora reutilizado pelo `ModalCliente` (vendedor) e pelo `EditorPedido` (caixa).
+- **`editarPedido`** (`services/vendas.ts`) ajusta o estoque **pela diferença** de cada produto:
+  - aumento → `baixarEstoque` (FEFO) e `mesclarBaixas` nos lotes já registrados do item;
+  - redução ou remoção → `estornarEstoque` parcial (`planejarEstornoParcial` em `utils/lote.ts`): primeiro devolve a parte que não tinha lote (a que deixou o estoque negativo), depois os lotes na **ordem inversa** da baixa (o último consumido volta primeiro);
+  - recalcula subtotal e total, grava o evento `editado` com a descrição legível das mudanças (itens, cliente, pagamento, desconto, observação) e salva o cliente.
+  - O cancelamento passou a usar o mesmo estorno com a quantidade total.
+- **`Pedido.observacao`** aparece no card (📝) e no detalhe. **`normalizarTexto`** foi para `utils/texto.ts`, compartilhado pela tela de vendas e pelo editor.
+- **Bug corrigido:** na tela Caixa, qualquer atualização do pedido (marcar como embalado, adicionar item de balcão) fechava o modal. Agora ele só fecha quando o status muda.
+- **Validado com Playwright (Pixel 7):** Alfa com 5 un. (A1=3, A2=2) e Beta com 0. Venda de 2 Alfa → Alfa 3, A1 1. Edição 1 (Alfa 4, +1 Beta, cliente por "077.", dinheiro, R$ 20, observação) → Alfa 1, A1 0, A2 1, Beta -1. Edição 2 (Alfa 1, −Beta) → Alfa 4, A1 2, A2 2, Beta 0. Pagamento recebido. Total final: R$ 100 − 20 = R$ 80. Histórico com as 2 edições descritas. Sem erros. Dados de teste removidos.

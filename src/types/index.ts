@@ -217,13 +217,14 @@ export type FormaPagamento = "PIX" | "CARTAO_CREDITO" | "CARTAO_DEBITO" | "DINHE
 
 export type StatusPedido = "AGUARDANDO" | "PAGO" | "CANCELADO";
 
-export type TipoEventoPedido = "criado" | "pago" | "cancelado" | "reaberto";
+export type TipoEventoPedido = "criado" | "pago" | "cancelado" | "reaberto" | "editado";
 
 export interface EventoPedido {
   tipo: TipoEventoPedido;
   data: string;
   responsavel: string;
   motivo?: string;
+  descricao?: string;
 }
 
 export type TipoDesconto = "percentual" | "valor";
@@ -281,7 +282,38 @@ export interface Pedido {
   status: StatusPedido;
   pagoEm: string | null;
   motivoCancelamento?: string | null;
+  observacao?: string;
   eventos: EventoPedido[];
+}
+
+export interface ItemRascunho {
+  produtoId: string;
+  nome: string;
+  icone: string;
+  precoUnitario: number;
+  quantidade: number;
+}
+
+export interface RascunhoPedido {
+  itens: ItemRascunho[];
+  itensBalcao: ItemBalcao[];
+  cliente: Cliente;
+  formaPagamento: FormaPagamento;
+  desconto: number;
+  observacao: string;
+}
+
+export interface EditorPedidoProps {
+  pedido: Pedido;
+  operador: string;
+  aoSalvar: (pedido: Pedido) => void;
+  aoDescartar: () => void;
+}
+
+export interface FormularioClienteProps {
+  clienteAtual: Cliente | null;
+  aoConfirmar: (cliente: Cliente | null) => void;
+  aoCancelar: () => void;
 }
 
 export interface NovoPedido {

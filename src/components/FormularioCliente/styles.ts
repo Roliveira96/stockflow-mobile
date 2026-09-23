@@ -7,6 +7,13 @@ export function criarEstilos(cores: Cores) {
     flex: {
       flex: 1,
     },
+    container: {
+      gap: 14,
+    },
+    acoes: {
+      flexDirection: "row",
+      gap: 10,
+    },
     opcaoAnonimo: {
       flexDirection: "row",
       alignItems: "center",

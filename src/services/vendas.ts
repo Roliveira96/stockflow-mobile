@@ -8,9 +8,11 @@ import type {
   NovoPedido,
   Pedido,
   Produto,
+  RascunhoPedido,
 } from "@/types";
-import { planejarBaixaFefo } from "@/utils/lote";
-import { calcularSubtotal, gerarNumeroPedido } from "@/utils/venda";
+import { mesclarBaixas, planejarBaixaFefo, planejarEstornoParcial } from "@/utils/lote";
+import { formatarMoeda } from "@/utils/moeda";
+import { calcularSubtotal, gerarNumeroPedido, rotuloFormaPagamento } from "@/utils/venda";
 
 export async function listarProdutosVendaveis(): Promise<Produto[]> {
   const resposta = await api.get<Produto[]>("/produtos", {
@@ -88,24 +90,36 @@ async function baixarEstoque(
   return { produto, baixas };
 }
 
-async function estornarEstoque(item: ItemPedido, descricao: string, data: string) {
+async function estornarEstoque(
+  item: ItemPedido,
+  quantidade: number,
+  descricao: string,
+  data: string
+): Promise<BaixaLote[]> {
   const respostaProduto = await api.get<Produto>(`/produtos/${item.produtoId}`);
   const produto = respostaProduto.data;
-  const novaQuantidade = produto.quantidade + item.quantidade;
+  const novaQuantidade = produto.quantidade + quantidade;
+  const { devolucoes, lotesRestantes } = planejarEstornoParcial(
+    item.quantidade,
+    item.lotes,
+    quantidade
+  );
 
   await api.patch(`/produtos/${produto.id}`, { quantidade: novaQuantidade, atualizadoEm: data });
 
-  for (const baixa of item.lotes) {
-    const respostaLote = await api.get<Lote>(`/lotes/${baixa.loteId}`).catch(() => null);
+  for (const devolucao of devolucoes) {
+    const respostaLote = await api.get<Lote>(`/lotes/${devolucao.loteId}`).catch(() => null);
 
     if (respostaLote) {
-      await api.patch(`/lotes/${baixa.loteId}`, {
-        saldoRestante: respostaLote.data.saldoRestante + baixa.quantidade,
+      await api.patch(`/lotes/${devolucao.loteId}`, {
+        saldoRestante: respostaLote.data.saldoRestante + devolucao.quantidade,
       });
     }
   }
 
   await registrarLogQuantidade(produto, novaQuantidade, descricao, data);
+
+  return lotesRestantes;
 }
 
 export async function criarPedido({
@@ -193,7 +207,7 @@ export async function cancelarPedido(
   });
 
   for (const item of pedido.itens) {
-    await estornarEstoque(item, `cancelamento ${pedido.numero}`, agora);
+    await estornarEstoque(item, item.quantidade, `cancelamento ${pedido.numero}`, agora);
   }
 
   return atualizado;
@@ -219,4 +233,118 @@ export async function reabrirPedido(pedido: Pedido, operador: string): Promise<P
     itens: itensRebaixados,
     eventos: adicionarEvento(pedido, { tipo: "reaberto", data: agora, responsavel: operador }),
   });
+}
+
+function descreverAlteracoes(pedido: Pedido, rascunho: RascunhoPedido): string[] {
+  const alteracoes: string[] = [];
+
+  rascunho.itens.forEach((item) => {
+    const original = pedido.itens.find((atual) => atual.produtoId === item.produtoId);
+    if (!original) {
+      alteracoes.push(`+ ${item.nome} (${item.quantidade} un.)`);
+    } else if (original.quantidade !== item.quantidade) {
+      alteracoes.push(`${item.nome}: ${original.quantidade} → ${item.quantidade} un.`);
+    }
+  });
+
+  pedido.itens.forEach((original) => {
+    if (!rascunho.itens.some((item) => item.produtoId === original.produtoId)) {
+      alteracoes.push(`− ${original.nome}`);
+    }
+  });
+
+  pedido.itensBalcao.forEach((original) => {
+    if (!rascunho.itensBalcao.includes(original)) {
+      alteracoes.push(`− ${original.nome}`);
+    }
+  });
+
+  const clienteAntes = `${pedido.cliente.nome}${pedido.cliente.cpf ? ` (CPF)` : ""}`;
+  const clienteDepois = `${rascunho.cliente.nome}${rascunho.cliente.cpf ? ` (CPF)` : ""}`;
+  if (
+    pedido.cliente.cpf !== rascunho.cliente.cpf ||
+    pedido.cliente.nome !== rascunho.cliente.nome
+  ) {
+    alteracoes.push(`Cliente: ${clienteAntes} → ${clienteDepois}`);
+  }
+
+  if (pedido.formaPagamento !== rascunho.formaPagamento) {
+    alteracoes.push(
+      `Pagamento: ${rotuloFormaPagamento(pedido.formaPagamento)} → ${rotuloFormaPagamento(rascunho.formaPagamento)}`
+    );
+  }
+
+  if (Math.abs(pedido.desconto - rascunho.desconto) >= 0.005) {
+    alteracoes.push(
+      `Desconto: ${formatarMoeda(pedido.desconto)} → ${formatarMoeda(rascunho.desconto)}`
+    );
+  }
+
+  if ((pedido.observacao ?? "") !== rascunho.observacao) {
+    alteracoes.push(rascunho.observacao ? "Observação atualizada" : "Observação removida");
+  }
+
+  return alteracoes;
+}
+
+export async function editarPedido(
+  pedido: Pedido,
+  rascunho: RascunhoPedido,
+  operador: string
+): Promise<Pedido> {
+  const agora = new Date().toISOString();
+  const descricaoLog = `edição ${pedido.numero}`;
+  const alteracoes = descreverAlteracoes(pedido, rascunho);
+  const itensAtualizados: ItemPedido[] = [];
+
+  for (const item of rascunho.itens) {
+    const original = pedido.itens.find((atual) => atual.produtoId === item.produtoId);
+    const quantidadeOriginal = original?.quantidade ?? 0;
+    const diferenca = item.quantidade - quantidadeOriginal;
+    let lotes = original?.lotes ?? [];
+
+    if (diferenca > 0) {
+      const { baixas } = await baixarEstoque(item.produtoId, diferenca, descricaoLog, agora);
+      lotes = mesclarBaixas(lotes, baixas);
+    } else if (diferenca < 0 && original) {
+      lotes = await estornarEstoque(original, -diferenca, descricaoLog, agora);
+    }
+
+    itensAtualizados.push({
+      ...item,
+      embalado: original ? original.embalado && diferenca === 0 : false,
+      lotes,
+    });
+  }
+
+  for (const original of pedido.itens) {
+    if (!rascunho.itens.some((item) => item.produtoId === original.produtoId)) {
+      await estornarEstoque(original, original.quantidade, descricaoLog, agora);
+    }
+  }
+
+  const subtotal =
+    rascunho.itens.reduce((soma, item) => soma + item.precoUnitario * item.quantidade, 0) +
+    rascunho.itensBalcao.reduce((soma, item) => soma + item.preco, 0);
+
+  const atualizado = await atualizarPedido(pedido.id, {
+    cliente: rascunho.cliente,
+    itens: itensAtualizados,
+    itensBalcao: rascunho.itensBalcao,
+    formaPagamento: rascunho.formaPagamento,
+    observacao: rascunho.observacao,
+    subtotal,
+    desconto: rascunho.desconto,
+    total: Math.max(0, subtotal - rascunho.desconto),
+    eventos: adicionarEvento(pedido, {
+      tipo: "editado",
+      data: agora,
+      responsavel: operador,
+      descricao: alteracoes.join("; ") || "Sem alterações",
+    }),
+  });
+
+  await salvarCliente(rascunho.cliente).catch(() => undefined);
+
+  return atualizado;
 }
