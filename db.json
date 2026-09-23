@@ -235,12 +235,12 @@
       "id": "seed-17",
       "nome": "Balança Digital Bluetooth 17",
       "codigoBarras": "7897557426379",
-      "quantidade": 63,
+      "quantidade": 60,
       "preco": 470.81,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-22T20:50:49.740Z"
+      "atualizadoEm": "2026-09-23T20:16:43.667Z"
     },
     {
       "id": "seed-18",
@@ -631,12 +631,12 @@
       "id": "seed-53",
       "nome": "Adaptador Duplo 53",
       "codigoBarras": "7899064899345",
-      "quantidade": 86,
+      "quantidade": 84,
       "preco": 454.77,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:42:01.293Z"
+      "atualizadoEm": "2026-09-23T20:16:43.667Z"
     },
     {
       "id": "seed-54",
@@ -939,12 +939,12 @@
       "id": "seed-81",
       "nome": "Balança Digital Básico 81",
       "codigoBarras": "7893344069186",
-      "quantidade": 56,
+      "quantidade": 54,
       "preco": 287.26,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-22T20:50:49.740Z"
+      "atualizadoEm": "2026-09-23T20:16:43.667Z"
     },
     {
       "id": "seed-82",
@@ -2787,12 +2787,12 @@
       "id": "seed-249",
       "nome": "Adaptador Compacto 249",
       "codigoBarras": "7898017784614",
-      "quantidade": 10,
+      "quantidade": 8,
       "preco": 847.83,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:42:01.293Z"
+      "atualizadoEm": "2026-09-23T20:16:43.667Z"
     },
     {
       "id": "seed-250",
@@ -2875,12 +2875,12 @@
       "id": "seed-257",
       "nome": "Adaptador Compacto 257",
       "codigoBarras": "7897392879892",
-      "quantidade": 34,
+      "quantidade": 32,
       "preco": 284.99,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:42:01.293Z"
+      "atualizadoEm": "2026-09-23T20:16:43.667Z"
     },
     {
       "id": "seed-258",
@@ -3368,6 +3368,50 @@
       "criadoEm": "2026-09-23T13:06:31.258Z",
       "atualizadoEm": "2026-09-23T13:06:31.258Z",
       "id": "Qpg1kfW"
+    },
+    {
+      "nome": "Mouse do TSI",
+      "codigoBarras": "7890252388615",
+      "codigoAuxiliar": "12312312",
+      "quantidade": 3245357,
+      "preco": 123.12,
+      "precoCusto": 1.23,
+      "descricao": "SADASDA dwaqdasd asd Sad asdasd asd asdasd asdas",
+      "categoria": "teste",
+      "categoriaIcone": "⌨️",
+      "ativo": true,
+      "criadoEm": "2026-09-23T20:14:58.410Z",
+      "atualizadoEm": "2026-09-23T20:15:23.763Z",
+      "id": "1FzcJC7"
+    },
+    {
+      "nome": "ewerfewrwe",
+      "codigoBarras": "7898307588662",
+      "codigoAuxiliar": "32ewrf",
+      "quantidade": 123,
+      "preco": 12.31,
+      "precoCusto": 0.23,
+      "descricao": "qsadasda",
+      "categoria": "Cabos",
+      "categoriaIcone": "⚡",
+      "ativo": true,
+      "criadoEm": "2026-09-23T20:43:59.034Z",
+      "atualizadoEm": "2026-09-23T20:43:59.034Z",
+      "id": "sY6RZ0l"
+    },
+    {
+      "nome": "fasdf",
+      "codigoBarras": "7894455390682",
+      "codigoAuxiliar": "sadfsad2",
+      "quantidade": 23,
+      "preco": 34.23,
+      "precoCusto": 2.34,
+      "categoria": "Conectividade",
+      "categoriaIcone": "🔌",
+      "ativo": true,
+      "criadoEm": "2026-09-23T20:49:24.304Z",
+      "atualizadoEm": "2026-09-23T20:49:24.304Z",
+      "id": "il1uDE6"
     }
   ],
   "logs": [
@@ -3681,6 +3725,84 @@
         }
       ],
       "id": 22
+    },
+    {
+      "produtoId": "1FzcJC7",
+      "produtoNome": "Mouse do TSI",
+      "data": "2026-09-23T20:15:23.763Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade",
+          "de": "12",
+          "para": "3245357"
+        }
+      ],
+      "id": 23
+    },
+    {
+      "produtoId": "seed-249",
+      "produtoNome": "Adaptador Compacto 249",
+      "data": "2026-09-23T20:16:43.667Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0003)",
+          "de": "10",
+          "para": "8"
+        }
+      ],
+      "id": 24
+    },
+    {
+      "produtoId": "seed-257",
+      "produtoNome": "Adaptador Compacto 257",
+      "data": "2026-09-23T20:16:43.667Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0003)",
+          "de": "34",
+          "para": "32"
+        }
+      ],
+      "id": 25
+    },
+    {
+      "produtoId": "seed-53",
+      "produtoNome": "Adaptador Duplo 53",
+      "data": "2026-09-23T20:16:43.667Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0003)",
+          "de": "86",
+          "para": "84"
+        }
+      ],
+      "id": 26
+    },
+    {
+      "produtoId": "seed-17",
+      "produtoNome": "Balança Digital Bluetooth 17",
+      "data": "2026-09-23T20:16:43.667Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0003)",
+          "de": "63",
+          "para": "60"
+        }
+      ],
+      "id": 27
+    },
+    {
+      "produtoId": "seed-81",
+      "produtoNome": "Balança Digital Básico 81",
+      "data": "2026-09-23T20:16:43.667Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0003)",
+          "de": "56",
+          "para": "54"
+        }
+      ],
+      "id": 28
     }
   ],
   "lotes": [
@@ -3713,6 +3835,46 @@
       "custoUnitario": 25,
       "criadoEm": "2026-09-23T13:06:31.258Z",
       "id": 3
+    },
+    {
+      "produtoId": "1FzcJC7",
+      "codigo": "LOTE-20260923-72JJ",
+      "validade": null,
+      "quantidadeEntrada": 12,
+      "saldoRestante": 12,
+      "custoUnitario": 1.23,
+      "criadoEm": "2026-09-23T20:14:58.410Z",
+      "id": 4
+    },
+    {
+      "produtoId": "1FzcJC7",
+      "codigo": "LOTE-20260923-V1DQ",
+      "validade": "2026-09-30",
+      "quantidadeEntrada": 3245345,
+      "saldoRestante": 3245345,
+      "custoUnitario": 34.34,
+      "criadoEm": "2026-09-23T20:15:23.763Z",
+      "id": 5
+    },
+    {
+      "produtoId": "sY6RZ0l",
+      "codigo": "LOTE-20260923-2MY8",
+      "validade": null,
+      "quantidadeEntrada": 123,
+      "saldoRestante": 123,
+      "custoUnitario": 0.23,
+      "criadoEm": "2026-09-23T20:43:59.034Z",
+      "id": 6
+    },
+    {
+      "produtoId": "il1uDE6",
+      "codigo": "LOTE-20260923-OGYS",
+      "validade": null,
+      "quantidadeEntrada": 23,
+      "saldoRestante": 23,
+      "custoUnitario": 2.34,
+      "criadoEm": "2026-09-23T20:49:24.304Z",
+      "id": 7
     }
   ],
   "categorias": [
@@ -3740,6 +3902,11 @@
       "id": "cat-outros",
       "nome": "Outros",
       "icone": "📦"
+    },
+    {
+      "nome": "teste",
+      "icone": "⌨️",
+      "id": "Cbco_41"
     }
   ],
   "pedidos": [
@@ -3906,6 +4073,88 @@
       ],
       "id": 2,
       "observacao": "Desconto vip"
+    },
+    {
+      "numero": "PED-0003",
+      "criadoEm": "2026-09-23T20:16:43.667Z",
+      "vendedor": "Ricardo",
+      "cliente": {
+        "nome": "Mariana Costa",
+        "cpf": "07701661301",
+        "telefone": "21998877665"
+      },
+      "itens": [
+        {
+          "produtoId": "seed-249",
+          "nome": "Adaptador Compacto 249",
+          "icone": "📦",
+          "precoUnitario": 847.83,
+          "quantidade": 2,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-257",
+          "nome": "Adaptador Compacto 257",
+          "icone": "📦",
+          "precoUnitario": 284.99,
+          "quantidade": 2,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-53",
+          "nome": "Adaptador Duplo 53",
+          "icone": "📦",
+          "precoUnitario": 454.77,
+          "quantidade": 2,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-17",
+          "nome": "Balança Digital Bluetooth 17",
+          "icone": "📦",
+          "precoUnitario": 470.81,
+          "quantidade": 3,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-81",
+          "nome": "Balança Digital Básico 81",
+          "icone": "📦",
+          "precoUnitario": 287.26,
+          "quantidade": 2,
+          "embalado": true,
+          "lotes": []
+        }
+      ],
+      "itensBalcao": [
+        {
+          "nome": "Embalagem para presente",
+          "preco": 5
+        }
+      ],
+      "subtotal": 5167.130000000001,
+      "desconto": 619.4556000000001,
+      "total": 4547.674400000001,
+      "formaPagamento": "PIX",
+      "status": "PAGO",
+      "pagoEm": "2026-09-23T20:17:46.836Z",
+      "eventos": [
+        {
+          "tipo": "criado",
+          "data": "2026-09-23T20:16:43.667Z",
+          "responsavel": "Ricardo"
+        },
+        {
+          "tipo": "pago",
+          "data": "2026-09-23T20:17:46.836Z",
+          "responsavel": "Ricardo"
+        }
+      ],
+      "id": 3
     }
   ],
   "clientes": [

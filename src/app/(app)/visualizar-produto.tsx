@@ -19,6 +19,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { api } from "@/services/api";
 import { criarEstilos } from "@/styles/visualizar-produto.styles";
 import type { Lote, LogEdicao, Produto } from "@/types";
+import { confirmarAcao } from "@/utils/confirmacao";
 import { formatarData, formatarDataCurta } from "@/utils/data";
 import { calcularNivelEstoque } from "@/utils/estoque";
 import {
@@ -89,32 +90,29 @@ export default function VisualizarProduto() {
     }, [id, router])
   );
 
-  function handleExcluir() {
-    Alert.alert(
-      "Remover produto",
-      `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Remover",
-          style: "destructive",
-          onPress: async () => {
-            setExcluindo(true);
+  async function handleExcluir() {
+    const confirmado = await confirmarAcao({
+      titulo: "Remover produto",
+      mensagem: `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
+      textoConfirmar: "Remover",
+    });
 
-            try {
-              await api.delete(`/produtos/${id}`);
-              mostrarToast("Produto excluído com sucesso");
-              router.back();
-            } catch {
-              Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
-            } finally {
-              setExcluindo(false);
-            }
-          },
-        },
-      ]
-    );
+    if (!confirmado) return;
+
+    setExcluindo(true);
+
+    try {
+      await api.delete(`/produtos/${id}`);
+      mostrarToast("Produto excluído com sucesso");
+      router.back();
+    } catch {
+      mostrarToast("Não foi possível remover o produto");
+      Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
+    } finally {
+      setExcluindo(false);
+    }
   }
+
 
   if (carregando || !produto) {
     return (

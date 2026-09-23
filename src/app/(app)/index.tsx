@@ -30,6 +30,7 @@ import {
 } from "@/services/produtos";
 import { criarEstilos } from "@/styles/produtos.styles";
 import type { Produto, ResumoVencimento, StatusFiltro } from "@/types";
+import { confirmarAcao } from "@/utils/confirmacao";
 import { agruparVencimentosPorProduto } from "@/utils/lote";
 
 export default function ListaDeProdutos() {
@@ -157,31 +158,28 @@ export default function ListaDeProdutos() {
     }
   }
 
-  function handleExcluir(id: string) {
+  async function handleExcluir(id: string) {
     const produto = produtos.find((item) => item.id === id);
 
-    Alert.alert(
-      "Remover produto",
-      `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Remover",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await api.delete(`/produtos/${id}`);
-              setProdutos((atual) => atual.filter((item) => item.id !== id));
-              setTotalItens((atual) => Math.max(0, atual - 1));
-              mostrarToast("Produto excluído com sucesso");
-            } catch {
-              Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
-            }
-          },
-        },
-      ]
-    );
+    const confirmado = await confirmarAcao({
+      titulo: "Remover produto",
+      mensagem: `Tem certeza que deseja remover "${produto?.nome ?? "este produto"}"? Essa ação não pode ser desfeita.`,
+      textoConfirmar: "Remover",
+    });
+
+    if (!confirmado) return;
+
+    try {
+      await api.delete(`/produtos/${id}`);
+      setProdutos((atual) => atual.filter((item) => item.id !== id));
+      setTotalItens((atual) => Math.max(0, atual - 1));
+      mostrarToast("Produto excluído com sucesso");
+    } catch {
+      mostrarToast("Não foi possível remover o produto");
+      Alert.alert("Erro de conexão", "Não foi possível remover o produto.");
+    }
   }
+
 
   function handleEditar(id: string) {
     router.push({ pathname: "/editar-produto", params: { id } });

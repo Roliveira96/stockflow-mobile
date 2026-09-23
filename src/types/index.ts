@@ -396,3 +396,9 @@ export interface ProdutoComprado {
   ultimaCompra: string;
   ultimoPreco: number;
 }
+
+export interface ConfirmacaoAcao {
+  titulo: string;
+  mensagem: string;
+  textoConfirmar: string;
+}
