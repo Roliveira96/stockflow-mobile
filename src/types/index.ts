@@ -381,8 +381,10 @@ export interface QrCodeProps {
 }
 
 export interface PagamentoPixProps {
-  valor: number;
-  numeroPedido: string;
+  pedido: Pedido;
+  itensConferidos: number;
+  gerado: boolean;
+  aoGerar: () => void;
 }
 
 export interface ProdutoComprado {

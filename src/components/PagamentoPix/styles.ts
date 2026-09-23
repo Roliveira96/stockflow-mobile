@@ -5,8 +5,8 @@ import { fonteMono, raios, sombra, type Cores } from "@/constants/theme";
 export function criarEstilos(cores: Cores) {
   return StyleSheet.create({
     cartao: {
-      alignItems: "center",
-      gap: 10,
+      alignItems: "stretch",
+      gap: 12,
       padding: 16,
       borderRadius: raios.md,
       borderWidth: 1,
@@ -34,6 +34,51 @@ export function criarEstilos(cores: Cores) {
     subtitulo: {
       fontSize: 11,
       color: cores.textoTerciario,
+    },
+    valorCabecalho: {
+      fontSize: 15,
+      fontWeight: "800",
+      fontFamily: fonteMono,
+      color: cores.textoPrimario,
+    },
+    conferencia: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      padding: 10,
+      borderRadius: raios.sm,
+      backgroundColor: cores.superficieAlternativa,
+    },
+    conferenciaTexto: {
+      flex: 1,
+      fontSize: 12,
+      fontWeight: "700",
+      color: cores.alerta,
+    },
+    conferenciaTextoOk: {
+      color: cores.sucesso,
+    },
+    gerando: {
+      alignItems: "center",
+      gap: 12,
+      paddingVertical: 28,
+    },
+    gerandoIcone: {
+      width: 84,
+      height: 84,
+      borderRadius: raios.pill,
+      backgroundColor: cores.sucessoFundo,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    gerandoTexto: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: cores.sucesso,
+    },
+    resultado: {
+      alignItems: "center",
+      gap: 10,
     },
     moldura: {
       padding: 10,
@@ -74,6 +119,9 @@ export function criarEstilos(cores: Cores) {
       lineHeight: 15,
       fontFamily: fonteMono,
       color: cores.textoSecundario,
+    },
+    botaoWhatsapp: {
+      alignSelf: "stretch",
     },
     aviso: {
       alignSelf: "stretch",

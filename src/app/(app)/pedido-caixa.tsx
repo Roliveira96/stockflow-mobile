@@ -60,6 +60,7 @@ export default function PedidoCaixa() {
   const styles = useMemo(() => criarEstilos(cores), [cores]);
   const [salvando, setSalvando] = useState(false);
   const [gerandoComprovante, setGerandoComprovante] = useState(false);
+  const [pixGeradoPara, setPixGeradoPara] = useState<string | null>(null);
   const [cancelando, setCancelando] = useState(false);
   const [editando, setEditando] = useState(false);
   const [motivoSelecionado, setMotivoSelecionado] = useState<string | null>(null);
@@ -109,6 +110,12 @@ export default function PedidoCaixa() {
   const status = pedido?.status;
   const aguardando = status === "AGUARDANDO";
   const embalados = pedido?.itens.filter((item) => item.embalado).length ?? 0;
+  const cobrancaPixAtual = pedido ? `${pedido.id}:${pedido.total.toFixed(2)}` : null;
+  const pixGerado = cobrancaPixAtual !== null && pixGeradoPara === cobrancaPixAtual;
+  const aguardandoPix = pedido?.formaPagamento === "PIX" && !pixGerado;
+  const handleGerarPix = useCallback(() => {
+    setPixGeradoPara(cobrancaPixAtual);
+  }, [cobrancaPixAtual]);
   const motivoFinal =
     motivoSelecionado === MOTIVO_OUTRO ? motivoLivre.trim() : (motivoSelecionado ?? "");
 
@@ -259,6 +266,7 @@ export default function PedidoCaixa() {
               )
             }
             carregando={salvando}
+            desabilitado={aguardandoPix}
             icone="checkmark"
             variante="sucesso"
             compacto
@@ -438,7 +446,12 @@ export default function PedidoCaixa() {
               </View>
 
               {aguardando && pedido.formaPagamento === "PIX" ? (
-                <PagamentoPix valor={pedido.total} numeroPedido={pedido.numero} />
+                <PagamentoPix
+                  pedido={pedido}
+                  itensConferidos={embalados}
+                  gerado={pixGerado}
+                  aoGerar={handleGerarPix}
+                />
               ) : null}
 
               <View style={styles.secao}>

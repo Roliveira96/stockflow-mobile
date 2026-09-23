@@ -92,12 +92,12 @@
       "id": "seed-4",
       "nome": "Adaptador Ergonômico 4",
       "codigoBarras": "7890575760661",
-      "quantidade": 88,
+      "quantidade": 87,
       "preco": 234.65,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:22:34.893Z"
+      "atualizadoEm": "2026-09-23T14:42:01.293Z"
     },
     {
       "id": "seed-5",
@@ -631,12 +631,12 @@
       "id": "seed-53",
       "nome": "Adaptador Duplo 53",
       "codigoBarras": "7899064899345",
-      "quantidade": 88,
+      "quantidade": 86,
       "preco": 454.77,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:01:56.146Z"
+      "atualizadoEm": "2026-09-23T14:42:01.293Z"
     },
     {
       "id": "seed-54",
@@ -2787,12 +2787,12 @@
       "id": "seed-249",
       "nome": "Adaptador Compacto 249",
       "codigoBarras": "7898017784614",
-      "quantidade": 11,
+      "quantidade": 10,
       "preco": 847.83,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:22:34.893Z"
+      "atualizadoEm": "2026-09-23T14:42:01.293Z"
     },
     {
       "id": "seed-250",
@@ -2875,12 +2875,12 @@
       "id": "seed-257",
       "nome": "Adaptador Compacto 257",
       "codigoBarras": "7897392879892",
-      "quantidade": 35,
+      "quantidade": 34,
       "preco": 284.99,
       "descricao": "",
       "ativo": true,
       "criadoEm": "2026-09-22T20:50:49.740Z",
-      "atualizadoEm": "2026-09-23T14:01:56.146Z"
+      "atualizadoEm": "2026-09-23T14:42:01.293Z"
     },
     {
       "id": "seed-258",
@@ -3629,6 +3629,58 @@
         }
       ],
       "id": 18
+    },
+    {
+      "produtoId": "seed-249",
+      "produtoNome": "Adaptador Compacto 249",
+      "data": "2026-09-23T14:42:01.293Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0002)",
+          "de": "11",
+          "para": "10"
+        }
+      ],
+      "id": 19
+    },
+    {
+      "produtoId": "seed-257",
+      "produtoNome": "Adaptador Compacto 257",
+      "data": "2026-09-23T14:42:01.293Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0002)",
+          "de": "35",
+          "para": "34"
+        }
+      ],
+      "id": 20
+    },
+    {
+      "produtoId": "seed-53",
+      "produtoNome": "Adaptador Duplo 53",
+      "data": "2026-09-23T14:42:01.293Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0002)",
+          "de": "88",
+          "para": "86"
+        }
+      ],
+      "id": 21
+    },
+    {
+      "produtoId": "seed-4",
+      "produtoNome": "Adaptador Ergonômico 4",
+      "data": "2026-09-23T14:42:01.293Z",
+      "alteracoes": [
+        {
+          "campo": "Quantidade (venda PED-0002)",
+          "de": "88",
+          "para": "87"
+        }
+      ],
+      "id": 22
     }
   ],
   "lotes": [
@@ -3774,6 +3826,81 @@
       ],
       "id": 1,
       "observacao": "Tal coisa"
+    },
+    {
+      "numero": "PED-0002",
+      "criadoEm": "2026-09-23T14:42:01.293Z",
+      "vendedor": "Ricardo",
+      "cliente": {
+        "nome": "Mariana Costa",
+        "cpf": "07701661301",
+        "telefone": "21998877665"
+      },
+      "itens": [
+        {
+          "produtoId": "seed-249",
+          "nome": "Adaptador Compacto 249",
+          "icone": "📦",
+          "precoUnitario": 847.83,
+          "quantidade": 1,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-257",
+          "nome": "Adaptador Compacto 257",
+          "icone": "📦",
+          "precoUnitario": 284.99,
+          "quantidade": 1,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-53",
+          "nome": "Adaptador Duplo 53",
+          "icone": "📦",
+          "precoUnitario": 454.77,
+          "quantidade": 2,
+          "embalado": true,
+          "lotes": []
+        },
+        {
+          "produtoId": "seed-4",
+          "nome": "Adaptador Ergonômico 4",
+          "icone": "📦",
+          "precoUnitario": 234.65,
+          "quantidade": 1,
+          "embalado": true,
+          "lotes": []
+        }
+      ],
+      "itensBalcao": [
+        {
+          "nome": "Embalagem para presente",
+          "preco": 5
+        }
+      ],
+      "subtotal": 2282.01,
+      "desconto": 227.70100000000002,
+      "total": 2054.309,
+      "formaPagamento": "PIX",
+      "status": "AGUARDANDO",
+      "pagoEm": null,
+      "eventos": [
+        {
+          "tipo": "criado",
+          "data": "2026-09-23T14:42:01.293Z",
+          "responsavel": "Ricardo"
+        },
+        {
+          "tipo": "editado",
+          "data": "2026-09-23T14:43:50.753Z",
+          "responsavel": "Ricardo",
+          "descricao": "Desconto: R$ 0,00 → R$ 227,70; Observação atualizada"
+        }
+      ],
+      "id": 2,
+      "observacao": "Desconto vip"
     }
   ],
   "clientes": [
