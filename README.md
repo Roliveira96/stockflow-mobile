@@ -5,7 +5,7 @@ Aplicativo móvel completo para gestão de estoque, controle de lotes, catálogo
 ---
 
 ## Demonstração em Vídeo
-- **Link da Defesa em Vídeo:** [Adicione o link do vídeo aqui (YouTube / Google Drive)]
+- **Link da Defesa em Vídeo:** [Assistir no Google Drive](https://drive.google.com/file/d/1l6-zk-J8-KbHcNZ0-mYz5Ef35eS9dS-e/view?usp=sharing)
 > Vídeo de até 15 minutos apresentando a aplicação em execução e demonstrando o cumprimento de cada um dos 10 requisitos da avaliação.
 
 ---
